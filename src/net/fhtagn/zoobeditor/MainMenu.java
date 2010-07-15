@@ -54,7 +54,7 @@ public class MainMenu extends Activity {
 								    }
 							    })
 							  .setCancelable(true)
-							  .setNegativeButton(R.string.cancel,
+							  .setNegativeButton(android.R.string.cancel,
 							    new DialogInterface.OnClickListener() {
 								    public void onClick(DialogInterface dialog, int id) {
 									    dialog.cancel();

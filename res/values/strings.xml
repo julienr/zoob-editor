@@ -3,12 +3,14 @@
     
     <string name="app_name">net.fhtagn.zoobeditor</string>
 <string name="btn_newlevel_txt">New level</string>
-<string name="ok">Ok</string>
-<string name="cancel">Cancel</string>
+
+
 <string name="xdim">Width</string>
 <string name="ydim">Height</string>
 <string name="newlvl_dlg_title">New level</string>
 <string name="btn_wall">Wall</string>
 <string name="btn_erase">Erase</string>
 <string name="editor_wall_dlg_title">Choose wall type</string>
+<string name="btn_tank">Tank</string>
+<string name="btn_save">Save</string>
 </resources>

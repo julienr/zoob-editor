@@ -14,10 +14,6 @@ public class WallTool implements EditorTool {
 		this.type = type;
 	}
 	
-	public WallTool (String type) {
-		this.type = WallCell.str2wall(type);
-	}
-
 	@Override
   public GridCell apply(GridCell cell) {
 		return new WallCell(type);
