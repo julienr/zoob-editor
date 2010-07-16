@@ -1,4 +1,4 @@
-package net.fhtagn.zoobeditor.types;
+package net.fhtagn.zoobeditor.utils;
 
 import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.cell.TankCell;
@@ -16,11 +16,11 @@ public class TankView extends View {
 	public TankView (Context context, Types.TankType type) {
 		super(context);
 		this.context = context;
-		cell = new TankCell(context, type);
+		cell = new TankCell(new Coords(0,0), context, type);
 	}
 	
 	public void setType (Types.TankType type) {
-		cell = new TankCell(context, type);
+		cell = new TankCell(new Coords(0,0), context, type);
 	}
 	
 	@Override

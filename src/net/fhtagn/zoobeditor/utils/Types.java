@@ -1,4 +1,4 @@
-package net.fhtagn.zoobeditor.types;
+package net.fhtagn.zoobeditor.utils;
 
 import android.graphics.Color;
 import android.util.Log;

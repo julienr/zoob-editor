@@ -1,11 +1,12 @@
 package net.fhtagn.zoobeditor;
 
 import net.fhtagn.zoobeditor.tools.EraseTool;
+import net.fhtagn.zoobeditor.tools.PathTool;
 import net.fhtagn.zoobeditor.tools.TankTool;
 import net.fhtagn.zoobeditor.tools.WallTool;
-import net.fhtagn.zoobeditor.types.TankView;
-import net.fhtagn.zoobeditor.types.Types;
-import net.fhtagn.zoobeditor.types.WallView;
+import net.fhtagn.zoobeditor.utils.TankView;
+import net.fhtagn.zoobeditor.utils.Types;
+import net.fhtagn.zoobeditor.utils.WallView;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -23,6 +24,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class Editor extends Activity {
@@ -31,6 +33,10 @@ public class Editor extends Activity {
 	static final int DIALOG_TANK_ID = 1;
 	
 	private LevelView levelView;
+	
+	private LinearLayout buttonsLayout;
+	
+	private PathTool pathTool = null;
 	
 	@Override
 	public void onCreate(Bundle bundle) {
@@ -41,19 +47,58 @@ public class Editor extends Activity {
 		Log.i(TAG, "xdim="+xdim+", ydim="+ydim);
 		
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);    
-
-		//setContentView(new LevelView(getApplicationContext(), xdim, ydim));
 		setContentView(R.layout.editor);
+		
+		buttonsLayout = (LinearLayout)findViewById(R.id.editor_btns);
+		
 		FrameLayout levelFrame = (FrameLayout)findViewById(R.id.levelframe);
 		levelView = new LevelView(getApplicationContext(), xdim, ydim);
 		levelFrame.addView(levelView);
 		
+		toNormalMode();
 		levelView.requestFocus(); //force trackball focus on level view
-		
-		setupCallbacks();
 	}
 	
-	private void setupCallbacks () {
+	private void toPathMode (PathTool tool) {
+		pathTool = tool;
+		buttonsLayout.removeAllViews();
+		buttonsLayout.addView(getLayoutInflater().inflate(R.layout.editor_path_btns, null));
+		levelView.postInvalidate();
+		setupPathCallbacks();
+	}
+	
+	private void toNormalMode () {
+		pathTool = null;
+		levelView.setEditorTool(null);
+		buttonsLayout.removeAllViews();
+		levelView.postInvalidate();
+		buttonsLayout.addView(getLayoutInflater().inflate(R.layout.editor_normal_btns, null));
+		setupNormalCallbacks();
+	}
+	
+	//Path editing mode buttons
+	private void setupPathCallbacks () {
+		Button resetButton = (Button)findViewById(R.id.btn_path_reset);
+		resetButton.setOnClickListener(new OnClickListener() {
+			@Override
+      public void onClick(View view) {
+				pathTool.resetPath();
+				levelView.postInvalidate();
+      }
+		});
+		
+		Button validateButton = (Button)findViewById(R.id.btn_path_validate);
+		validateButton.setOnClickListener(new OnClickListener() {
+			@Override
+      public void onClick(View view) {
+				pathTool.savePath();
+				toNormalMode();
+      }
+		});
+	}
+	
+	//Normal mode buttons
+	private void setupNormalCallbacks () {
 		Button wallButton = (Button)findViewById(R.id.btn_wall);
 		wallButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -75,6 +120,16 @@ public class Editor extends Activity {
 			@Override
 			public void onClick(View view) {
 				showDialog(DIALOG_TANK_ID);
+			}
+		});
+		
+		Button pathButton = (Button)findViewById(R.id.btn_path);
+		pathButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				PathTool tool = new PathTool();
+				levelView.setEditorTool(tool);
+				toPathMode(tool);
 			}
 		});
 	} 

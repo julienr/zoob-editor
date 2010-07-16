@@ -1,4 +1,4 @@
-package net.fhtagn.zoobeditor.types;
+package net.fhtagn.zoobeditor.utils;
 
 import net.fhtagn.zoobeditor.cell.WallCell;
 import android.content.Context;
@@ -11,11 +11,11 @@ public class WallView extends View {
 	
 	public WallView (Context context, Types.WallType type) {
 		super(context);
-		cell = new WallCell(type);
+		cell = new WallCell(new Coords(0,0), type);
 	}
 	
 	public void setType (Types.WallType type) {
-		cell = new WallCell(type);
+		cell = new WallCell(new Coords(0,0), type);
 	}
 	
 	@Override

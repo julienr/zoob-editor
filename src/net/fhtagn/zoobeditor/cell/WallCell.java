@@ -1,13 +1,14 @@
 package net.fhtagn.zoobeditor.cell;
 
-import net.fhtagn.zoobeditor.types.Types;
+import net.fhtagn.zoobeditor.utils.Coords;
+import net.fhtagn.zoobeditor.utils.Types;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.Log;
 
-public class WallCell implements GridCell {
+public class WallCell extends GridCell {
 	static final String TAG = "WallCell";
 	
 	private final Types.WallType type;
@@ -19,7 +20,8 @@ public class WallCell implements GridCell {
 		drawPaint.setColor(Color.BLACK);
 	}
 	
-	public WallCell (Types.WallType type) {
+	public WallCell (Coords c, Types.WallType type) {
+		super(c);
 		this.type = type;
 		
 		switch (type) {
@@ -43,5 +45,15 @@ public class WallCell implements GridCell {
 		//canvas.drawText(wall2str(type), 0, 0, paint);
 		canvas.drawRect(drawRect, drawPaint);
 	}
+
+	@Override
+  public boolean canHavePath() {
+	  return false;
+  }
+
+	@Override
+  public boolean isValidWaypoint() {
+	  return false;
+  }
 	
 }

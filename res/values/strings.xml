@@ -14,4 +14,7 @@
 <string name="btn_tank">Tank</string>
 <string name="btn_save">Save</string>
 <string name="editor_tank_dlg_title">Choose tank type</string>
+<string name="btn_path">Path</string>
+<string name="btn_path_reset">Reset</string>
+<string name="btn_path_validate">Done</string>
 </resources>

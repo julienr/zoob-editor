@@ -4,7 +4,8 @@ import net.fhtagn.zoobeditor.cell.EmptyCell;
 import net.fhtagn.zoobeditor.cell.GridCell;
 import net.fhtagn.zoobeditor.cell.WallCell;
 import net.fhtagn.zoobeditor.tools.EditorTool;
-import net.fhtagn.zoobeditor.types.Types;
+import net.fhtagn.zoobeditor.utils.Coords;
+import net.fhtagn.zoobeditor.utils.Types;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -48,17 +49,17 @@ public class LevelView extends View {
 						(x == xdim-1 && y==ydim-1) ||
 						(x == xdim-1 && y == 0) ||
 						(x == 0 && y == ydim-1)) //corners
-					grid[x][y] = new WallCell(Types.WallType.W);
+					grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.W);
 				else if (y == 0)
-					grid[x][y] = new WallCell(Types.WallType.T);
+					grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.T);
 				else if (y == ydim-1)
-					grid[x][y] = new WallCell(Types.WallType.B);
+					grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.B);
 				else if (x == 0)
-					grid[x][y] = new WallCell(Types.WallType.L);
+					grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.L);
 				else if (x == xdim-1)
-					grid[x][y] = new WallCell(Types.WallType.R);
+					grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.R);
 				else
-					grid[x][y] = new EmptyCell();
+					grid[x][y] = new EmptyCell(new Coords(x, y));
 			}
 		}
 		
@@ -113,6 +114,9 @@ public class LevelView extends View {
 				}
 			}
 		}
+		
+		if (currentTool != null)
+			currentTool.draw(canvas);
 		
 		if (selectedCell[0] != -1) {
 			Log.v(TAG, "drawing selected");

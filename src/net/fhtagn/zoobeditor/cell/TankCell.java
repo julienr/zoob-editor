@@ -11,9 +11,10 @@ import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import net.fhtagn.zoobeditor.R;
-import net.fhtagn.zoobeditor.types.Types;
+import net.fhtagn.zoobeditor.utils.Coords;
+import net.fhtagn.zoobeditor.utils.Types;
 
-public class TankCell implements GridCell {
+public class TankCell extends GridCell {
 	static final String TAG = "TankCell";
 	
 	private final Types.TankType type;
@@ -31,7 +32,8 @@ public class TankCell implements GridCell {
 	}
 
 	
-	public TankCell(Context context, Types.TankType type) {
+	public TankCell(Coords c, Context context, Types.TankType type) {
+		super(c);
 		this.type = type;
 		
 		if (type == Types.TankType.BOUNCE || 
@@ -78,4 +80,14 @@ public class TankCell implements GridCell {
 		if (Types.isBoss(type))
 			canvas.drawText("Boss", 0.5f, 0.9f, bossTextPaint);
 	}
+
+	@Override
+  public boolean canHavePath() {
+	  return true;
+  }
+
+	@Override
+  public boolean isValidWaypoint() {
+	  return true;
+  }
 }
