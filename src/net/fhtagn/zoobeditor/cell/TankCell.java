@@ -18,6 +18,7 @@ public class TankCell implements GridCell {
 	
 	private final Types.TankType type;
 	private final Drawable tank;
+	private Drawable shield = null;
 	
 	//Paint used to draw "boss" text overlay
 	private final static Paint bossTextPaint;
@@ -34,10 +35,16 @@ public class TankCell implements GridCell {
 		this.type = type;
 		
 		if (type == Types.TankType.BOUNCE || 
-				type == Types.TankType.BOSS_BOUNCE)
+				type == Types.TankType.BOSS_BOUNCE) {
 			tank = context.getResources().getDrawable(R.drawable.tank_bounce);
-		else
+		} else {
 			tank = context.getResources().getDrawable(R.drawable.tank);
+			if (type == Types.TankType.SHIELD ||
+					type == Types.TankType.BOSS_SHIELD) {
+				shield = context.getResources().getDrawable(R.drawable.shield);
+				shield.setBounds(0,0,1,1);
+			}
+		}
 		
 		tank.setBounds(0,0,1,1);
 	}
@@ -65,6 +72,9 @@ public class TankCell implements GridCell {
 		//share the same drawable
 		tank.setColorFilter(Types.tank2color(type), PorterDuff.Mode.MULTIPLY);
 		tank.draw(canvas);
+		if (shield != null) {
+			shield.draw(canvas);
+		}
 		if (Types.isBoss(type))
 			canvas.drawText("Boss", 0.5f, 0.9f, bossTextPaint);
 	}
