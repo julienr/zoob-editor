@@ -1,6 +1,6 @@
 package net.fhtagn.zoobeditor.cell;
 
-import net.fhtagn.zoobeditor.cell.WallCell.WallType;
+import net.fhtagn.zoobeditor.types.Types;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.view.View;
@@ -9,12 +9,12 @@ public class WallCellView extends View {
 	private WallCell cell;
 	int width, height;
 	
-	public WallCellView (Context context, WallType type) {
+	public WallCellView (Context context, Types.WallType type) {
 		super(context);
 		cell = new WallCell(type);
 	}
 	
-	public void setType (WallType type) {
+	public void setType (Types.WallType type) {
 		cell = new WallCell(type);
 	}
 	
@@ -24,7 +24,7 @@ public class WallCellView extends View {
 		height = h;
 	}
 	
-	public WallType getType () {
+	public Types.WallType getType () {
 		return cell.getType();
 	}
 	

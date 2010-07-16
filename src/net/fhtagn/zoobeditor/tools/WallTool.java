@@ -1,16 +1,15 @@
 package net.fhtagn.zoobeditor.tools;
 
-import net.fhtagn.zoobeditor.cell.WallCell.WallType;
 import net.fhtagn.zoobeditor.cell.GridCell;
 import net.fhtagn.zoobeditor.cell.WallCell;
-import android.util.Log;
+import net.fhtagn.zoobeditor.types.Types;
 
 public class WallTool implements EditorTool {
 	static final String TAG = "WallTool";
 	
-	private final WallType type;
+	private final Types.WallType type;
 	
-	public WallTool (WallType type) {
+	public WallTool (Types.WallType type) {
 		this.type = type;
 	}
 	

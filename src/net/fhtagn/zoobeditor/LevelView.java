@@ -3,12 +3,11 @@ package net.fhtagn.zoobeditor;
 import net.fhtagn.zoobeditor.cell.EmptyCell;
 import net.fhtagn.zoobeditor.cell.GridCell;
 import net.fhtagn.zoobeditor.cell.WallCell;
-import net.fhtagn.zoobeditor.cell.WallCell.WallType;
 import net.fhtagn.zoobeditor.tools.EditorTool;
+import net.fhtagn.zoobeditor.types.Types;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
@@ -49,15 +48,15 @@ public class LevelView extends View {
 						(x == xdim-1 && y==ydim-1) ||
 						(x == xdim-1 && y == 0) ||
 						(x == 0 && y == ydim-1)) //corners
-					grid[x][y] = new WallCell(WallType.W);
+					grid[x][y] = new WallCell(Types.WallType.W);
 				else if (y == 0)
-					grid[x][y] = new WallCell(WallType.T);
+					grid[x][y] = new WallCell(Types.WallType.T);
 				else if (y == ydim-1)
-					grid[x][y] = new WallCell(WallType.B);
+					grid[x][y] = new WallCell(Types.WallType.B);
 				else if (x == 0)
-					grid[x][y] = new WallCell(WallType.L);
+					grid[x][y] = new WallCell(Types.WallType.L);
 				else if (x == xdim-1)
-					grid[x][y] = new WallCell(WallType.R);
+					grid[x][y] = new WallCell(Types.WallType.R);
 				else
 					grid[x][y] = new EmptyCell();
 			}

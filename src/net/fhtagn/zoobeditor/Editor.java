@@ -1,11 +1,9 @@
 package net.fhtagn.zoobeditor;
 
-import net.fhtagn.zoobeditor.WallToolSelectorDialog.OnWallTypeSelectedListener;
 import net.fhtagn.zoobeditor.cell.WallCellView;
-import net.fhtagn.zoobeditor.cell.WallCell;
-import net.fhtagn.zoobeditor.cell.WallCell.WallType;
 import net.fhtagn.zoobeditor.tools.EraseTool;
 import net.fhtagn.zoobeditor.tools.WallTool;
+import net.fhtagn.zoobeditor.types.Types;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,14 +11,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -88,11 +84,11 @@ public class Editor extends Activity {
 		}
 		
 		public int getCount () {
-			return WallType.values().length;
+			return Types.WallType.values().length;
 		}
 		
 		public Object getItem (int position) {
-			return WallType.values()[position];
+			return Types.WallType.values()[position];
 		}
 		
 		@Override
@@ -101,7 +97,7 @@ public class Editor extends Activity {
     }
 		
 		public View getView (int position, View convertView, ViewGroup parent) {
-			WallType type = WallType.values()[position];
+			Types.WallType type = Types.WallType.values()[position];
 			WallCellView view;
 			if (convertView != null) {
 				view = (WallCellView)convertView;
