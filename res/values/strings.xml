@@ -13,4 +13,5 @@
 <string name="editor_wall_dlg_title">Choose wall type</string>
 <string name="btn_tank">Tank</string>
 <string name="btn_save">Save</string>
+<string name="editor_tank_dlg_title">Choose tank type</string>
 </resources>

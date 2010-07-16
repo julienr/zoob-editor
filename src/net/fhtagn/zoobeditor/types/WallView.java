@@ -1,15 +1,15 @@
-package net.fhtagn.zoobeditor.cell;
+package net.fhtagn.zoobeditor.types;
 
-import net.fhtagn.zoobeditor.types.Types;
+import net.fhtagn.zoobeditor.cell.WallCell;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.view.View;
 
-public class WallCellView extends View {
+public class WallView extends View {
 	private WallCell cell;
-	int width, height;
+	private int width, height;
 	
-	public WallCellView (Context context, Types.WallType type) {
+	public WallView (Context context, Types.WallType type) {
 		super(context);
 		cell = new WallCell(type);
 	}

@@ -1,9 +1,11 @@
 package net.fhtagn.zoobeditor;
 
-import net.fhtagn.zoobeditor.cell.WallCellView;
 import net.fhtagn.zoobeditor.tools.EraseTool;
+import net.fhtagn.zoobeditor.tools.TankTool;
 import net.fhtagn.zoobeditor.tools.WallTool;
+import net.fhtagn.zoobeditor.types.TankView;
 import net.fhtagn.zoobeditor.types.Types;
+import net.fhtagn.zoobeditor.types.WallView;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -98,12 +100,12 @@ public class Editor extends Activity {
 		
 		public View getView (int position, View convertView, ViewGroup parent) {
 			Types.WallType type = Types.WallType.values()[position];
-			WallCellView view;
+			WallView view;
 			if (convertView != null) {
-				view = (WallCellView)convertView;
+				view = (WallView)convertView;
 				view.setType(type);
 			} else {
-				view = new WallCellView(context, type);
+				view = new WallView(context, type);
 				view.setLayoutParams(new GridView.LayoutParams(50,50));
 				view.setPadding(8,8,8,8);
 			}
@@ -111,34 +113,84 @@ public class Editor extends Activity {
 		}
 	}
 	
+	private class TankTypeAdapter extends BaseAdapter {
+		private final Context context;
+		public TankTypeAdapter (Context c) {
+			context = c;
+		}
+		
+		public int getCount () {
+			return Types.TankType.values().length;
+		}
+		
+		public Object getItem (int position) {
+			return Types.TankType.values()[position];
+		}
+		
+		@Override
+		public long getItemId (int position) {
+			return position;
+		}
+		
+		public View getView (int position, View convertView, ViewGroup parent) {
+			Types.TankType type = Types.TankType.values()[position];
+			TankView view;
+			if (convertView != null) {
+				view = (TankView)convertView;
+				view.setType(type); 
+			} else {
+				view = new TankView(context, type);
+				view.setLayoutParams(new GridView.LayoutParams(50,50));
+				view.setPadding(8,8,8,8);
+			}
+			return view;
+		}
+	}
+	
+	private Dialog createGridDialog (final int dialogId, int titleRes, BaseAdapter adapter, OnItemClickListener listener) {
+		GridView gridView = (GridView)getLayoutInflater().inflate(R.layout.dlg_gridview, null).findViewById(R.id.gridview);
+		gridView.setAdapter(adapter);
+		gridView.setOnItemClickListener(listener);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(titleRes)
+		 			 .setView(gridView)
+					 .setCancelable(true)
+					 .setNegativeButton(android.R.string.cancel,
+							 new DialogInterface.OnClickListener() {
+						 	   public void onClick(DialogInterface dialog, int item) {
+						 	  	 dismissDialog(dialogId);
+						 	   }
+					 		 });
+		return builder.create();		
+	}
+	
 	protected Dialog onCreateDialog (int id) {
 		switch (id) {
-			case DIALOG_WALL_ID: {
-				GridView gridView = (GridView)getLayoutInflater().inflate(R.layout.dlg_gridview, null).findViewById(R.id.gridview);
-				gridView.setAdapter(new WallTypeAdapter(getApplicationContext()));
-				gridView.setOnItemClickListener(new OnItemClickListener() {
-					@Override
-          public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						 WallCellView cellView = (WallCellView)view;
-						 levelView.setEditorTool(new WallTool(cellView.getType()));
-						 dismissDialog(DIALOG_WALL_ID);
-          }
-				});
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.editor_wall_dlg_title)
-				 			 .setView(gridView)
-							 .setCancelable(true)
-							 .setNegativeButton(android.R.string.cancel,
-									 new DialogInterface.OnClickListener() {
-								 	   public void onClick(DialogInterface dialog, int item) {
-								 	  	 dismissDialog(DIALOG_WALL_ID);
-								 	   }
-							 		 });
-				return builder.create();
-			}
+			case DIALOG_WALL_ID: 
+				return createGridDialog(DIALOG_WALL_ID, R.string.editor_wall_dlg_title,
+				    new WallTypeAdapter(getApplicationContext()),
+				    new OnItemClickListener() {
+					    @Override
+					    public void onItemClick(AdapterView<?> parent, View view,
+					        int position, long id) {
+						    WallView cellView = (WallView) view;
+						    levelView.setEditorTool(new WallTool(cellView.getType()));
+						    dismissDialog(DIALOG_WALL_ID);
+					    }
+				    });
 			case DIALOG_TANK_ID: {
-				return null;
+				return createGridDialog(DIALOG_TANK_ID, R.string.editor_tank_dlg_title,
+				    new TankTypeAdapter(getApplicationContext()),
+				    new OnItemClickListener() {
+					    @Override
+					    public void onItemClick(AdapterView<?> parent, View view,
+					        int position, long id) {
+						    TankView cellView = (TankView) view;
+						    levelView.setEditorTool(new TankTool(getApplicationContext(), cellView.getType()));
+						    dismissDialog(DIALOG_TANK_ID);
+					    }
+				    });
 			}
 			default:
 				return null;
