@@ -1,7 +1,14 @@
 package net.fhtagn.zoobeditor;
 
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import net.fhtagn.zoobeditor.cell.EmptyCell;
 import net.fhtagn.zoobeditor.cell.GridCell;
+import net.fhtagn.zoobeditor.cell.TankCell;
 import net.fhtagn.zoobeditor.cell.WallCell;
 import net.fhtagn.zoobeditor.tools.EditorTool;
 import net.fhtagn.zoobeditor.utils.Coords;
@@ -87,7 +94,55 @@ public class LevelView extends View {
 
     //mDstRect.set(MARGIN, MARGIN, size - MARGIN, size - MARGIN);
 	}
+	
+	public JSONArray coords2json (Coords c) {
+		JSONArray arr = new JSONArray();
+		arr.put(c.getX());
+		arr.put(c.getY());
+		return arr;
+	}
 
+	public JSONObject toJSON () throws JSONException {
+		JSONObject obj = new JSONObject();
+		
+		obj.put("xdim", xdim);
+		obj.put("ydim", ydim);
+		//FIXME: support for boss ?
+		obj.put("shadows", false);
+		obj.put("boss", false);
+		
+		//tiles and tanks
+		JSONArray tanks = new JSONArray();
+		JSONArray tiles = new JSONArray();
+		for (int y=0; y<ydim; y++) {
+			JSONArray row = new JSONArray();
+			for (int x=0; x<xdim; x++) {
+				row.put(grid[x][y].toTileString());
+				
+				//Got a tank => add to tanks array
+				if (grid[x][y] instanceof TankCell) {
+					TankCell cell = (TankCell)grid[x][y];
+					JSONObject tank = new JSONObject();
+					tank.put("coords", coords2json(cell.getCoords()));
+					tank.put("type", Types.tank2str(cell.getType()));
+					ArrayList<Coords> path = cell.getPath();
+					if (path != null) {
+						JSONArray pathArr = new JSONArray();
+						for (Coords c: path)
+							pathArr.put(coords2json(c));
+						tank.put("path", pathArr);
+					}
+					
+					tanks.put(tank);
+				}
+			}
+			tiles.put(row);
+		}
+		obj.put("tiles", tiles);
+		obj.put("tanks", tanks);
+		
+		return obj;
+	}
 	
 	@Override
 	protected void onDraw (Canvas canvas) {

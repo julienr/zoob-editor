@@ -1,13 +1,10 @@
 package net.fhtagn.zoobeditor.tools;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
-import net.fhtagn.zoobeditor.LevelView;
 import net.fhtagn.zoobeditor.cell.GridCell;
 import net.fhtagn.zoobeditor.utils.Coords;
 
@@ -23,7 +20,7 @@ public class PathTool extends EditorTool {
 	
 	private int state;
 	
-	private Coords selectedTank = null;
+	private GridCell selectedCell = null;
 	
 	private final ArrayList<Coords> waypoints = new ArrayList<Coords>();
 	
@@ -54,7 +51,8 @@ public class PathTool extends EditorTool {
 			
 			//Highlight selected tank
 			canvas.save();
-			canvas.translate(selectedTank.getX(), selectedTank.getY());
+			canvas.translate(selectedCell.getCoords().getX(), 
+											 selectedCell.getCoords().getY());
 			Paint paint = new Paint();
 			paint.setColor(Color.argb(120, 0,0,255));
 			canvas.drawRect(0, 0, 1, 1, paint);
@@ -69,20 +67,22 @@ public class PathTool extends EditorTool {
 	}
 	
 	public void savePath () {
-		//FIXME: todo
+		selectedCell.setPath(waypoints);
 	}
 	
 	@Override
   public GridCell apply(GridCell cell) {
 		if (state == STATE_NO_TANK && cell.canHavePath()) {
-			Log.i(TAG, "Tank selected");
 			state = STATE_DRAWING_PATH;
-			selectedTank = cell.getCoords();
+			selectedCell = cell;
+			ArrayList<Coords> path = cell.getPath();
+			if (path != null) {
+				waypoints.clear();
+				waypoints.addAll(cell.getPath());
+			}
 			return cell;
 		} else if (state == STATE_DRAWING_PATH){ //STATE_DRAWING_PATH
-			Log.i(TAG, "path drawing");
 			if (cell.isValidWaypoint()) {
-				Log.i(TAG, "adding waypoint");
 				waypoints.add(cell.getCoords());
 			} 
 			return cell;

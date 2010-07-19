@@ -1,5 +1,7 @@
 package net.fhtagn.zoobeditor.cell;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,6 +22,7 @@ public class TankCell extends GridCell {
 	private final Types.TankType type;
 	private final Drawable tank;
 	private Drawable shield = null;
+	private ArrayList<Coords> path = null;
 	
 	//Paint used to draw "boss" text overlay
 	private final static Paint bossTextPaint;
@@ -51,18 +54,16 @@ public class TankCell extends GridCell {
 		tank.setBounds(0,0,1,1);
 	}
 	
-	public ColorMatrixColorFilter createFilter (int targetColor) {
-		ColorMatrix cm = new ColorMatrix();
-		final float tr = Color.red(targetColor)/255.0f;
-		final float tg = Color.green(targetColor)/255.0f;
-		final float tb = Color.blue(targetColor)/255.0f;
-		cm.set(new float[] {
-				tr, 0, 0, 0, 0,
-				0, tg, 0, 0, 0,
-				0, 0, tb, 0, 0,
-				0, 0, 0, 1, 0,
-		});
-		return new ColorMatrixColorFilter(cm);
+	public String toTileString () {
+		return "E";
+	}
+	
+	public void setPath (ArrayList<Coords> waypoints) {
+		path = new ArrayList<Coords>(waypoints);
+	}
+	
+	public ArrayList<Coords> getPath () {
+		return path;
 	}
 	
 	public Types.TankType getType () {

@@ -1,5 +1,12 @@
 package net.fhtagn.zoobeditor;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import net.fhtagn.zoobeditor.tools.EraseTool;
 import net.fhtagn.zoobeditor.tools.PathTool;
 import net.fhtagn.zoobeditor.tools.TankTool;
@@ -15,6 +22,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +30,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
@@ -31,6 +40,12 @@ public class Editor extends Activity {
 	static final String TAG = "Editor";
 	static final int DIALOG_WALL_ID = 0;
 	static final int DIALOG_TANK_ID = 1;
+	static final int DIALOG_SAVE_NAME = 2;
+	static final int DIALOG_ERR_EXTERNAL = 3;
+	static final int DIALOG_ERR_EXPORT = 4;
+	static final int DIALOG_SAVE_SUCCESS = 5;
+	
+	static final String LEVELS_DIR_NAME = "levels";
 	
 	private LevelView levelView;
 	
@@ -132,7 +147,48 @@ public class Editor extends Activity {
 				toPathMode(tool);
 			}
 		});
+		
+		Button saveButton = (Button)findViewById(R.id.btn_save);
+		saveButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				showDialog(DIALOG_SAVE_NAME);
+			}
+		});
 	} 
+	
+	public void saveAs (String name) {
+		String state = Environment.getExternalStorageState();
+		File root = Environment.getExternalStorageDirectory();
+		if (!Environment.MEDIA_MOUNTED.equals(state) || !root.canWrite()) {
+			showDialog(DIALOG_ERR_EXTERNAL);
+			return;
+		}
+		
+		String jsonLevel = "";
+		try {
+	    jsonLevel = levelView.toJSON().toString();
+    } catch (JSONException e) {
+    	e.printStackTrace();
+    	showDialog(DIALOG_ERR_EXPORT);
+    	return;
+    }
+    
+    File levelsDir = new File(root+File.separator+"zoob_levels");
+    levelsDir.mkdirs();
+    File levelFile = new File(levelsDir, name + ".json");
+    FileWriter writer;
+    try {
+	    writer = new FileWriter(levelFile);
+	    writer.write(jsonLevel);
+	    writer.close();
+    } catch (IOException e) {
+	    e.printStackTrace();
+	    showDialog(DIALOG_ERR_EXTERNAL);
+	    return;
+    }
+    showDialog(DIALOG_SAVE_SUCCESS);
+	}
 	
 	private class WallTypeAdapter extends BaseAdapter {
 		private final Context context;
@@ -220,6 +276,18 @@ public class Editor extends Activity {
 		return builder.create();		
 	}
 	
+	private Dialog createErrorDialog (final int dialogId, int messageRes) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(messageRes)
+					 .setCancelable(false)
+					 .setNeutralButton(android.R.string.ok,  new DialogInterface.OnClickListener() {
+						 	   public void onClick(DialogInterface dialog, int item) {
+						 	  	 dismissDialog(dialogId);
+						 	   }
+					 		 });
+		return builder.create();
+	}
+	
 	protected Dialog onCreateDialog (int id) {
 		switch (id) {
 			case DIALOG_WALL_ID: 
@@ -247,6 +315,15 @@ public class Editor extends Activity {
 					    }
 				    });
 			}
+			case DIALOG_SAVE_NAME: {
+				return new SaveDialog(this, DIALOG_SAVE_NAME, this);
+			}
+			case DIALOG_ERR_EXTERNAL:
+				return createErrorDialog(DIALOG_ERR_EXTERNAL, R.string.save_err_external);
+			case DIALOG_ERR_EXPORT:
+				return createErrorDialog(DIALOG_ERR_EXPORT, R.string.save_err_export);
+			case DIALOG_SAVE_SUCCESS: 
+				return createErrorDialog(DIALOG_SAVE_SUCCESS, R.string.save_success);
 			default:
 				return null;
 		}

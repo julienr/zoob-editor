@@ -17,4 +17,9 @@
 <string name="btn_path">Path</string>
 <string name="btn_path_reset">Reset</string>
 <string name="btn_path_validate">Done</string>
+<string name="dlg_save_name_title">Level name</string>
+<string name="btn_play">Play</string>
+<string name="save_err_external">Error writing to the external directory</string>
+<string name="save_err_export">Error during level export</string>
+<string name="save_success">Saved succesfully </string>
 </resources>

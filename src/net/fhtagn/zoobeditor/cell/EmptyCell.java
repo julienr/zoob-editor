@@ -13,6 +13,10 @@ public class EmptyCell extends GridCell {
   public void draw(Canvas canvas) {
 	  
   }
+	
+	public String toTileString () {
+		return "E";
+	}
 
 	@Override
   public boolean canHavePath() {

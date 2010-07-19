@@ -41,6 +41,10 @@ public class WallCell extends GridCell {
 		return type;
 	}
 	
+	public String toTileString () {
+		return Types.wall2str(type);
+	}
+	
 	public void draw (Canvas canvas) {
 		//canvas.drawText(wall2str(type), 0, 0, paint);
 		canvas.drawRect(drawRect, drawPaint);
