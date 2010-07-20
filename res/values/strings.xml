@@ -22,4 +22,10 @@
 <string name="save_err_external">Error writing to the external directory</string>
 <string name="save_err_export">Error during level export</string>
 <string name="save_success">Saved succesfully </string>
+<string name="mylevels_tab">My levels</string>
+<string name="online_tab">Online Levels</string>
+<string name="menu_edit">Edit</string>
+<string name="menu_upload">Upload</string>
+<string name="menu_delete">Delete</string>
+<string name="menu_play">Play</string>
 </resources>

@@ -1,7 +1,7 @@
-package net.fhtagn.zoobeditor.tools;
+package net.fhtagn.zoobeditor.editor.tools;
 
-import net.fhtagn.zoobeditor.cell.EmptyCell;
-import net.fhtagn.zoobeditor.cell.GridCell;
+import net.fhtagn.zoobeditor.editor.cell.EmptyCell;
+import net.fhtagn.zoobeditor.editor.cell.GridCell;
 
 public class EraseTool extends EditorTool {
 	@Override

@@ -1,7 +1,7 @@
-package net.fhtagn.zoobeditor.cell;
+package net.fhtagn.zoobeditor.editor.cell;
 
-import net.fhtagn.zoobeditor.utils.Coords;
-import net.fhtagn.zoobeditor.utils.Types;
+import net.fhtagn.zoobeditor.editor.utils.Coords;
+import net.fhtagn.zoobeditor.editor.utils.Types;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;

@@ -1,12 +1,12 @@
-package net.fhtagn.zoobeditor.tools;
+package net.fhtagn.zoobeditor.editor.tools;
 
 import java.util.ArrayList;
 
+import net.fhtagn.zoobeditor.editor.cell.GridCell;
+import net.fhtagn.zoobeditor.editor.utils.Coords;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import net.fhtagn.zoobeditor.cell.GridCell;
-import net.fhtagn.zoobeditor.utils.Coords;
 
 public class PathTool extends EditorTool {
 	static final String TAG = "PathTool";

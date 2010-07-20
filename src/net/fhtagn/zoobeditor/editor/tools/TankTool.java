@@ -1,9 +1,9 @@
-package net.fhtagn.zoobeditor.tools;
+package net.fhtagn.zoobeditor.editor.tools;
 
+import net.fhtagn.zoobeditor.editor.cell.GridCell;
+import net.fhtagn.zoobeditor.editor.cell.TankCell;
+import net.fhtagn.zoobeditor.editor.utils.Types;
 import android.content.Context;
-import net.fhtagn.zoobeditor.cell.GridCell;
-import net.fhtagn.zoobeditor.cell.TankCell;
-import net.fhtagn.zoobeditor.utils.Types;
 
 public class TankTool extends EditorTool {
 	static final String TAG = "TankTool";

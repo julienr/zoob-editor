@@ -1,6 +1,6 @@
-package net.fhtagn.zoobeditor.cell;
+package net.fhtagn.zoobeditor.editor.cell;
 
-import net.fhtagn.zoobeditor.utils.Coords;
+import net.fhtagn.zoobeditor.editor.utils.Coords;
 import android.graphics.Canvas;
 
 public class EmptyCell extends GridCell {

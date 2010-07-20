@@ -1,11 +1,8 @@
-package net.fhtagn.zoobeditor.utils;
+package net.fhtagn.zoobeditor.editor.utils;
 
-import net.fhtagn.zoobeditor.R;
-import net.fhtagn.zoobeditor.cell.TankCell;
+import net.fhtagn.zoobeditor.editor.cell.TankCell;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 
 public class TankView extends View {

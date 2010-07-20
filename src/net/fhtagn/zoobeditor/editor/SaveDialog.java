@@ -1,12 +1,12 @@
-package net.fhtagn.zoobeditor;
+package net.fhtagn.zoobeditor.editor;
 
+import net.fhtagn.zoobeditor.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;

@@ -1,20 +1,16 @@
-package net.fhtagn.zoobeditor.cell;
+package net.fhtagn.zoobeditor.editor.cell;
 
 import java.util.ArrayList;
 
+import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.editor.utils.Coords;
+import net.fhtagn.zoobeditor.editor.utils.Types;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import net.fhtagn.zoobeditor.R;
-import net.fhtagn.zoobeditor.utils.Coords;
-import net.fhtagn.zoobeditor.utils.Types;
 
 public class TankCell extends GridCell {
 	static final String TAG = "TankCell";

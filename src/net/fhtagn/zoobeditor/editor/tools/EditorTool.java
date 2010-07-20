@@ -1,8 +1,7 @@
-package net.fhtagn.zoobeditor.tools;
+package net.fhtagn.zoobeditor.editor.tools;
 
+import net.fhtagn.zoobeditor.editor.cell.GridCell;
 import android.graphics.Canvas;
-import net.fhtagn.zoobeditor.LevelView;
-import net.fhtagn.zoobeditor.cell.GridCell;
 
 //And editor tool specify the action to take when the user click on a cell 
 //(such as erasing its content, putting something in, etc...)

@@ -1,17 +1,17 @@
-package net.fhtagn.zoobeditor;
+package net.fhtagn.zoobeditor.browser;
 
-import android.app.Activity;
+import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.editor.Editor;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.TabHost;
 
-public class MainMenu extends Activity {
+public class Browser extends TabActivity {
 	static final String TAG = "ZoobEditor";
 	static final int DIALOG_NEWLVL_ID = 0;
 
@@ -19,16 +19,25 @@ public class MainMenu extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
-		Button newLvlBtn = (Button) findViewById(R.id.btn_newlevel);
-		newLvlBtn.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Log.i(TAG, "new level");
-				showDialog(DIALOG_NEWLVL_ID);
-			}
-		});
-
+		
+		Resources res = getResources();
+		TabHost tabHost = getTabHost();
+		TabHost.TabSpec spec;
+		Intent intent;
+		
+		//My levels
+		intent = new Intent().setClass(this, MyLevelsActivity.class);
+		spec = tabHost.newTabSpec("mylevels").setIndicator(res.getString(R.string.mylevels_tab))
+								  .setContent(intent);
+		tabHost.addTab(spec);
+		
+		//Online levels
+		intent = new Intent().setClass(this, OnlineLevelsActivity.class);
+		spec = tabHost.newTabSpec("online").setIndicator(res.getString(R.string.online_tab))
+									.setContent(intent);
+		tabHost.addTab(spec);
+		
+		tabHost.setCurrentTab(0);
 	}
 	
 	protected void launchEditor (int xdim, int ydim) {

@@ -1,19 +1,22 @@
-package net.fhtagn.zoobeditor;
+package net.fhtagn.zoobeditor.editor;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import net.fhtagn.zoobeditor.Common;
+import net.fhtagn.zoobeditor.ExternalStorageException;
+import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.editor.tools.EraseTool;
+import net.fhtagn.zoobeditor.editor.tools.PathTool;
+import net.fhtagn.zoobeditor.editor.tools.TankTool;
+import net.fhtagn.zoobeditor.editor.tools.WallTool;
+import net.fhtagn.zoobeditor.editor.utils.TankView;
+import net.fhtagn.zoobeditor.editor.utils.Types;
+import net.fhtagn.zoobeditor.editor.utils.WallView;
 
-import net.fhtagn.zoobeditor.tools.EraseTool;
-import net.fhtagn.zoobeditor.tools.PathTool;
-import net.fhtagn.zoobeditor.tools.TankTool;
-import net.fhtagn.zoobeditor.tools.WallTool;
-import net.fhtagn.zoobeditor.utils.TankView;
-import net.fhtagn.zoobeditor.utils.Types;
-import net.fhtagn.zoobeditor.utils.WallView;
+import org.json.JSONException;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -30,7 +33,6 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
@@ -44,8 +46,6 @@ public class Editor extends Activity {
 	static final int DIALOG_ERR_EXTERNAL = 3;
 	static final int DIALOG_ERR_EXPORT = 4;
 	static final int DIALOG_SAVE_SUCCESS = 5;
-	
-	static final String LEVELS_DIR_NAME = "levels";
 	
 	private LevelView levelView;
 	
@@ -158,9 +158,10 @@ public class Editor extends Activity {
 	} 
 	
 	public void saveAs (String name) {
-		String state = Environment.getExternalStorageState();
-		File root = Environment.getExternalStorageDirectory();
-		if (!Environment.MEDIA_MOUNTED.equals(state) || !root.canWrite()) {
+		File levelsDir;
+		try {
+			levelsDir = Common.getLevelsDir();
+		} catch (ExternalStorageException e) {
 			showDialog(DIALOG_ERR_EXTERNAL);
 			return;
 		}
@@ -174,8 +175,6 @@ public class Editor extends Activity {
     	return;
     }
     
-    File levelsDir = new File(root+File.separator+"zoob_levels");
-    levelsDir.mkdirs();
     File levelFile = new File(levelsDir, name + ".json");
     FileWriter writer;
     try {
@@ -288,6 +287,7 @@ public class Editor extends Activity {
 		return builder.create();
 	}
 	
+	@Override
 	protected Dialog onCreateDialog (int id) {
 		switch (id) {
 			case DIALOG_WALL_ID: 

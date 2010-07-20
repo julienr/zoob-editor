@@ -1,4 +1,4 @@
-package net.fhtagn.zoobeditor.utils;
+package net.fhtagn.zoobeditor.editor.utils;
 
 public class Coords {
 	private final int x;

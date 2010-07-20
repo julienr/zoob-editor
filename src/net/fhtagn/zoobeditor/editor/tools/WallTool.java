@@ -1,8 +1,8 @@
-package net.fhtagn.zoobeditor.tools;
+package net.fhtagn.zoobeditor.editor.tools;
 
-import net.fhtagn.zoobeditor.cell.GridCell;
-import net.fhtagn.zoobeditor.cell.WallCell;
-import net.fhtagn.zoobeditor.utils.Types;
+import net.fhtagn.zoobeditor.editor.cell.GridCell;
+import net.fhtagn.zoobeditor.editor.cell.WallCell;
+import net.fhtagn.zoobeditor.editor.utils.Types;
 
 public class WallTool extends EditorTool {
 	static final String TAG = "WallTool";

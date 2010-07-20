@@ -1,6 +1,6 @@
-package net.fhtagn.zoobeditor.utils;
+package net.fhtagn.zoobeditor.editor.utils;
 
-import net.fhtagn.zoobeditor.cell.WallCell;
+import net.fhtagn.zoobeditor.editor.cell.WallCell;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.view.View;

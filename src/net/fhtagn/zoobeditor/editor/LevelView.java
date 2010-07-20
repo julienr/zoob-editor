@@ -1,18 +1,19 @@
-package net.fhtagn.zoobeditor;
+package net.fhtagn.zoobeditor.editor;
 
 import java.util.ArrayList;
+
+import net.fhtagn.zoobeditor.editor.cell.EmptyCell;
+import net.fhtagn.zoobeditor.editor.cell.GridCell;
+import net.fhtagn.zoobeditor.editor.cell.TankCell;
+import net.fhtagn.zoobeditor.editor.cell.WallCell;
+import net.fhtagn.zoobeditor.editor.tools.EditorTool;
+import net.fhtagn.zoobeditor.editor.utils.Coords;
+import net.fhtagn.zoobeditor.editor.utils.Types;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import net.fhtagn.zoobeditor.cell.EmptyCell;
-import net.fhtagn.zoobeditor.cell.GridCell;
-import net.fhtagn.zoobeditor.cell.TankCell;
-import net.fhtagn.zoobeditor.cell.WallCell;
-import net.fhtagn.zoobeditor.tools.EditorTool;
-import net.fhtagn.zoobeditor.utils.Coords;
-import net.fhtagn.zoobeditor.utils.Types;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
