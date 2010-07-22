@@ -6,6 +6,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.commonsware.cwac.tlv.TouchListView;
+import com.commonsware.cwac.tlv.TouchListView.DragListener;
+import com.commonsware.cwac.tlv.TouchListView.DropListener;
+import com.commonsware.cwac.tlv.TouchListView.RemoveListener;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -22,6 +27,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class SerieEditActivity extends ListActivity {
+	static final String TAG = "SerieEditActivity";
 	static final int DIALOG_NEWLVL_ID = 0;
 	static final int REQUEST_LEVEL_EDITOR = 1;
 	
@@ -51,6 +57,51 @@ public class SerieEditActivity extends ListActivity {
 			levelsArray  = arr;
 	    
 	    setListAdapter(new SerieAdapter());
+	    
+	    /** Drag'n'drop reordering */
+	    TouchListView listView = (TouchListView)getListView();
+	    listView.setDragListener(new DragListener() {
+				@Override
+        public void drag(int from, int to) {
+					Log.e(TAG, "drag from : " + from + ", to : " + to);
+        }
+	    });
+	    
+	    listView.setRemoveListener(new RemoveListener() {
+				@Override
+        public void remove(int which) {
+	        Log.i(TAG, "remove " + which);
+        }
+	    });
+	    
+	    listView.setDropListener(new DropListener() {
+				@Override
+        public void drop(int from, int to) {
+					if (from == to)
+						return;
+					Log.e(TAG, "drop from : " + from + ", to : " + to);
+					try {
+	          JSONArray newArray = new JSONArray();
+	          //Copy all the objects between the beginning and min
+	          for (int i=0; i<levelsArray.length(); i++) {
+	          	if (i == from) {
+	          		
+	          	} else if (i == to) {
+	          		newArray.put(levelsArray.getJSONObject(from));
+	          		newArray.put(levelsArray.getJSONObject(i));
+	          	} else {
+	          		newArray.put(levelsArray.getJSONObject(i));
+	          	}
+	          }
+	          serieObj.put("levels", newArray);
+	          levelsArray = newArray;
+	          notifyAdapter();
+          } catch (JSONException e) {
+          	Log.e(TAG, "Error dropping from " + from + " to " + to + " : " + e.getMessage());
+	          e.printStackTrace();
+          }
+        }
+	    });
     } catch (JSONException e) {
     	TextView textView = new TextView(this);
     	e.printStackTrace();
@@ -87,9 +138,7 @@ public class SerieEditActivity extends ListActivity {
 	      else
 	      	levelsArray.put(levelObj);
 	      
-	      SerieAdapter adapter = (SerieAdapter)getListAdapter();
-	      adapter.notifyDataSetChanged();
-	      
+	      notifyAdapter();
       } catch (JSONException e) {
 	      e.printStackTrace();
 	      return;
@@ -97,6 +146,11 @@ public class SerieEditActivity extends ListActivity {
 		} else { //RESULT_CANCELED
 			
 		}
+	}
+	
+	public void notifyAdapter () {
+    SerieAdapter adapter = (SerieAdapter)getListAdapter();
+    adapter.notifyDataSetChanged();
 	}
 	
 	private void doLaunch (int position, JSONObject obj) {
@@ -188,7 +242,13 @@ public class SerieEditActivity extends ListActivity {
 				view = getLayoutInflater().inflate(R.layout.serieedit_item, null);
 			
 			TextView textName = (TextView)view.findViewById(R.id.name);
-			textName.setText("Level " + position);
+			try {
+	      JSONObject levelObj = levelsArray.getJSONObject(position);
+	      textName.setText("Level " + position + " ["+levelObj.getInt("xdim")+","+levelObj.getInt("ydim")+"]");
+      } catch (JSONException e) {
+      	textName.setText("Error reading level");
+	      e.printStackTrace();
+      }
 	    return view;
     }
 		
