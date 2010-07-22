@@ -63,43 +63,22 @@ public class SerieEditActivity extends ListActivity {
 	    listView.setDragListener(new DragListener() {
 				@Override
         public void drag(int from, int to) {
-					Log.e(TAG, "drag from : " + from + ", to : " + to);
+					//FIXME: highlight the place where it would end ?
         }
 	    });
 	    
-	    listView.setRemoveListener(new RemoveListener() {
+	    //Remove is disallowed
+	    /*listView.setRemoveListener(new RemoveListener() {
 				@Override
         public void remove(int which) {
 	        Log.i(TAG, "remove " + which);
         }
-	    });
+	    });*/
 	    
 	    listView.setDropListener(new DropListener() {
 				@Override
         public void drop(int from, int to) {
-					if (from == to)
-						return;
-					Log.e(TAG, "drop from : " + from + ", to : " + to);
-					try {
-	          JSONArray newArray = new JSONArray();
-	          //Copy all the objects between the beginning and min
-	          for (int i=0; i<levelsArray.length(); i++) {
-	          	if (i == from) {
-	          		
-	          	} else if (i == to) {
-	          		newArray.put(levelsArray.getJSONObject(from));
-	          		newArray.put(levelsArray.getJSONObject(i));
-	          	} else {
-	          		newArray.put(levelsArray.getJSONObject(i));
-	          	}
-	          }
-	          serieObj.put("levels", newArray);
-	          levelsArray = newArray;
-	          notifyAdapter();
-          } catch (JSONException e) {
-          	Log.e(TAG, "Error dropping from " + from + " to " + to + " : " + e.getMessage());
-	          e.printStackTrace();
-          }
+					moveLevel(from, to);
         }
 	    });
     } catch (JSONException e) {
@@ -116,6 +95,31 @@ public class SerieEditActivity extends ListActivity {
 				showDialog(DIALOG_NEWLVL_ID);
       }
     });
+	}
+	
+	private void moveLevel (int from, int to) {
+		if (from == to)
+			return;
+		try {
+      JSONArray newArray = new JSONArray();
+      //Copy all the objects between the beginning and min
+      for (int i=0; i<levelsArray.length(); i++) {
+      	if (i == from) {
+      		
+      	} else if (i == to) {
+      		newArray.put(levelsArray.getJSONObject(from));
+      		newArray.put(levelsArray.getJSONObject(i));
+      	} else {
+      		newArray.put(levelsArray.getJSONObject(i));
+      	}
+      }
+      serieObj.put("levels", newArray);
+      levelsArray = newArray;
+      notifyAdapter();
+    } catch (JSONException e) {
+    	Log.e(TAG, "Error in moveLevel from " + from + " to " + to + " : " + e.getMessage());
+      e.printStackTrace();
+    }
 	}
 	
 	@Override

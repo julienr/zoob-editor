@@ -14,9 +14,10 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:drawSelectorOnTop="false"
-        tlv:grabber="@+id/name"
+        android:scrollbars="vertical"
+        tlv:grabber="@+id/grabber"
         tlv:remove_mode="none"
-        tlv:normal_height="32dip" />
+        tlv:normal_height="64dip" />
   <!--<ListView android:id="@android:id/list"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" />-->
