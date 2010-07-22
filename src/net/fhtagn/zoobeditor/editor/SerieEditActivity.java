@@ -86,6 +86,10 @@ public class SerieEditActivity extends ListActivity {
 	      	levelsArray.put(levelNumber, levelObj);
 	      else
 	      	levelsArray.put(levelObj);
+	      
+	      SerieAdapter adapter = (SerieAdapter)getListAdapter();
+	      adapter.notifyDataSetChanged();
+	      
       } catch (JSONException e) {
 	      e.printStackTrace();
 	      return;
@@ -174,7 +178,6 @@ public class SerieEditActivity extends ListActivity {
     public long getItemId(int position) {
 			return position;
     }
-		
 		
 		@Override
     public View getView(int position, View convertView, ViewGroup parent) {
