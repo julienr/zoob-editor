@@ -13,12 +13,16 @@ import org.json.JSONObject;
 import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.ExternalStorageException;
 import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.editor.EditorActivity;
+import net.fhtagn.zoobeditor.editor.SerieEditActivity;
 import net.fhtagn.zoobeditor.editor.utils.Types;
 import net.fhtagn.zoobeditor.editor.utils.WallView;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -34,8 +38,10 @@ import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class MyLevelsActivity extends ListActivity {
+public class MySeriesActivity extends ListActivity {
 	static final String TAG = "MyLevelsActivity";
+	
+	static final int DIALOG_NEWSERIE_ID = 0;
 	
 	static final int MENU_ITEM_PLAY = 0;
 	static final int MENU_ITEM_EDIT = 1;
@@ -55,18 +61,16 @@ public class MyLevelsActivity extends ListActivity {
   				return name.endsWith(".json");
         }
   		});
-			setContentView(R.layout.mylevels_list);
+			setContentView(R.layout.myseries_list);
 			
   		setListAdapter(new LevelAdapter(this, levels));
   		getListView().setOnCreateContextMenuListener(this);
 			
-			Button newLvlBtn = (Button) findViewById(R.id.btn_newlevel);
-			newLvlBtn.setOnClickListener(new OnClickListener() {
+			Button newSerieBtn = (Button) findViewById(R.id.btn_newserie);
+			newSerieBtn.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					//TODO
-					/*Log.i(TAG, "new level");
-					showDialog(DIALOG_NEWLVL_ID);*/
+					showDialog(DIALOG_NEWSERIE_ID);
 				}
 			});
     } catch (ExternalStorageException e) {
@@ -127,6 +131,40 @@ public class MyLevelsActivity extends ListActivity {
 		l.showContextMenuForChild(v);
 	}
 	
+	protected void launchSerieEditor (JSONObject serieObj) {
+		Intent i = new Intent(getParent(), SerieEditActivity.class);
+		i.putExtra("serie", serieObj.toString());
+		this.getParent().startActivity(i);
+	}
+	
+	protected JSONObject newSerie (String name) throws JSONException {
+		JSONObject obj = new JSONObject();
+	  obj.put("name", name);
+		return obj;
+	}
+	
+	@Override
+	protected Dialog onCreateDialog (int id) {
+		switch (id) {
+			case DIALOG_NEWSERIE_ID: {
+				return new SaveDialog(this, DIALOG_NEWSERIE_ID, this, new SaveDialog.OnOkListener() {
+					@Override
+					public void onOK(String enteredText) {
+						try {
+	            launchSerieEditor(newSerie(enteredText));
+            } catch (JSONException e) {
+	            e.printStackTrace();
+            }
+					}
+				});
+			}
+			default:
+				return null;
+		}
+	}
+	
+	
+	
 	public class LevelAdapter extends BaseAdapter {
 		private final File[] files;
 		private final Context context;
@@ -177,7 +215,7 @@ public class MyLevelsActivity extends ListActivity {
       if (convertView != null)
       	view = convertView;
       else
-      	view = getLayoutInflater().inflate(R.layout.levellist_item, null);
+      	view = getLayoutInflater().inflate(R.layout.serielist_item, null);
       
       //JSONObject levelObj = loadLevel(files[position]);
       //FIXME: currently, "name" is not stored in level => do that

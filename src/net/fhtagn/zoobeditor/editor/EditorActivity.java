@@ -16,6 +16,7 @@ import net.fhtagn.zoobeditor.editor.utils.Types;
 import net.fhtagn.zoobeditor.editor.utils.WallView;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -36,9 +37,10 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class Editor extends Activity {
+public class EditorActivity extends Activity {
 	static final String TAG = "Editor";
 	static final int DIALOG_WALL_ID = 0;
 	static final int DIALOG_TANK_ID = 1;
@@ -53,13 +55,13 @@ public class Editor extends Activity {
 	
 	private PathTool pathTool = null;
 	
+	private int levelNumber;
+	
 	@Override
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		Intent i = getIntent();
-		int xdim = i.getIntExtra("xdim", 12);
-		int ydim = i.getIntExtra("ydim", 8);
-		Log.i(TAG, "xdim="+xdim+", ydim="+ydim);
+		levelNumber = i.getIntExtra("number", -1);
 		
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);    
 		setContentView(R.layout.editor);
@@ -67,11 +69,17 @@ public class Editor extends Activity {
 		buttonsLayout = (LinearLayout)findViewById(R.id.editor_btns);
 		
 		FrameLayout levelFrame = (FrameLayout)findViewById(R.id.levelframe);
-		levelView = new LevelView(getApplicationContext(), xdim, ydim);
-		levelFrame.addView(levelView);
-		
-		toNormalMode();
-		levelView.requestFocus(); //force trackball focus on level view
+		try {
+			JSONObject levelObj = new JSONObject(i.getStringExtra("json"));
+			levelView = new LevelView(getApplicationContext(), levelObj);
+			levelFrame.addView(levelView);
+			toNormalMode();
+			levelView.requestFocus(); //force trackball focus on level view
+		} catch (JSONException e) {
+			TextView textView = new TextView(this);
+			textView.setText("Error loading level from JSON : " + e.getMessage());
+			levelFrame.addView(textView);
+		}
 	}
 	
 	private void toPathMode (PathTool tool) {
@@ -152,10 +160,24 @@ public class Editor extends Activity {
 		saveButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				showDialog(DIALOG_SAVE_NAME);
+				saveToSerie();
 			}
 		});
-	} 
+	}
+	
+	public void saveToSerie () {
+		Intent i = new Intent(this, SerieEditActivity.class);
+		try {
+			i.putExtra("json", levelView.toJSON().toString());
+			i.putExtra("number", levelNumber);
+			setResult(RESULT_OK, i);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			//FIXME: display error to user ?
+			setResult(RESULT_CANCELED);
+		}
+		finish();
+	}
 	
 	public void saveAs (String name) {
 		File levelsDir;
@@ -316,7 +338,9 @@ public class Editor extends Activity {
 				    });
 			}
 			case DIALOG_SAVE_NAME: {
-				return new SaveDialog(this, DIALOG_SAVE_NAME, this);
+				//FIXME:
+				return null;
+				//return new SaveDialog(this, DIALOG_SAVE_NAME, this);
 			}
 			case DIALOG_ERR_EXTERNAL:
 				return createErrorDialog(DIALOG_ERR_EXTERNAL, R.string.save_err_external);

@@ -1,7 +1,10 @@
 package net.fhtagn.zoobeditor.browser;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import net.fhtagn.zoobeditor.R;
-import net.fhtagn.zoobeditor.editor.Editor;
+import net.fhtagn.zoobeditor.editor.EditorActivity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TabActivity;
@@ -13,7 +16,6 @@ import android.widget.TabHost;
 
 public class Browser extends TabActivity {
 	static final String TAG = "ZoobEditor";
-	static final int DIALOG_NEWLVL_ID = 0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -26,52 +28,17 @@ public class Browser extends TabActivity {
 		Intent intent;
 		
 		//My levels
-		intent = new Intent().setClass(this, MyLevelsActivity.class);
-		spec = tabHost.newTabSpec("mylevels").setIndicator(res.getString(R.string.mylevels_tab))
+		intent = new Intent().setClass(this, MySeriesActivity.class);
+		spec = tabHost.newTabSpec("myseries").setIndicator(res.getString(R.string.myseries_tab))
 								  .setContent(intent);
 		tabHost.addTab(spec);
 		
 		//Online levels
-		intent = new Intent().setClass(this, OnlineLevelsActivity.class);
+		intent = new Intent().setClass(this, OnlineSeriesActivity.class);
 		spec = tabHost.newTabSpec("online").setIndicator(res.getString(R.string.online_tab))
 									.setContent(intent);
 		tabHost.addTab(spec);
 		
 		tabHost.setCurrentTab(0);
-	}
-	
-	protected void launchEditor (int xdim, int ydim) {
-		Intent i = new Intent(getApplicationContext(), Editor.class);
-  	i.putExtra("xdim", xdim);
-  	i.putExtra("ydim", ydim);
-  	this.startActivity(i);
-	}
-	
-	protected Dialog onCreateDialog (int id) {
-		switch (id) {
-			case DIALOG_NEWLVL_ID: {
-				final CharSequence[] items = {"8x8", "9x8"};
-				final int[][] itemsDim = {{8,8},{9,8}};
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.newlvl_dlg_title)
-							 .setItems(items,
-							    new DialogInterface.OnClickListener() {
-								    @Override
-								    public void onClick(DialogInterface dialog, int item) {
-								    	launchEditor(itemsDim[item][0], itemsDim[item][1]);
-								    }
-							    })
-							  .setCancelable(true)
-							  .setNegativeButton(android.R.string.cancel,
-							    new DialogInterface.OnClickListener() {
-								    public void onClick(DialogInterface dialog, int id) {
-									    dialog.cancel();
-								    }
-								  });
-				return builder.create();
-			}
-			default:
-				return null;
-		}
 	}
 }

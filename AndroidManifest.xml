@@ -13,11 +13,12 @@
             </intent-filter>
         </activity>
         
-        <activity android:name=".browser.MyLevelsActivity"></activity>
-        <activity android:name=".browser.OnlineLevelsActivity"></activity>
+        <activity android:name=".browser.MySeriesActivity"></activity>
+        <activity android:name=".browser.OnlineSeriesActivity"></activity>
+        <activity android:name=".editor.SerieEditActivity"></activity>
                   
         
-        <activity android:name=".editor.Editor"
+        <activity android:name=".editor.EditorActivity"
                   android:configChanges="keyboard|keyboardHidden|orientation"
                   android:theme="@android:style/Theme.NoTitleBar">
           <intent-filter>

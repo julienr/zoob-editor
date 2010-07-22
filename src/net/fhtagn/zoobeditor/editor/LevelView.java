@@ -45,29 +45,68 @@ public class LevelView extends View {
 	
 	private EditorTool currentTool = null;
 	
-	public LevelView (Context context, int xdim, int ydim) {
+	public LevelView (Context context, JSONObject levelObj) throws JSONException {
 		super(context);
-		this.xdim = xdim;
-		this.ydim = ydim;
+		this.xdim = levelObj.getInt("xdim");
+		this.ydim = levelObj.getInt("ydim");
+		grid = new GridCell[xdim][ydim];
 		
-		grid = new GridCell[xdim][ydim]; 
-		for (int x=0; x<xdim; x++) {
+		if (levelObj.has("tiles")) {
+			JSONArray tilesArr = levelObj.getJSONArray("tiles");
 			for (int y=0; y<ydim; y++) {
-				if ((x == 0 && y == 0) ||
-						(x == xdim-1 && y==ydim-1) ||
-						(x == xdim-1 && y == 0) ||
-						(x == 0 && y == ydim-1)) //corners
-					grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.W);
-				else if (y == 0)
-					grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.T);
-				else if (y == ydim-1)
-					grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.B);
-				else if (x == 0)
-					grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.L);
-				else if (x == xdim-1)
-					grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.R);
-				else
-					grid[x][y] = new EmptyCell(new Coords(x, y));
+				JSONArray row = tilesArr.getJSONArray(y);
+				for (int x=0; x<xdim; x++) {
+					String v = row.getString(x);
+					if (Types.isEmpty(v)) {
+						grid[x][y] = new EmptyCell(new Coords(x,y));
+					} else {
+						Types.WallType t = Types.str2wall(row.getString(x));
+						grid[x][y] = new WallCell(new Coords(x,y), t);
+					}
+				}
+			}
+			/** TANKS **/
+			if (levelObj.has("tanks")) {
+				JSONArray tanksArr = levelObj.getJSONArray("tanks");
+				for (int i=0; i<tanksArr.length(); i++) {
+					JSONObject tank = tanksArr.getJSONObject(i);
+					Types.TankType type = Types.str2tank(tank.getString("type"));
+					JSONArray cArr = tank.getJSONArray("coords");
+					Coords c = new Coords(cArr.getInt(0), cArr.getInt(1));
+					
+					TankCell cell = new TankCell(c, context, type); 
+					
+					if (tank.has("path")) {
+						JSONArray pathArr = tank.getJSONArray("path");
+						ArrayList<Coords> path = new ArrayList<Coords>();
+						for (int j=0; j<pathArr.length(); j++) {
+							cArr = pathArr.getJSONArray(j);
+							path.add(new Coords(cArr.getInt(0), cArr.getInt(1)));
+						}
+						cell.setPath(path);
+					}
+					grid[c.getX()][c.getY()] = cell;
+				}
+			}
+		} else { //Build empty level
+			for (int x = 0; x < xdim; x++) {
+				for (int y = 0; y < ydim; y++) {
+					if ((x == 0 && y == 0) || 
+							(x == xdim - 1 && y == ydim - 1) || 
+							(x == xdim - 1 && y == 0) || 
+							(x == 0 && y == ydim - 1)) // corners
+						grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.W);
+					else if (y == 0)
+						grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.T);
+					else if (y == ydim - 1)
+						grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.B);
+					else if (x == 0)
+						grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.L);
+					else if (x == xdim - 1)
+						grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.R);
+					else
+						grid[x][y] = new EmptyCell(new Coords(x, y));
+				}
 			}
 		}
 		

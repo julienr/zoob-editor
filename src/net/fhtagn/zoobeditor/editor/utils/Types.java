@@ -9,6 +9,10 @@ public class Types {
 	public enum WallType {
 		T, L, B, R, W, M 
 	}
+	
+	static public boolean isEmpty (String str) {
+		return str.equals("E");
+	}
 
 	static public WallType str2wall (String str) {
 		if (str.equals("T"))
@@ -21,6 +25,8 @@ public class Types {
 			return WallType.W;
 		else if (str.equals("M"))
 			return WallType.M;
+		else if (str.equals("R"))
+			return WallType.R;
 		else {
 			Log.e(TAG, "Unhandled wall type : " + str);
 			return WallType.W;
