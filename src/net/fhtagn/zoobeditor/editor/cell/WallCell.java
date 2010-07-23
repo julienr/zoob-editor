@@ -20,21 +20,25 @@ public class WallCell extends GridCell {
 		drawPaint.setColor(Color.BLACK);
 	}
 	
+	public static RectF getRectFor (Types.WallType type) {
+		switch (type) {
+			case T: return new RectF(0, 0, 1, 0.5f);
+			case B: return new RectF(0, 0.5f, 1, 1);
+			case L: return new RectF(0, 0, 0.5f, 1);
+			case R: return new RectF(0.5f, 0, 1, 1);
+			case W: return new RectF(0, 0, 1, 1);
+			case M: return new RectF(0.25f, 0.25f, 0.75f, 0.75f);
+			default:
+				Log.e(TAG, "Unhandled type : " + type);
+				return null;
+		}
+	}
+	
 	public WallCell (Coords c, Types.WallType type) {
 		super(c);
 		this.type = type;
 		
-		switch (type) {
-			case T: drawRect = new RectF(0, 0, 1, 0.5f); break;
-			case B: drawRect = new RectF(0, 0.5f, 1, 1); break;
-			case L: drawRect = new RectF(0, 0, 0.5f, 1); break;
-			case R: drawRect = new RectF(0.5f, 0, 1, 1); break;
-			case W: drawRect = new RectF(0, 0, 1, 1); break;
-			case M: drawRect = new RectF(0.25f, 0.25f, 0.75f, 0.75f); break;
-			default:
-				Log.e(TAG, "Unhandled type : " + type);
-				drawRect = null;
-		}
+		drawRect = getRectFor(type);
 	}
 	
 	public Types.WallType getType () {

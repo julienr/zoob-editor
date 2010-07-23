@@ -311,9 +311,11 @@ public class SerieEditActivity extends ListActivity {
 				view = getLayoutInflater().inflate(R.layout.serieedit_item, null);
 			
 			TextView textName = (TextView)view.findViewById(R.id.name);
+			MiniLevelView levelView = (MiniLevelView)view.findViewById(R.id.minilevel);
 			try {
 	      JSONObject levelObj = levelsArray.getJSONObject(position);
 	      textName.setText("Level " + position + " ["+levelObj.getInt("xdim")+","+levelObj.getInt("ydim")+"]");
+	      levelView.setLevel(levelObj);
       } catch (JSONException e) {
       	textName.setText("Error reading level");
 	      e.printStackTrace();

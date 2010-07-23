@@ -25,8 +25,8 @@ import android.view.View;
 
 public class LevelView extends View {
 	static final int MARGIN = 4;
-	static final int LEVEL_MAX_WIDTH = 12;
-	static final int LEVEL_MAX_HEIGHT = 8;
+	public static final int LEVEL_MAX_WIDTH = 12;
+	public static final int LEVEL_MAX_HEIGHT = 8;
 	static final String TAG = "LevelView";
 	
 	//Size on x/y of a cell (calculated for resolution independence so a grid of 
@@ -60,7 +60,7 @@ public class LevelView extends View {
 					if (Types.isEmpty(v)) {
 						grid[x][y] = new EmptyCell(new Coords(x,y));
 					} else {
-						Types.WallType t = Types.str2wall(row.getString(x));
+						Types.WallType t = Types.str2wall(v);
 						grid[x][y] = new WallCell(new Coords(x,y), t);
 					}
 				}
