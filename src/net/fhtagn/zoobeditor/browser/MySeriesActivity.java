@@ -146,6 +146,14 @@ public class MySeriesActivity extends ListActivity {
 	}
 	
 	@Override
+	protected void onResume () {
+		super.onResume();
+		SerieAdapter adapter = (SerieAdapter)getListAdapter();
+		adapter.loadFiles();
+		adapter.notifyDataSetChanged();
+	}
+	
+	@Override
 	public void onListItemClick (ListView l, View v, int position, long id) {
 		l.showContextMenuForChild(v);
 	}

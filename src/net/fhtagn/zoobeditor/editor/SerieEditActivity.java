@@ -320,7 +320,7 @@ public class SerieEditActivity extends ListActivity {
       	TextView textView = new TextView(SerieEditActivity.this);
       	textView.setText("Error reading level");
 	      e.printStackTrace();
-	      return textView;
+	      return textView;	
       }
 	    return view;
     }

@@ -22,12 +22,19 @@ public class TankCell extends GridCell {
 	
 	//Paint used to draw "boss" text overlay
 	private final static Paint bossTextPaint;
+	private final static Paint playerTextPaint;
 	static {
 		bossTextPaint = new Paint();
 		bossTextPaint.setTextSize(0.5f);
 		bossTextPaint.setColor(Color.WHITE);
 		bossTextPaint.setTextAlign(Paint.Align.CENTER);
 		bossTextPaint.setShadowLayer(0.05f, 0.05f, 0.05f, Color.BLACK);
+		
+		playerTextPaint = new Paint();
+		playerTextPaint.setTextSize(0.35f);
+		playerTextPaint.setColor(Color.WHITE);
+		playerTextPaint.setTextAlign(Paint.Align.CENTER);
+		playerTextPaint.setShadowLayer(0.05f, 0.05f, 0.05f, Color.BLACK);
 	}
 
 	
@@ -76,6 +83,8 @@ public class TankCell extends GridCell {
 		}
 		if (Types.isBoss(type))
 			canvas.drawText("Boss", 0.5f, 0.9f, bossTextPaint);
+		else if (type == Types.TankType.PLAYER)
+			canvas.drawText("Player", 0.5f, 0.9f, playerTextPaint);
 	}
 
 	@Override

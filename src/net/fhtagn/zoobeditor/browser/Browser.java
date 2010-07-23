@@ -10,6 +10,7 @@ import android.app.Dialog;
 import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.TabHost;
@@ -40,5 +41,7 @@ public class Browser extends TabActivity {
 		tabHost.addTab(spec);
 		
 		tabHost.setCurrentTab(0);
+		
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); 
 	}
 }
