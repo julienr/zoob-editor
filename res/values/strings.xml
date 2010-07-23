@@ -29,4 +29,6 @@
 <string name="menu_delete">Delete</string>
 <string name="menu_play">Play</string>
 <string name="btn_newserie">New levels serie</string>
+<string name="delete_dlg_title">Confirm Delete</string>
+<string name="confirm_delete">Are you sure you want to delete that serie ?</string>
 </resources>

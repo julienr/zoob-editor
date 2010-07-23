@@ -1,5 +1,11 @@
 package net.fhtagn.zoobeditor.editor;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import net.fhtagn.zoobeditor.Common;
+import net.fhtagn.zoobeditor.ExternalStorageException;
 import net.fhtagn.zoobeditor.R;
 
 import org.json.JSONArray;
@@ -14,10 +20,13 @@ import com.commonsware.cwac.tlv.TouchListView.RemoveListener;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -25,10 +34,14 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class SerieEditActivity extends ListActivity {
 	static final String TAG = "SerieEditActivity";
 	static final int DIALOG_NEWLVL_ID = 0;
+	static final int DIALOG_ERR_EXTERNAL = 1;
+	static final int DIALOG_ERR_EXPORT = 2;
+	
 	static final int REQUEST_LEVEL_EDITOR = 1;
 	
 	private JSONObject serieObj;
@@ -120,6 +133,40 @@ public class SerieEditActivity extends ListActivity {
     	Log.e(TAG, "Error in moveLevel from " + from + " to " + to + " : " + e.getMessage());
       e.printStackTrace();
     }
+	} 
+	
+	public void save () {
+		String name;
+		File levelsDir;
+		try {
+			levelsDir = Common.getLevelsDir();
+		} catch (ExternalStorageException e) {
+			showDialog(DIALOG_ERR_EXTERNAL);
+			return;
+		}
+		
+		String jsonSerie = "";
+		try {
+			name = Common.removeSpecialCharacters(serieObj.getString("name"));
+	    jsonSerie = serieObj.toString();
+    } catch (JSONException e) {
+    	e.printStackTrace();
+    	showDialog(DIALOG_ERR_EXPORT);
+    	return;
+    }
+    
+    File levelFile = new File(levelsDir, name + ".json");
+    FileWriter writer;
+    try {
+	    writer = new FileWriter(levelFile);
+	    writer.write(jsonSerie);
+	    writer.close();
+	    Log.i(TAG, "Saved serie to : " + name);
+    } catch (IOException e) {
+	    e.printStackTrace();
+	    showDialog(DIALOG_ERR_EXTERNAL);
+	    return;
+    }
 	}
 	
 	@Override
@@ -141,7 +188,6 @@ public class SerieEditActivity extends ListActivity {
 	      	levelsArray.put(levelNumber, levelObj);
 	      else
 	      	levelsArray.put(levelObj);
-	      
 	      notifyAdapter();
       } catch (JSONException e) {
 	      e.printStackTrace();
@@ -153,6 +199,7 @@ public class SerieEditActivity extends ListActivity {
 	}
 	
 	public void notifyAdapter () {
+		save();
     SerieAdapter adapter = (SerieAdapter)getListAdapter();
     adapter.notifyDataSetChanged();
 	}
@@ -186,6 +233,18 @@ public class SerieEditActivity extends ListActivity {
     doLaunch(-1, obj);
 	}
 	
+	private Dialog createErrorDialog (final int dialogId, int messageRes) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(messageRes)
+					 .setCancelable(false)
+					 .setNeutralButton(android.R.string.ok,  new DialogInterface.OnClickListener() {
+						 	   public void onClick(DialogInterface dialog, int item) {
+						 	  	 dismissDialog(dialogId);
+						 	   }
+					 		 });
+		return builder.create();
+	}
+	
 	@Override
 	protected Dialog onCreateDialog (int id) {
 		switch (id) {
@@ -209,6 +268,12 @@ public class SerieEditActivity extends ListActivity {
 								    }
 								  });
 				return builder.create();
+			}
+			case DIALOG_ERR_EXTERNAL: {
+				return createErrorDialog(DIALOG_ERR_EXTERNAL, R.string.save_err_external);
+			}
+			case DIALOG_ERR_EXPORT: {
+				return createErrorDialog(DIALOG_ERR_EXPORT, R.string.save_err_export);
 			}
 			default:
 				return null;

@@ -44,10 +44,6 @@ public class EditorActivity extends Activity {
 	static final String TAG = "Editor";
 	static final int DIALOG_WALL_ID = 0;
 	static final int DIALOG_TANK_ID = 1;
-	static final int DIALOG_SAVE_NAME = 2;
-	static final int DIALOG_ERR_EXTERNAL = 3;
-	static final int DIALOG_ERR_EXPORT = 4;
-	static final int DIALOG_SAVE_SUCCESS = 5;
 	
 	private LevelView levelView;
 	
@@ -179,38 +175,6 @@ public class EditorActivity extends Activity {
 		finish();
 	}
 	
-	public void saveAs (String name) {
-		File levelsDir;
-		try {
-			levelsDir = Common.getLevelsDir();
-		} catch (ExternalStorageException e) {
-			showDialog(DIALOG_ERR_EXTERNAL);
-			return;
-		}
-		
-		String jsonLevel = "";
-		try {
-	    jsonLevel = levelView.toJSON().toString();
-    } catch (JSONException e) {
-    	e.printStackTrace();
-    	showDialog(DIALOG_ERR_EXPORT);
-    	return;
-    }
-    
-    File levelFile = new File(levelsDir, name + ".json");
-    FileWriter writer;
-    try {
-	    writer = new FileWriter(levelFile);
-	    writer.write(jsonLevel);
-	    writer.close();
-    } catch (IOException e) {
-	    e.printStackTrace();
-	    showDialog(DIALOG_ERR_EXTERNAL);
-	    return;
-    }
-    showDialog(DIALOG_SAVE_SUCCESS);
-	}
-	
 	private class WallTypeAdapter extends BaseAdapter {
 		private final Context context;
 		public WallTypeAdapter (Context c) {
@@ -297,18 +261,6 @@ public class EditorActivity extends Activity {
 		return builder.create();		
 	}
 	
-	private Dialog createErrorDialog (final int dialogId, int messageRes) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(messageRes)
-					 .setCancelable(false)
-					 .setNeutralButton(android.R.string.ok,  new DialogInterface.OnClickListener() {
-						 	   public void onClick(DialogInterface dialog, int item) {
-						 	  	 dismissDialog(dialogId);
-						 	   }
-					 		 });
-		return builder.create();
-	}
-	
 	@Override
 	protected Dialog onCreateDialog (int id) {
 		switch (id) {
@@ -337,17 +289,6 @@ public class EditorActivity extends Activity {
 					    }
 				    });
 			}
-			case DIALOG_SAVE_NAME: {
-				//FIXME:
-				return null;
-				//return new SaveDialog(this, DIALOG_SAVE_NAME, this);
-			}
-			case DIALOG_ERR_EXTERNAL:
-				return createErrorDialog(DIALOG_ERR_EXTERNAL, R.string.save_err_external);
-			case DIALOG_ERR_EXPORT:
-				return createErrorDialog(DIALOG_ERR_EXPORT, R.string.save_err_export);
-			case DIALOG_SAVE_SUCCESS: 
-				return createErrorDialog(DIALOG_SAVE_SUCCESS, R.string.save_success);
 			default:
 				return null;
 		}

@@ -20,4 +20,10 @@ public class Common {
     levelsDir.mkdirs();
     return levelsDir;
 	}
+	
+	public static String removeSpecialCharacters(String s) {
+	  return s.replaceAll("\\W", "");
+	}
+
+
 }

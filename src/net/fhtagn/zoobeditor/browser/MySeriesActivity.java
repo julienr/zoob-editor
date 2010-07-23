@@ -19,9 +19,11 @@ import net.fhtagn.zoobeditor.editor.utils.Types;
 import net.fhtagn.zoobeditor.editor.utils.WallView;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,28 +44,23 @@ public class MySeriesActivity extends ListActivity {
 	static final String TAG = "MyLevelsActivity";
 	
 	static final int DIALOG_NEWSERIE_ID = 0;
+	static final int DIALOG_CONFIRM_DELETE = 1;
 	
 	static final int MENU_ITEM_PLAY = 0;
 	static final int MENU_ITEM_EDIT = 1;
 	static final int MENU_ITEM_UPLOAD = 2;
 	static final int MENU_ITEM_DELETE = 3;
 	
+	private int deletePosition; //set when the confirm dialog for deletion is shown. Contains the item position 
+	
 	public void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 				
-		File root;
     try {
-    	//Normal case => display a list of levels
-	    root = Common.getLevelsDir();
-  		File[] levels = root.listFiles(new FilenameFilter() {
-  			@Override
-        public boolean accept(File file, String name) {
-  				return name.endsWith(".json");
-        }
-  		});
+    	Common.getLevelsDir(); //this is just to test if external storage is available. It will raise an exception if not
 			setContentView(R.layout.myseries_list);
 			
-  		setListAdapter(new LevelAdapter(this, levels));
+  		setListAdapter(new SerieAdapter(this));
   		getListView().setOnCreateContextMenuListener(this);
 			
 			Button newSerieBtn = (Button) findViewById(R.id.btn_newserie);
@@ -116,12 +113,19 @@ public class MySeriesActivity extends ListActivity {
     }
     
     switch (item.getItemId()) {
-    	case MENU_ITEM_EDIT:
+    	case MENU_ITEM_EDIT: {
+    		SerieAdapter adapter = (SerieAdapter)getListAdapter();
+    		JSONObject serieObj = adapter.loadSerie(info.position);
+    		launchSerieEditor(serieObj);
     		return true;
+    	}
     	case MENU_ITEM_UPLOAD:
     		return true;
-    	case MENU_ITEM_DELETE:
+    	case MENU_ITEM_DELETE: {
+    		deletePosition = info.position;
+    		showDialog(DIALOG_CONFIRM_DELETE);
     		return true;
+    	}
     }
     return false;
 	}
@@ -158,29 +162,73 @@ public class MySeriesActivity extends ListActivity {
 					}
 				});
 			}
+			case DIALOG_CONFIRM_DELETE: {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string.delete_dlg_title)
+							 .setMessage(R.string.confirm_delete)
+							  .setCancelable(true)
+							  .setPositiveButton(android.R.string.ok,
+							  		new DialogInterface.OnClickListener() {
+							  			public void onClick (DialogInterface dialog, int id) {
+							  				deleteSerie();
+							  			}
+							  	})
+							  .setNegativeButton(android.R.string.cancel,
+							    new DialogInterface.OnClickListener() {
+								    public void onClick(DialogInterface dialog, int id) {
+									    dialog.cancel();
+								    }
+								  });
+				return builder.create();
+			}
 			default:
 				return null;
 		}
 	}
 	
+	private void deleteSerie () {
+		SerieAdapter adapter = (SerieAdapter)getListAdapter();
+		adapter.deleteSerie(deletePosition);
+	}
 	
 	
-	public class LevelAdapter extends BaseAdapter {
-		private final File[] files;
+	
+	public class SerieAdapter extends BaseAdapter {
+		private File[] files;
 		private final Context context;
-		public LevelAdapter (Context context, File[] files) {
+		public SerieAdapter (Context context) {
 			super();
 			this.context = context;
-			this.files = files;
+			loadFiles();
+		}
+		
+		public void loadFiles () {
+			try {
+	    	//Normal case => display a list of levels
+		    File root = Common.getLevelsDir();
+	  		files = root.listFiles(new FilenameFilter() {
+	  			@Override
+	        public boolean accept(File file, String name) {
+	  				return name.endsWith(".json");
+	        }
+	  		});
+			} catch (ExternalStorageException e) {
+				e.printStackTrace();
+				files = null;
+			}
 		}
 
 		@Override
     public int getCount() {
+			if (files == null)
+				return 0;
 			return files.length;
     }
 
 		@Override
     public Object getItem(int position) {
+			if (files == null)
+				return null;
 			return files[position];
     }
 
@@ -189,9 +237,15 @@ public class MySeriesActivity extends ListActivity {
 			return position;
     }
 		
-		private JSONObject loadLevel (File f) {
+		public void deleteSerie (int position) {
+			files[position].delete();
+			loadFiles();
+			this.notifyDataSetChanged();
+		}
+		
+		public JSONObject loadSerie (int position) {
 		  try {
-	      BufferedReader reader = new BufferedReader(new FileReader(f));
+	      BufferedReader reader = new BufferedReader(new FileReader(files[position]));
 	      String content = "";
 	      String line;
 	      while ((line = reader.readLine()) != null)
@@ -220,7 +274,10 @@ public class MySeriesActivity extends ListActivity {
       //JSONObject levelObj = loadLevel(files[position]);
       //FIXME: currently, "name" is not stored in level => do that
       TextView textName = (TextView)view.findViewById(R.id.name);
-      textName.setText(files[position].getName());
+      if (files == null)
+      	textName.setText(R.string.save_err_external);
+      else
+      	textName.setText(files[position].getName());
     	/*try {
     		String name = levelObj.getString("name");
         textName.setText(name);
