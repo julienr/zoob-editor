@@ -25,6 +25,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -113,6 +114,20 @@ public class MySeriesActivity extends ListActivity {
     }
     
     switch (item.getItemId()) {
+    	case MENU_ITEM_PLAY: {
+    		Uri.Builder builder = new Uri.Builder();
+    		builder.scheme("content");
+    		builder.authority("net.fhtagn.zoobgame");
+    		
+    		SerieAdapter adapter = (SerieAdapter)getListAdapter();
+    		File serie = adapter.getSerie(info.position);
+    		builder.path(serie.getName());
+    		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", builder.build());
+    		Log.e(TAG, "uri : " + i.getData().toString());
+    		Log.e(TAG, "type : " + i.getType());
+    		startActivity(i);
+    		return true;
+    	}
     	case MENU_ITEM_EDIT: {
     		SerieAdapter adapter = (SerieAdapter)getListAdapter();
     		JSONObject serieObj = adapter.loadSerie(info.position);
@@ -261,6 +276,10 @@ public class MySeriesActivity extends ListActivity {
 	      e.printStackTrace();
 	      return null;
       }
+		}
+		
+		public File getSerie (int position) {
+			return files[position];
 		}
 
 		@Override
