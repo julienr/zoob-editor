@@ -310,15 +310,17 @@ public class SerieEditActivity extends ListActivity {
 			else
 				view = getLayoutInflater().inflate(R.layout.serieedit_item, null);
 			
-			TextView textName = (TextView)view.findViewById(R.id.name);
+			//TextView textName = (TextView)view.findViewById(R.id.name);
 			MiniLevelView levelView = (MiniLevelView)view.findViewById(R.id.minilevel);
 			try {
 	      JSONObject levelObj = levelsArray.getJSONObject(position);
-	      textName.setText("Level " + position + " ["+levelObj.getInt("xdim")+","+levelObj.getInt("ydim")+"]");
+	      //textName.setText("Level " + position + " ["+levelObj.getInt("xdim")+","+levelObj.getInt("ydim")+"]");
 	      levelView.setLevel(levelObj);
       } catch (JSONException e) {
-      	textName.setText("Error reading level");
+      	TextView textView = new TextView(SerieEditActivity.this);
+      	textView.setText("Error reading level");
 	      e.printStackTrace();
+	      return textView;
       }
 	    return view;
     }
