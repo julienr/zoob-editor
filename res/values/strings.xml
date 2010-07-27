@@ -31,4 +31,9 @@
 <string name="btn_newserie">New levels serie</string>
 <string name="delete_dlg_title">Confirm Delete</string>
 <string name="confirm_delete">Are you sure you want to delete that serie ?</string>
+<string name="no_account_found_title">No account found</string>
+<string name="no_account_found">No account found to upload tracks to.</string>
+<string name="choose_account_title">Choose Account</string>
+<string name="progress_title">Please wait...</string>
+
 </resources>
