@@ -20,7 +20,7 @@
         <activity android:name=".editor.SerieEditActivity"
                   android:configChanges="orientation" />
                   
-        <activity android:name=".browser.AccountList"/>
+        <activity android:name=".browser.GoogleLoginActivity"/>
                   
         
         <activity android:name=".editor.EditorActivity"

@@ -29,7 +29,7 @@ import android.widget.TextView;
 import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.R;
 
-public class AccountList extends Activity {
+public class GoogleLoginActivity extends Activity {
 	static final int DIALOG_PROGRESS = 1;
 	
 	private AuthManager auth = null;
@@ -37,9 +37,9 @@ public class AccountList extends Activity {
 	
 	private ProgressDialog progressDialog = null;
 	
-	private static AccountList instance = null;
+	private static GoogleLoginActivity instance = null;
 	
-	public static AccountList getInstance () {
+	public static GoogleLoginActivity getInstance () {
 		return instance;
 	}
 	
@@ -52,30 +52,8 @@ public class AccountList extends Activity {
 		super.onCreate(savedInstanceState);
 		instance = this;
 		
-		/*AccountChooser chooser = new AccountChooser();
-		chooser.chooseAccount(this, new AccountHandler() {
-			@Override
-      public void handleAccountSelected(Account account) {
-				System.out.println("Selected account : " + account.name);
-				text.setText("Selected : " + account.name);
-				choosedAccount = account;
-				getAuthToken();
-      }
-		});*/
-		
-		/*text = new TextView(this);
-		setContentView(text);*/
-		
-		Button authButton = new Button(this);
-		authButton.setText("authenticate");
-		authButton.setOnClickListener(new OnClickListener() {
-			@Override
-      public void onClick(View arg0) {
-				showDialog(DIALOG_PROGRESS);
-				authenticate(new Intent(), EditorConstants.SEND_TO_ZOOB_WEB);
-      }
-		});
-		setContentView(authButton);
+		showDialog(DIALOG_PROGRESS);
+		authenticate(new Intent(), EditorConstants.SEND_TO_ZOOB_WEB);
 	}
 	
 	private void authenticate (final Intent results, final int requestCode) {
@@ -86,7 +64,7 @@ public class AccountList extends Activity {
 			runOnUiThread(new Runnable() {
 				@Override
         public void run() {
-					accountChooser.chooseAccount(AccountList.this, new AccountChooser.AccountHandler() {
+					accountChooser.chooseAccount(GoogleLoginActivity.this, new AccountChooser.AccountHandler() {
 						@Override
 						public void handleAccountSelected(Account account) {
 							if (account == null) {
@@ -135,10 +113,16 @@ public class AccountList extends Activity {
 			}
 			case EditorConstants.SEND_TO_ZOOB_WEB: {
 				if (resultCode == RESULT_OK && auth != null) {
+					Intent i = new Intent();
+					i.putExtra("token", auth.getAuthToken());
 					dismissDialogSafely(DIALOG_PROGRESS);
+					setResult(RESULT_OK, i);
 					Log.i(EditorConstants.TAG, "Auth token : " + auth.getAuthToken());
+					finish();
 				} else {
 					dismissDialogSafely(DIALOG_PROGRESS);
+					setResult(RESULT_CANCELED);
+					finish();
 				}
 				break;
 			}
@@ -168,43 +152,4 @@ public class AccountList extends Activity {
       }
 		}, account);
 	}
-		
-	//This function might need to be called twice
-	//1. On the first call, it will launch the intent to request user's approval of the account's use
-	//2. On the second call, the actual auth token will be returned
-	/*private void getAuthToken () {
-		AccountManager accountManager = AccountManager.get(getApplicationContext());
-		accountManager.getAuthToken(choosedAccount, "ah", false, new AccountManagerCallback<Bundle>() {
-			@Override
-      public void run(AccountManagerFuture<Bundle> result) {
-				try {
-          Bundle bundle = result.getResult();
-          //An intent is returned if we should request user approval of his account usage
-          Intent intent = (Intent)bundle.get(AccountManager.KEY_INTENT);
-          if (intent != null) {
-          	System.out.println("got intent");
-          	startActivity(intent);
-          } else {
-          	String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-            System.out.println("obtained token : " + authToken);
-            text.setText("obtained token : " + authToken);
-          }
-        } catch (OperationCanceledException e) {
-          e.printStackTrace();
-        } catch (AuthenticatorException e) {
-          e.printStackTrace();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        
-      }
-		}, null);
-	}
-	
-	@Override
-	protected void onResume () {
-		super.onResume();
-		if (choosedAccount != null)
-			getAuthToken();
-	}*/
 }
