@@ -30,7 +30,8 @@ import android.util.Log;
 import java.io.IOException;
 
 import net.fhtagn.zoobeditor.EditorConstants;
-import net.fhtagn.zoobeditor.browser.GoogleLoginActivity;
+import net.fhtagn.zoobeditor.browser.Browser;
+import net.fhtagn.zoobeditor.browser.UploadActivity;
 
 /**
  * AuthManager keeps track of the current auth token for a user. The advantage
@@ -183,7 +184,7 @@ public class ModernAuthManager implements AuthManager {
       public void run() {
         accountManager.invalidateAuthToken(EditorConstants.ACCOUNT_TYPE,
             authToken);
-        GoogleLoginActivity.getInstance().getAccountChooser().chooseAccount(activity,
+        UploadActivity.getInstance().getAccountChooser().chooseAccount(activity,
             new AccountChooser.AccountHandler() {
               @Override
               public void handleAccountSelected(Account account) {

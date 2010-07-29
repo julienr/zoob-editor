@@ -1,17 +1,14 @@
 package net.fhtagn.zoobeditor.browser;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorConstants;
+import net.fhtagn.zoobeditor.R;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -22,11 +19,16 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class OnlineSeriesActivity extends Activity {
-	static final String LEVEL_LIST_GET_URL = "http://zoobweb.appspot.com/level";
 	
 	private JSONArray series = null;
 	
@@ -35,47 +37,52 @@ public class OnlineSeriesActivity extends Activity {
 	@Override
 	public void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		progress = new ProgressBar(this);
-		setContentView(progress);
-		progress.setIndeterminate(true);
 		
-		fetchSeriesJSON();
+		toLoadingState();
 	}
 	
-	private void onSeriesUpdated () {
+	private void toLoadingState () {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run () {
-				if (series != null) {
-					System.out.println("num series : " + series.length());
-					for (int i=0; i<series.length(); i++) {
-						try {
-	            JSONObject serieObj = series.getJSONObject(i);
-	            TextView textView = new TextView(OnlineSeriesActivity.this);
-	            String message = "serie name : " + serieObj.get("name") + ", by : " + serieObj.getJSONObject("meta").get("author");
-	            textView.setText(message);
-	            setContentView(textView);
-	            System.out.println(message);
-            } catch (JSONException e) {
-	            e.printStackTrace();
-            }
-					}
-				} else {
-					TextView textView = new TextView(OnlineSeriesActivity.this);
-					textView.setText("Error retrieving series");
-					setContentView(textView);
-					System.out.println("Error retrieving series");
-				}
+				setContentView(R.layout.loading);
+				progress = (ProgressBar)findViewById(R.id.progressbar);
+				progress.setIndeterminate(true);
+				fetchSeriesJSON();
 			}
 		});
 	}
 	
-	private void fetchSeriesJSON () {
+	private void toListState () {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run () {
+				progress = null;
+				setContentView(R.layout.onlineseries_list);
+				ListView listView = (ListView)findViewById(android.R.id.list);
+				listView.setAdapter(new SeriesAdapter());
+				
+				Button refreshBtn = (Button)findViewById(R.id.btn_refresh);
+				refreshBtn.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick (View v) {
+						toLoadingState();
+					}
+				});
+			}
+		});
+	}
+	
+	protected void onSeriesUpdated () {
+		toListState();
+	}
+	
+	protected void fetchSeriesJSON () {
 		(new Thread() {
 			@Override
 			public void run () {
 				HttpClient httpClient = new DefaultHttpClient();
-				HttpGet httpGet = new HttpGet(LEVEL_LIST_GET_URL);
+				HttpGet httpGet = new HttpGet(EditorConstants.getListUrl());
 				HttpResponse response;
 				
 				try {
@@ -103,5 +110,54 @@ public class OnlineSeriesActivity extends Activity {
 				onSeriesUpdated();
 			}
 		}).start();
+	}
+	
+	class SeriesAdapter extends BaseAdapter {
+		@Override
+		public int getCount () {
+			if (series == null)
+				return 0;
+			return series.length();
+		}
+		
+		@Override 
+		public Object getItem (int position) {
+			if (series == null)
+				return null;
+			try {
+	      return series.get(position);
+      } catch (JSONException e) {
+	      e.printStackTrace();
+	      return null;
+      }
+		}
+		
+		@Override
+		public long getItemId (int position) {
+			return position;
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view;
+			if (convertView != null)
+				view = convertView;
+			else
+				view = getLayoutInflater().inflate(R.layout.serielist_item, null);
+			TextView textName = (TextView)view.findViewById(R.id.name);
+			if (series == null)
+				textName.setText(R.string.save_err_external);
+			else {
+				JSONObject serieObj;
+        try {
+	        serieObj = series.getJSONObject(position);
+	        textName.setText(serieObj.getString("name"));
+        } catch (JSONException e) {
+	        e.printStackTrace();
+	        textName.setText("Error loading serie");
+        }
+			}
+			return view;
+		}
 	}
 }

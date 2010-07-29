@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.fhtagn.zoobeditor.Common;
+import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.ExternalStorageException;
 import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.editor.EditorActivity;
@@ -134,8 +135,15 @@ public class MySeriesActivity extends ListActivity {
     		launchSerieEditor(serieObj);
     		return true;
     	}
-    	case MENU_ITEM_UPLOAD:
+    	case MENU_ITEM_UPLOAD: {
+    		SerieAdapter adapter = (SerieAdapter)getListAdapter();
+    		JSONObject serieObj = adapter.loadSerie(info.position);
+    		Browser parent = (Browser)getParent();
+    		Intent i = new Intent(getApplicationContext(), UploadActivity.class);
+    		i.putExtra("data", serieObj.toString());
+    		startActivityForResult(i, EditorConstants.SEND_TO_ZOOB_WEB);
     		return true;
+    	}
     	case MENU_ITEM_DELETE: {
     		deletePosition = info.position;
     		showDialog(DIALOG_CONFIRM_DELETE);

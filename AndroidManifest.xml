@@ -15,12 +15,11 @@
             </intent-filter>
         </activity>
         
+        <activity android:name=".browser.UploadActivity"/>
         <activity android:name=".browser.MySeriesActivity"/>
         <activity android:name=".browser.OnlineSeriesActivity"/>
         <activity android:name=".editor.SerieEditActivity"
                   android:configChanges="orientation" />
-                  
-        <activity android:name=".browser.GoogleLoginActivity"/>
                   
         
         <activity android:name=".editor.EditorActivity"
@@ -35,7 +34,6 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH" />-->
     
     <uses-sdk android:minSdkVersion="3" />
 </manifest> 
