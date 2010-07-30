@@ -54,7 +54,7 @@ public class MiniLevelView extends View {
     	Log.e("MiniLevelView", "size changed to ["+w+","+h+"]");
     	return;
     }
-    Log.e("MiniLevelView", "onSizeChanged to ["+w+","+h+"]");
+    //Log.e("MiniLevelView", "onSizeChanged to ["+w+","+h+"]");
 
     int sx = w / LevelView.LEVEL_MAX_WIDTH;
     int sy = h / LevelView.LEVEL_MAX_HEIGHT;
