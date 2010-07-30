@@ -17,9 +17,9 @@
 //Copied from mytracks
 package com.google.android.apps.mytracks.io;
 
-import com.google.android.accounts.Account;
-import com.google.android.accounts.AccountManager;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;

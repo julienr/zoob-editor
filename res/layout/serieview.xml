@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:orientation="vertical">
+  <TextView android:id="@+id/name"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" />
+  <!-- <ListView android:id="@android:id/list"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"/>-->
+    
+    <GridView  
+      android:id="@android:id/list"
+      android:layout_width="fill_parent" 
+      android:layout_height="wrap_content"
+      android:numColumns="auto_fit"
+      android:verticalSpacing="10dp"
+      android:horizontalSpacing="10dp"
+      android:columnWidth="90dp"
+      android:stretchMode="columnWidth"
+      android:gravity="center" />
+    
+    
+  <RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    <Button android:id="@+id/dl_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/btn_download"
+      android:layout_centerInParent="true" />
+  </RelativeLayout>
+</LinearLayout>

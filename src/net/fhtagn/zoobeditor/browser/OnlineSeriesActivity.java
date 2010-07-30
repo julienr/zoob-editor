@@ -1,38 +1,27 @@
 package net.fhtagn.zoobeditor.browser;
 
-import java.io.InputStream;
-
-import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.R;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
-public class OnlineSeriesActivity extends Activity {
+public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClickListener {
 	
 	private JSONArray series = null;
-	
-	private ProgressBar progress;
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState) {
@@ -41,76 +30,45 @@ public class OnlineSeriesActivity extends Activity {
 		toLoadingState();
 	}
 	
-	private void toLoadingState () {
-		runOnUiThread(new Runnable() {
+	@Override
+	protected void onContentReady (String result) {
+    try {
+    	if (result != null)
+    		series = new JSONArray(result);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    
+		setContentView(R.layout.onlineseries_list);
+		ListView listView = (ListView)findViewById(android.R.id.list);
+		listView.setAdapter(new SeriesAdapter());
+		listView.setOnItemClickListener(OnlineSeriesActivity.this);
+		
+		Button refreshBtn = (Button)findViewById(R.id.btn_refresh);
+		refreshBtn.setOnClickListener(new OnClickListener() {
 			@Override
-			public void run () {
-				setContentView(R.layout.loading);
-				progress = (ProgressBar)findViewById(R.id.progressbar);
-				progress.setIndeterminate(true);
-				fetchSeriesJSON();
+			public void onClick (View v) {
+				toLoadingState();
 			}
 		});
 	}
 	
-	private void toListState () {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run () {
-				progress = null;
-				setContentView(R.layout.onlineseries_list);
-				ListView listView = (ListView)findViewById(android.R.id.list);
-				listView.setAdapter(new SeriesAdapter());
-				
-				Button refreshBtn = (Button)findViewById(R.id.btn_refresh);
-				refreshBtn.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick (View v) {
-						toLoadingState();
-					}
-				});
-			}
-		});
+	@Override
+	protected String getURL() {
+		return EditorConstants.getListUrl();
 	}
 	
-	protected void onSeriesUpdated () {
-		toListState();
-	}
-	
-	protected void fetchSeriesJSON () {
-		(new Thread() {
-			@Override
-			public void run () {
-				HttpClient httpClient = new DefaultHttpClient();
-				HttpGet httpGet = new HttpGet(EditorConstants.getListUrl());
-				HttpResponse response;
-				
-				try {
-					response = httpClient.execute(httpGet);
-					if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-						HttpEntity entity = response.getEntity();
-						if (entity == null) {
-							Log.e(EditorConstants.TAG, "Entity = null");
-							onSeriesUpdated();
-							return;
-						}
-						
-						InputStream instream = entity.getContent();
-						String result = Common.convertStreamToString(instream);
-						series = new JSONArray(result);
-					} else {
-						Log.e(EditorConstants.TAG, "Error : status code : " + response.getStatusLine().getStatusCode());
-						series = null;
-						//TODO: error
-					}
-				} catch (Exception e) {
-					series = null;
-					e.printStackTrace();
-				}
-				onSeriesUpdated();
-			}
-		}).start();
-	}
+	@Override
+  public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
+	  try {
+	    int serieId = series.getJSONObject(position).getJSONObject("meta").getInt("id");
+	    Intent i = new Intent(getApplicationContext(), OnlineSerieViewActivity.class);
+	    i.putExtra("serieid", serieId);
+	    startActivity(i);
+    } catch (JSONException e) {
+	    e.printStackTrace();
+    }
+  }
 	
 	class SeriesAdapter extends BaseAdapter {
 		@Override

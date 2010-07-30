@@ -18,7 +18,7 @@ public class EditorConstants {
 	/**
 	 * Zoobweb
 	 */
-	private static final boolean production = true; 
+	private static final boolean production = false; 
 	private static final String SERVER_URL = "http://zoobweb.appspot.com";
 	private static final String LOCAL_URL = "http://192.168.0.2:8080";
 	
@@ -39,5 +39,9 @@ public class EditorConstants {
 	
 	public static String getListUrl () {
 		return getServerUrl()+"/";
+	}
+	
+	public static String getDetailsUrl (int serieId) {
+		return getServerUrl()+"/show?id="+serieId;
 	}
 }

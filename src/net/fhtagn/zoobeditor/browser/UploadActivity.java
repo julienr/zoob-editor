@@ -12,13 +12,15 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.google.android.accounts.Account;
 import com.google.android.apps.mytracks.io.AccountChooser;
-import com.google.android.apps.mytracks.io.AuthManager;
-import com.google.android.apps.mytracks.io.AuthManagerFactory;
 
 import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.R;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -34,8 +36,8 @@ public class UploadActivity extends Activity {
 	static final int DIALOG_PROGRESS = 1;
 	static final int DIALOG_LOGIN_ERROR = 2;
 	static final int DIALOG_SUCCESS = 3;
-	
-	private AuthManager auth = null;
+
+	private AccountManager accountManager = null;
 	private AccountChooser accountChooser = new AccountChooser();
 	
 	private ProgressDialog progressDialog = null;
@@ -52,6 +54,8 @@ public class UploadActivity extends Activity {
 	public void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		instance = this;
+		
+		accountManager = AccountManager.get(this);
 		
 		Intent i = getIntent();
 		if (i == null) {
@@ -92,29 +96,19 @@ public class UploadActivity extends Activity {
 	
 	public void authenticate (final Intent results, final int requestCode) {
 		final String service = "ah";
-		if (auth == null)
-			auth = AuthManagerFactory.getAuthManager(this, requestCode, null, true, service);
 		
-		if (AuthManagerFactory.useModernAuthManager()) {
-			runOnUiThread(new Runnable() {
-				@Override
-        public void run() {
-					accountChooser.chooseAccount(UploadActivity.this, new AccountChooser.AccountHandler() {
-						@Override
-						public void handleAccountSelected(Account account) {
-							UploadActivity.this.account = account;
-							if (account == null) {
-								dismissDialogSafely(DIALOG_PROGRESS);
-								return;
-							}
-							doLogin(results, requestCode, service, account);
-						}
-					});
-        }
-			});
-		} else {
-			doLogin(results, requestCode, service, null);
-		}
+		accountChooser.chooseAccount(UploadActivity.this, new AccountChooser.AccountHandler() {
+			@Override
+			public void handleAccountSelected(Account account) {
+				UploadActivity.this.account = account;
+				if (account == null) {
+					Log.e(TAG, "No account chooser, account = null");
+					dismissDialogSafely(DIALOG_PROGRESS);
+					return;
+				}
+				onActivityResult(requestCode, RESULT_OK, results);
+			}
+		});
 	}
 	
 	@Override
@@ -171,7 +165,14 @@ public class UploadActivity extends Activity {
 		
 		try {
 			if (EditorConstants.isProd()) {
-				final String token = auth.getAuthToken();
+				AccountManagerFuture<Bundle> authToken = accountManager.getAuthToken(account, "ah", null, UploadActivity.this, null, null);
+				Bundle bundle = authToken.getResult();
+				String token = bundle.get(AccountManager.KEY_AUTHTOKEN).toString();
+				//invalidate and get new, otherwise we might have an expired cached token, leading to authentication failure
+				accountManager.invalidateAuthToken(account.type, token);
+				authToken = accountManager.getAuthToken(account, "ah", null, UploadActivity.this, null, null);
+				bundle = authToken.getResult();
+				token = bundle.get(AccountManager.KEY_AUTHTOKEN).toString();
 				
 				final String continueURL = EditorConstants.getServerUrl();
 				httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);		
@@ -222,6 +223,10 @@ public class UploadActivity extends Activity {
 	    e.printStackTrace();
     } catch (IOException e) {
 	    e.printStackTrace();
+    } catch (OperationCanceledException e) {
+	    e.printStackTrace();
+    } catch (AuthenticatorException e) {
+	    e.printStackTrace();
     }
     return false;
 	}
@@ -245,7 +250,7 @@ public class UploadActivity extends Activity {
 	@Override
 	protected void onActivityResult (int requestCode, int resultCode, final Intent results) {
 		switch (requestCode) {
-			case EditorConstants.GET_LOGIN: {
+/*			case EditorConstants.GET_LOGIN: {
 				if (resultCode == RESULT_OK && auth != null) {
 					if (!auth.authResult(resultCode, results)) {
 						dismissDialogSafely(DIALOG_PROGRESS);
@@ -254,10 +259,9 @@ public class UploadActivity extends Activity {
 					dismissDialogSafely(DIALOG_PROGRESS);
 				}
 				break;
-			}
+			}*/
 			case EditorConstants.SEND_TO_ZOOB_WEB: {
-				if (resultCode == RESULT_OK && auth != null) {
-					Log.i(EditorConstants.TAG, "Auth token : " + auth.getAuthToken());
+				if (resultCode == RESULT_OK) {
 					(new Thread() {
 						public void run() {
 							if (getCookieFromAuthToken()) {
@@ -279,7 +283,6 @@ public class UploadActivity extends Activity {
 					}).start();
 				} else {
 					dismissDialogSafely(DIALOG_PROGRESS);
-					auth = null;
 					showDialogSafely(DIALOG_LOGIN_ERROR);
 				}
 				break;
@@ -310,14 +313,4 @@ public class UploadActivity extends Activity {
 			}
 		});
 	}
-	
-	private void doLogin (final Intent results, final int requestCode, final String service, final Account account) {
-		auth.doLogin(new Runnable() {
-			@Override
-      public void run() {
-				onActivityResult(requestCode, RESULT_OK, results);
-      }
-		}, account);
-	}
-	
 }

@@ -16,6 +16,7 @@
         </activity>
         
         <activity android:name=".browser.UploadActivity"/>
+        <activity android:name=".browser.OnlineSerieViewActivity"/>
         <activity android:name=".browser.MySeriesActivity"/>
         <activity android:name=".browser.OnlineSeriesActivity"/>
         <activity android:name=".editor.SerieEditActivity"
@@ -32,6 +33,7 @@
     </application>
     
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.INTERNET" />
     
