@@ -31,11 +31,12 @@
    
    <RelativeLayout 
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
-	   <Button android:id="@+id/dl_btn"
+    android:layout_height="wrap_content"
+    android:padding="2dip">
+	   <Button android:id="@+id/btn_play"
 	     android:layout_width="wrap_content"
 	     android:layout_height="wrap_content"
-	     android:text="@string/btn_download"
+	     android:text="@string/btn_play"
 	     android:padding="5dp"
 	     android:layout_centerInParent="true" />
    </RelativeLayout>

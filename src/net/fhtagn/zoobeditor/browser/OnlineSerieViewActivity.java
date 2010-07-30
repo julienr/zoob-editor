@@ -1,9 +1,12 @@
 package net.fhtagn.zoobeditor.browser;
 
+import java.io.IOException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.browser.OnlineSeriesActivity.SeriesAdapter;
@@ -73,7 +76,27 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	    e.printStackTrace();
     }
 		
-		Button downloadBtn = (Button)findViewById(R.id.dl_btn);
+		Button playBtn = (Button)findViewById(R.id.btn_play);
+		playBtn.setOnClickListener(new OnClickListener() {
+			@Override
+      public void onClick(View view) {
+				if (serieObj == null) {
+					Log.e(TAG, "Trying to play with serieObj = null");
+					return;
+				}
+				try {
+					Common.saveCommunitySerie(serieObj);
+					Intent i = Common.playCommunitySerie(serieObj);
+					startActivity(i);
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return;
+				} catch (IOException e) {
+					e.printStackTrace();
+					return;
+				}				
+      }
+		});
 	}
 	
 	@Override

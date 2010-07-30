@@ -59,7 +59,7 @@ public class MySeriesActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 				
     try {
-    	Common.getLevelsDir(); //this is just to test if external storage is available. It will raise an exception if not
+    	Common.getMySeriesDir(); //this is just to test if external storage is available. It will raise an exception if not
 			setContentView(R.layout.myseries_list);
 			
   		setListAdapter(new SerieAdapter(this));
@@ -73,6 +73,7 @@ public class MySeriesActivity extends ListActivity {
 				}
 			});
     } catch (ExternalStorageException e) {
+    	//FIXME: this won't work because we are in a list activity.
     	//If the external storage is not available, display simple error message
   		e.printStackTrace();
   		TextView textView = new TextView(this);
@@ -116,7 +117,7 @@ public class MySeriesActivity extends ListActivity {
     
     switch (item.getItemId()) {
     	case MENU_ITEM_PLAY: {
-    		Uri.Builder builder = new Uri.Builder();
+    		/*Uri.Builder builder = new Uri.Builder();
     		builder.scheme("content");
     		builder.authority("net.fhtagn.zoobgame");
     		
@@ -127,7 +128,16 @@ public class MySeriesActivity extends ListActivity {
     		Log.e(TAG, "uri : " + i.getData().toString());
     		Log.e(TAG, "type : " + i.getType());
     		startActivity(i);
-    		return true;
+    		return true;*/
+    		SerieAdapter adapter = (SerieAdapter)getListAdapter();
+    		try {
+	        Intent i = Common.playMySerie(adapter.loadSerie(info.position));
+	        startActivity(i);
+	        return true;
+        } catch (JSONException e) {
+	        e.printStackTrace();
+	        return false;
+        }
     	}
     	case MENU_ITEM_EDIT: {
     		SerieAdapter adapter = (SerieAdapter)getListAdapter();
@@ -236,7 +246,7 @@ public class MySeriesActivity extends ListActivity {
 		public void loadFiles () {
 			try {
 	    	//Normal case => display a list of levels
-		    File root = Common.getLevelsDir();
+		    File root = Common.getMySeriesDir();
 	  		files = root.listFiles(new FilenameFilter() {
 	  			@Override
 	        public boolean accept(File file, String name) {

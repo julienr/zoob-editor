@@ -136,32 +136,15 @@ public class SerieEditActivity extends ListActivity {
 	} 
 	
 	public void save () {
-		String name;
-		File levelsDir;
 		try {
-			levelsDir = Common.getLevelsDir();
+			Common.saveMySerie(serieObj);
 		} catch (ExternalStorageException e) {
 			showDialog(DIALOG_ERR_EXTERNAL);
 			return;
-		}
-		
-		String jsonSerie = "";
-		try {
-			name = Common.removeSpecialCharacters(serieObj.getString("name"));
-	    jsonSerie = serieObj.toString();
-    } catch (JSONException e) {
+		} catch (JSONException e) {
     	e.printStackTrace();
     	showDialog(DIALOG_ERR_EXPORT);
     	return;
-    }
-    
-    File levelFile = new File(levelsDir, name + ".json");
-    FileWriter writer;
-    try {
-	    writer = new FileWriter(levelFile);
-	    writer.write(jsonSerie);
-	    writer.close();
-	    Log.i(TAG, "Saved serie to : " + name);
     } catch (IOException e) {
 	    e.printStackTrace();
 	    showDialog(DIALOG_ERR_EXTERNAL);
