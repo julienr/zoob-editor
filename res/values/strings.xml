@@ -22,8 +22,8 @@
 <string name="save_err_external">Error writing to the external directory</string>
 <string name="save_err_export">Error during level export</string>
 <string name="save_success">Saved succesfully </string>
-<string name="myseries_tab">My series</string>
-<string name="online_tab">Online Series</string>
+<string name="myseries_tab">My levels</string>
+<string name="online_tab">Community levels</string>
 <string name="menu_edit">Edit</string>
 <string name="menu_upload">Upload</string>
 <string name="menu_delete">Delete</string>
