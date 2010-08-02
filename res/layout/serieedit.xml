@@ -8,6 +8,11 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:text="@string/btn_newlevel"/>
+  <TextView android:id="@+id/debugmsg"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text=""/>
+    
   <com.commonsware.cwac.tlv.TouchListView
         xmlns:tlv="http://schemas.android.com/apk/res/net.fhtagn.zoobeditor"
         android:id="@android:id/list"

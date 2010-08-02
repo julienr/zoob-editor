@@ -32,11 +32,11 @@ public class LevelSizeDialog extends AlertDialog {
 		 });
 	  
 	  final NumberPicker widthPicker = (NumberPicker)view.findViewById(R.id.width);
-	  widthPicker.setRange(8, 12);
+	  widthPicker.setRange(4, 12);
 	  widthPicker.setWrap(false);
 	  
 	  final NumberPicker heightPicker = (NumberPicker)view.findViewById(R.id.height);
-	  heightPicker.setRange(8, 10);
+	  heightPicker.setRange(4, 8);
 	  heightPicker.setWrap(false);
 	  
 	  

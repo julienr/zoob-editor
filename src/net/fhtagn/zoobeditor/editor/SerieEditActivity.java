@@ -47,6 +47,8 @@ public class SerieEditActivity extends ListActivity {
 	private JSONObject serieObj;
 	private JSONArray levelsArray;
 	
+	private TextView debugText;
+	
 	@Override
 	public void onCreate (Bundle bundle) {
 		super.onCreate(bundle);
@@ -61,6 +63,8 @@ public class SerieEditActivity extends ListActivity {
    
 	    setContentView(R.layout.serieedit);
 	    
+	    debugText = (TextView)findViewById(R.id.debugmsg);
+	    
 			//Create levels array if not yet existing
 			JSONArray arr = serieObj.optJSONArray("levels");
 			if (arr == null) {
@@ -73,12 +77,12 @@ public class SerieEditActivity extends ListActivity {
 	    
 	    /** Drag'n'drop reordering */
 	    TouchListView listView = (TouchListView)getListView();
-	    listView.setDragListener(new DragListener() {
+	    /*listView.setDragListener(new DragListener() {
 				@Override
         public void drag(int from, int to) {
 					//FIXME: highlight the place where it would end ?
         }
-	    });
+	    });*/
 	    
 	    //Remove is disallowed
 	    /*listView.setRemoveListener(new RemoveListener() {
@@ -91,6 +95,7 @@ public class SerieEditActivity extends ListActivity {
 	    listView.setDropListener(new DropListener() {
 				@Override
         public void drop(int from, int to) {
+					debugText.setText("Drop from  " + from + " to " + to);
 					moveLevel(from, to);
         }
 	    });
@@ -120,14 +125,24 @@ public class SerieEditActivity extends ListActivity {
       	if (i == from) {
       		
       	} else if (i == to) {
-      		newArray.put(levelsArray.getJSONObject(from));
-      		newArray.put(levelsArray.getJSONObject(i));
+      		if (from < to) {
+      			newArray.put(levelsArray.getJSONObject(i));
+      			newArray.put(levelsArray.getJSONObject(from));
+      		} else {
+      			newArray.put(levelsArray.getJSONObject(from));
+      			newArray.put(levelsArray.getJSONObject(i));
+      		}
+      		
       	} else {
       		newArray.put(levelsArray.getJSONObject(i));
       	}
       }
       serieObj.put("levels", newArray);
       levelsArray = newArray;
+      Log.i(TAG, "newArray : ");
+      for (int i=0; i<newArray.length(); i++) {
+      	Log.i(TAG, "" + i + ":"+newArray.getJSONObject(i).getInt("xdim")+"*"+newArray.getJSONObject(i).getInt("ydim"));
+      }
       notifyAdapter();
     } catch (JSONException e) {
     	Log.e(TAG, "Error in moveLevel from " + from + " to " + to + " : " + e.getMessage());
