@@ -101,7 +101,7 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 			if (convertView != null)
 				view = convertView;
 			else
-				view = getLayoutInflater().inflate(R.layout.serielist_item, null);
+				view = getLayoutInflater().inflate(R.layout.onlineserielist_item, null);
 			TextView textName = (TextView)view.findViewById(R.id.name);
 			if (series == null)
 				textName.setText(R.string.save_err_external);

@@ -14,7 +14,9 @@
     android:layout_height="wrap_content"
     style="?android:attr/ratingBarStyleIndicator"
     android:layout_alignParentRight="true"
-    android:isIndicator="true" />
+    android:isIndicator="true"
+    android:rating="4"
+    android:numStars="5" />
     
   <TextView android:id="@+id/upload_status"
     android:layout_width="wrap_content"
@@ -22,6 +24,6 @@
     android:layout_below="@id/rating"
     android:layout_alignParentRight="true"
     android:textStyle="bold"
-    android:textColor="#FFBC3300"
-    android:text="Not uploaded" />
+    android:textColor="#FF50AB86"
+    android:text="Downloaded" />
 </RelativeLayout>
