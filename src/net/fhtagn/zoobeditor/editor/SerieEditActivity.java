@@ -17,6 +17,7 @@ import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -43,6 +44,7 @@ public class SerieEditActivity extends ListActivity {
 	@Override
 	public void onCreate (Bundle bundle) {
 		super.onCreate(bundle);
+		
 		Intent i = getIntent();
 		if (i == null)
 			Log.e("SerieEditActivity", "NULL INTENT");
@@ -53,6 +55,7 @@ public class SerieEditActivity extends ListActivity {
 	    serieObj = new JSONObject(serieString);
    
 	    setContentView(R.layout.serieedit);
+	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);    
 	    
 	    debugText = (TextView)findViewById(R.id.debugmsg);
 	    

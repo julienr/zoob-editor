@@ -39,8 +39,6 @@ public class Browser extends TabActivity {
 		
 		tabHost.setCurrentTab(0);
 		
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		
 		//FIXME: big hack, but found no other way to achieve that.
 		//Since we don't us icons in our tabs, reduce tab height. 
 		TabWidget tw = getTabHost().getTabWidget();
@@ -48,5 +46,11 @@ public class Browser extends TabActivity {
 			final float scale = res.getDisplayMetrics().density;
 			tw.getChildAt(i).getLayoutParams().height = (int)(scale*40); //40 dip for tab height (converted to pixels by using scale 
 		}
+	}
+	
+	@Override
+	protected void onResume () {
+		super.onResume();
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 	}
 }
