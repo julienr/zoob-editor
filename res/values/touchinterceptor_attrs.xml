@@ -13,11 +13,18 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
 <resources>
-    <!-- height of a normal list item in edit playlist mode -->
-    <dimen name="normal_height">64dip</dimen>
-    <!-- height of an expanded list item in edit playlist mode -->
-    <dimen name="expanded_height">128dip</dimen>
-    <color name="dragndrop_background">#e0103010</color>
+  <declare-styleable name="TouchInterceptor">
+    <attr name="normal_height" format="dimension" />
+    <attr name="expanded_height" format="dimension" />
+    <attr name="grabber" format="reference" />
+    <attr name="dragndrop_background" format="color" />
+    <attr name="remove_mode">
+      <enum name="none" value="-1" />
+      <enum name="fling" value="0" />
+      <enum name="slide" value="1" />
+      <enum name="slideRight" value="1" />
+      <enum name="slideLeft" value="2" />
+    </attr>
+  </declare-styleable>
 </resources>

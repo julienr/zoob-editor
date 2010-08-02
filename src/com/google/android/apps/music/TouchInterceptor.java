@@ -20,6 +20,7 @@ import net.fhtagn.zoobeditor.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -61,16 +62,27 @@ public class TouchInterceptor extends ListView {
     private int mItemHeightNormal;
     private int mItemHeightExpanded;
     private int mItemHeightHalf;
+    private int grabberId=-1;
+    private int dragndropBackgroundColor=0x00000000; 
 
     public TouchInterceptor(Context context, AttributeSet attrs) {
         super(context, attrs);
-        SharedPreferences pref = context.getSharedPreferences("Music", 3);
-        mRemoveMode = pref.getInt("deletemode", -1);
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
-        Resources res = getResources();
-        mItemHeightNormal = res.getDimensionPixelSize(R.dimen.normal_height);
-        mItemHeightHalf = mItemHeightNormal / 2;
-        mItemHeightExpanded = res.getDimensionPixelSize(R.dimen.expanded_height);
+				if (attrs != null) {
+					TypedArray a = getContext().obtainStyledAttributes(attrs,
+					    R.styleable.TouchInterceptor, 0, 0);
+		
+					mItemHeightNormal = a.getDimensionPixelSize(
+					    R.styleable.TouchInterceptor_normal_height, 0);
+					mItemHeightExpanded = a.getDimensionPixelSize(
+					    R.styleable.TouchInterceptor_expanded_height, mItemHeightNormal);
+					grabberId = a.getResourceId(R.styleable.TouchInterceptor_grabber, -1);
+					dragndropBackgroundColor = a.getColor(
+					    R.styleable.TouchInterceptor_dragndrop_background, 0x00000000);
+					mRemoveMode = a.getInt(R.styleable.TouchInterceptor_remove_mode, -1);
+		
+					a.recycle();
+				}
     }
     
     @Override
@@ -112,7 +124,7 @@ public class TouchInterceptor extends ListView {
                     ViewGroup item = (ViewGroup) getChildAt(itemnum - getFirstVisiblePosition());
                     mDragPoint = y - item.getTop();
                     mCoordOffset = ((int)ev.getRawY()) - y;
-                    View dragger = item.findViewById(R.id.grabber);
+                    View dragger = item.findViewById(grabberId);
                     Rect r = mTempRect;
                     dragger.getDrawingRect(r);
                     // The dragger icon itself is quite small, so pretend the touch area is bigger
@@ -353,8 +365,7 @@ public class TouchInterceptor extends ListView {
         
         Context context = getContext();
         ImageView v = new ImageView(context);
-        int backGroundColor = context.getResources().getColor(R.color.dragndrop_background);
-        v.setBackgroundColor(backGroundColor);
+        v.setBackgroundColor(dragndropBackgroundColor);
         v.setImageBitmap(bm);
         mDragBitmap = bm;
 

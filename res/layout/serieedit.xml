@@ -14,15 +14,16 @@
     android:text=""/>
     
   <com.google.android.apps.music.TouchInterceptor
-        xmlns:tlv="http://schemas.android.com/apk/res/net.fhtagn.zoobeditor"
+        xmlns:ti="http://schemas.android.com/apk/res/net.fhtagn.zoobeditor"
         android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:drawSelectorOnTop="false"
         android:scrollbars="vertical"
-        tlv:grabber="@+id/grabber"
-        tlv:remove_mode="none"
-        tlv:normal_height="64dip" />
+        ti:grabber="@+id/grabber"
+        ti:remove_mode="none"
+        ti:normal_height="64dip"
+        ti:expanded_height="128dip" />
   <!--<ListView android:id="@android:id/list"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" />-->
