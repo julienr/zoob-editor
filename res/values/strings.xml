@@ -7,7 +7,7 @@
 
 <string name="xdim">Width</string>
 <string name="ydim">Height</string>
-<string name="newlvl_dlg_title">New level</string>
+<string name="lvlsize_dlg_title">Choose level size</string>
 <string name="btn_wall">Wall</string>
 <string name="btn_erase">Erase</string>
 <string name="editor_wall_dlg_title">Choose wall type</string>

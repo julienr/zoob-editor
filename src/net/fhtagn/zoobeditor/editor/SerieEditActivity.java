@@ -232,7 +232,7 @@ public class SerieEditActivity extends ListActivity {
 	protected Dialog onCreateDialog (int id) {
 		switch (id) {
 			case DIALOG_NEWLVL_ID: {
-				final CharSequence[] items = {"8x8", "9x8"};
+				/*final CharSequence[] items = {"8x8", "9x8"};
 				final int[][] itemsDim = {{8,8},{9,8}};
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.newlvl_dlg_title)
@@ -250,7 +250,13 @@ public class SerieEditActivity extends ListActivity {
 									    dialog.cancel();
 								    }
 								  });
-				return builder.create();
+				return builder.create();*/
+				return new LevelSizeDialog(this, DIALOG_NEWLVL_ID, this, new LevelSizeDialog.OnOkListener() {
+					@Override
+					public void onOK(int xdim, int ydim) {
+						launchEditorNew(xdim, ydim);
+					}
+				});
 			}
 			case DIALOG_ERR_EXTERNAL: {
 				return createErrorDialog(DIALOG_ERR_EXTERNAL, R.string.save_err_external);
