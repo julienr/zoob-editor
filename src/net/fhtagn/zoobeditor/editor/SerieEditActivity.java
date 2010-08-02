@@ -1,7 +1,5 @@
 package net.fhtagn.zoobeditor.editor;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import net.fhtagn.zoobeditor.Common;
@@ -12,21 +10,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.commonsware.cwac.tlv.TouchListView;
-import com.commonsware.cwac.tlv.TouchListView.DragListener;
-import com.commonsware.cwac.tlv.TouchListView.DropListener;
-import com.commonsware.cwac.tlv.TouchListView.RemoveListener;
+import com.google.android.apps.music.TouchInterceptor;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -34,7 +26,6 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class SerieEditActivity extends ListActivity {
 	static final String TAG = "SerieEditActivity";
@@ -76,7 +67,7 @@ public class SerieEditActivity extends ListActivity {
 	    setListAdapter(new SerieAdapter());
 	    
 	    /** Drag'n'drop reordering */
-	    TouchListView listView = (TouchListView)getListView();
+	    TouchInterceptor listView = (TouchInterceptor)getListView();
 	    /*listView.setDragListener(new DragListener() {
 				@Override
         public void drag(int from, int to) {
@@ -92,7 +83,7 @@ public class SerieEditActivity extends ListActivity {
         }
 	    });*/
 	    
-	    listView.setDropListener(new DropListener() {
+	    listView.setDropListener(new TouchInterceptor.DropListener() {
 				@Override
         public void drop(int from, int to) {
 					debugText.setText("Drop from  " + from + " to " + to);
@@ -139,10 +130,10 @@ public class SerieEditActivity extends ListActivity {
       }
       serieObj.put("levels", newArray);
       levelsArray = newArray;
-      Log.i(TAG, "newArray : ");
+      /*Log.i(TAG, "newArray : ");
       for (int i=0; i<newArray.length(); i++) {
       	Log.i(TAG, "" + i + ":"+newArray.getJSONObject(i).getInt("xdim")+"*"+newArray.getJSONObject(i).getInt("ydim"));
-      }
+      }*/
       notifyAdapter();
     } catch (JSONException e) {
     	Log.e(TAG, "Error in moveLevel from " + from + " to " + to + " : " + e.getMessage());
