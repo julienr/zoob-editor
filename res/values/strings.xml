@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <string name="app_name">net.fhtagn.zoobeditor</string>
+<string name="app_name">ZoobEditor</string>
 <string name="btn_newlevel">New level</string>
 
 

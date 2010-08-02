@@ -192,7 +192,7 @@ public class MySeriesActivity extends ListActivity {
 	protected Dialog onCreateDialog (int id) {
 		switch (id) {
 			case DIALOG_NEWSERIE_ID: {
-				return new SaveDialog(this, DIALOG_NEWSERIE_ID, this, new SaveDialog.OnOkListener() {
+				return new NameDialog(this, DIALOG_NEWSERIE_ID, this, new NameDialog.OnOkListener() {
 					@Override
 					public void onOK(String enteredText) {
 						try {

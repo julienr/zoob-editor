@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class SaveDialog extends AlertDialog {
+public class NameDialog extends AlertDialog {
 	
 	public interface OnOkListener {
 		public void onOK (String enteredText);
@@ -20,7 +20,7 @@ public class SaveDialog extends AlertDialog {
 	
 	private final OnOkListener listener;
 
-	protected SaveDialog(Context context, final int thisID, final Activity sourceActivity, final OnOkListener listener) {
+	protected NameDialog(Context context, final int thisID, final Activity sourceActivity, final OnOkListener listener) {
 	  super(context);
 	  
 	  this.listener = listener;
@@ -49,7 +49,7 @@ public class SaveDialog extends AlertDialog {
 	  editText.addTextChangedListener(new TextWatcher() {
 			@Override
       public void afterTextChanged(Editable editable) {
-				Button okButton = SaveDialog.this.getButton(AlertDialog.BUTTON_POSITIVE);
+				Button okButton = NameDialog.this.getButton(AlertDialog.BUTTON_POSITIVE);
 				if (okButton == null)
 					return;
 				
@@ -71,7 +71,7 @@ public class SaveDialog extends AlertDialog {
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Button okButton = SaveDialog.this.getButton(AlertDialog.BUTTON_POSITIVE);
+		Button okButton = NameDialog.this.getButton(AlertDialog.BUTTON_POSITIVE);
 		if (okButton != null)
 			okButton.setEnabled(false);
 	}
