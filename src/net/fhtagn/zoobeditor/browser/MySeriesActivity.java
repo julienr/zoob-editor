@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -47,7 +48,7 @@ public class MySeriesActivity extends ListActivity {
 	
 	private long deleteID; //set when the confirm dialog for deletion is shown. Contains the item position 
 	
-	private String[] projection = new String[]{Series.ID, Series.JSON};
+	private String[] projection = new String[]{Series.ID, Series.JSON, Series.COMMUNITY_ID};
 	
 	public void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -152,7 +153,7 @@ public class MySeriesActivity extends ListActivity {
 	  obj.put("name", name);
 	  ContentValues values = new ContentValues();
 	  values.put(Series.JSON, obj.toString());
-	  values.put(Series.IS_MINE, 1);
+	  values.put(Series.IS_MINE, true);
 	  return getContentResolver().insert(Series.CONTENT_URI, values);
 	}
 	
@@ -232,6 +233,16 @@ public class MySeriesActivity extends ListActivity {
 				e.printStackTrace();
 				textName.setText("JSON error");
 			}		
+			
+			TextView uploadStatus = (TextView)view.findViewById(R.id.upload_status);
+			boolean uploaded = !cursor.isNull(cursor.getColumnIndex(Series.COMMUNITY_ID));
+			if (uploaded) {
+				uploadStatus.setText(R.string.uploaded);
+				uploadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);
+			} else {
+				uploadStatus.setText(R.string.not_uploaded);
+				uploadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
+			}
 		}
 
 		@Override

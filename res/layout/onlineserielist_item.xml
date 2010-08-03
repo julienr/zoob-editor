@@ -18,7 +18,7 @@
     android:rating="4"
     android:numStars="5" />
     
-  <TextView android:id="@+id/upload_status"
+  <TextView android:id="@+id/download_status"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_below="@id/rating"

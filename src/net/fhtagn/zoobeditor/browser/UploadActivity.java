@@ -3,8 +3,10 @@ package net.fhtagn.zoobeditor.browser;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.Series;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -14,6 +16,8 @@ import org.apache.http.client.params.ClientPNames;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -24,8 +28,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -49,6 +57,8 @@ public class UploadActivity extends Activity {
 	
 	private String toUploadContent = null;
 	
+	private Uri serieUri;
+	
 	private Account account = null;
 	
 	@Override
@@ -59,13 +69,23 @@ public class UploadActivity extends Activity {
 		accountManager = AccountManager.get(this);
 		
 		Intent i = getIntent();
-		if (i == null) {
+		if (i == null || !i.hasExtra("id")) {
 			Log.e(TAG, "null intent");
 			setResult(EditorConstants.RESULT_ERROR);
 			finish();
 		}
 		
-		toUploadContent = i.getExtras().getString("data");
+		serieUri = ContentUris.withAppendedId(Series.CONTENT_URI, i.getExtras().getLong("id"));
+		
+		Cursor cur = this.managedQuery(serieUri, new String[]{Series.JSON}, null, null, null);
+		if (!cur.moveToFirst()) {
+			Log.e(TAG, "Couldn't find serie : " + i.getExtras().getLong("id"));
+			setResult(EditorConstants.RESULT_ERROR);
+			finish();
+		}
+		
+		toUploadContent = cur.getString(cur.getColumnIndex(Series.JSON));
+		
 		showDialog(DIALOG_PROGRESS);
 		authenticate(new Intent(), EditorConstants.SEND_TO_ZOOB_WEB);
 		
@@ -236,13 +256,26 @@ public class UploadActivity extends Activity {
 		try {
 			HttpPost httpPost = new HttpPost(EditorConstants.getCreateUrl());
 	    httpPost.setEntity(new StringEntity(toUploadContent));
-	    httpClient.execute(httpPost);
+	    HttpResponse response = httpClient.execute(httpPost);
+	    if (response.getStatusLine().getStatusCode() != 200) {
+	    	Log.e(TAG, "Error uploading : " + response.getStatusLine().getReasonPhrase());
+	    	return false;
+	    }
+	    
+	    String json = Common.convertStreamToString(response.getEntity().getContent());
+	    JSONObject serieObj = new JSONObject(json);
+	    int communityID = serieObj.getJSONObject("meta").getInt("id");
+	    ContentValues values = new ContentValues();
+	    values.put(Series.COMMUNITY_ID, communityID);
+	    getContentResolver().update(serieUri, values, null, null);
 	    return true;
     } catch (UnsupportedEncodingException e) {
 	    e.printStackTrace();
     } catch (ClientProtocolException e) {
 	    e.printStackTrace();
     } catch (IOException e) {
+	    e.printStackTrace();
+    } catch (JSONException e) {
 	    e.printStackTrace();
     }
     return false;

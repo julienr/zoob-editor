@@ -1,6 +1,7 @@
 package net.fhtagn.zoobeditor;
 
 import android.app.Activity;
+import android.graphics.Color;
 
 public class EditorConstants {
 	public static final String TAG  = "ZoobEditor";
@@ -14,6 +15,13 @@ public class EditorConstants {
 	public static final int SEND_TO_ZOOB_WEB = 2;
 	
 	public static final int RESULT_ERROR = Activity.RESULT_FIRST_USER;
+	
+	/**
+	 * Colors
+	 */
+	
+	public static final int COLOR_UPLOADED = Color.parseColor("#FF50AB86");
+	public static final int COLOR_NOT_UPLOADED = Color.parseColor("#FFBC3300");
 	
 	/**
 	 * Zoobweb

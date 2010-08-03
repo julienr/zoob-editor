@@ -87,10 +87,17 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	}
 	
 	private long saveSerie (JSONObject serie) {
-	  ContentValues values = new ContentValues();
-	  values.put(Series.JSON, serie.toString());
-	  values.put(Series.IS_MINE, 0); //FIXME: should check if author is owner of phone, in case of reinstall
-	  return Long.parseLong(getContentResolver().insert(Series.CONTENT_URI, values).getLastPathSegment());
+	  try {
+		  ContentValues values = new ContentValues();
+		  values.put(Series.JSON, serie.toString());
+		  values.put(Series.IS_MINE, false); //FIXME: should check if author is owner of phone, in case of reinstall
+	    values.put(Series.COMMUNITY_ID, serie.getJSONObject("meta").getInt("id"));
+	    return Long.parseLong(getContentResolver().insert(Series.CONTENT_URI, values).getLastPathSegment());
+    } catch (JSONException e) {
+	    e.printStackTrace();	   
+	    throw new IllegalArgumentException("saveSerie. Serie deson't have a community id");
+    }
+	  
 	}
 	
 	@Override

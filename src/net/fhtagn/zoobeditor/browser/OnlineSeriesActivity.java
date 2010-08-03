@@ -2,12 +2,14 @@ package net.fhtagn.zoobeditor.browser;
 
 import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.Series;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -110,11 +113,34 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
         try {
 	        serieObj = series.getJSONObject(position);
 	        textName.setText(serieObj.getString("name"));
+	        
+	        //Look if this serie has been downloaded
+	        int communityId = serieObj.getJSONObject("meta").getInt("id");
+	        Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID}, Series.COMMUNITY_ID+"="+communityId, null, null);
+	  			TextView downloadStatus = (TextView)view.findViewById(R.id.download_status);
+	        if (!cur.moveToFirst()) {
+	        	downloadStatus.setText(R.string.not_downloaded);
+	        	downloadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
+	        } else {
+	        	downloadStatus.setText(R.string.downloaded);
+	        	downloadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);
+	        }
+	        cur.close();
+	        
+	        //Rating
+	        RatingBar ratingBar = (RatingBar)view.findViewById(R.id.rating);
+	        if (serieObj.getJSONObject("meta").has("rating")) {
+	        	float rating = (float)serieObj.getJSONObject("meta").getDouble("rating");
+	        	ratingBar.setRating(rating);
+	        } else {
+	        	ratingBar.setVisibility(View.INVISIBLE);
+	        }
         } catch (JSONException e) {
 	        e.printStackTrace();
 	        textName.setText("Error loading serie");
         }
 			}
+			
 			return view;
 		}
 	}
