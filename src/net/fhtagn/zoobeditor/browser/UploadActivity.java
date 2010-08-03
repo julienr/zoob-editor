@@ -3,6 +3,9 @@ package net.fhtagn.zoobeditor.browser;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import net.fhtagn.zoobeditor.EditorConstants;
+import net.fhtagn.zoobeditor.R;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -12,10 +15,6 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.google.android.apps.mytracks.io.AccountChooser;
-
-import net.fhtagn.zoobeditor.EditorConstants;
-import net.fhtagn.zoobeditor.R;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
@@ -29,6 +28,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+
+import com.google.android.apps.mytracks.io.AccountChooser;
 
 public class UploadActivity extends Activity {
 	static final String TAG = "UploadActivity";

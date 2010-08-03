@@ -1,8 +1,5 @@
 package net.fhtagn.zoobeditor.editor;
 
-import java.util.ArrayList;
-
-import net.fhtagn.zoobeditor.editor.cell.TankCell;
 import net.fhtagn.zoobeditor.editor.cell.WallCell;
 import net.fhtagn.zoobeditor.editor.utils.Coords;
 import net.fhtagn.zoobeditor.editor.utils.Types;

@@ -1,17 +1,13 @@
 package net.fhtagn.zoobeditor.browser;
 
 import net.fhtagn.zoobeditor.R;
-import android.app.Activity;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.TabHost;
 import android.widget.TabWidget;
-import android.widget.TextView;
 
 public class Browser extends TabActivity {
 	static final String TAG = "ZoobEditor";

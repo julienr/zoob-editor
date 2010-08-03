@@ -18,8 +18,6 @@ package com.google.android.apps.music;
 
 import net.fhtagn.zoobeditor.R;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;

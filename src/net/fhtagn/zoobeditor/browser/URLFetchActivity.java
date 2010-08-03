@@ -2,25 +2,19 @@ package net.fhtagn.zoobeditor.browser;
 
 import java.io.InputStream;
 
+import net.fhtagn.zoobeditor.Common;
+import net.fhtagn.zoobeditor.EditorConstants;
+import net.fhtagn.zoobeditor.R;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
 
-import net.fhtagn.zoobeditor.Common;
-import net.fhtagn.zoobeditor.EditorConstants;
-import net.fhtagn.zoobeditor.R;
-import net.fhtagn.zoobeditor.browser.OnlineSeriesActivity.SeriesAdapter;
 import android.app.Activity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
 /** 

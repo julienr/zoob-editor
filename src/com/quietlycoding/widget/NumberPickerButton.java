@@ -16,13 +16,12 @@
 
 package com.quietlycoding.widget;
 
+import net.fhtagn.zoobeditor.R;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.widget.ImageButton;
-
-import net.fhtagn.zoobeditor.R;
 
 /**
  * This class exists purely to cancel long click events.

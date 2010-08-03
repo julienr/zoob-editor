@@ -1,23 +1,19 @@
 package net.fhtagn.zoobeditor.editor;
 
-import java.io.IOException;
-
-import net.fhtagn.zoobeditor.Common;
-import net.fhtagn.zoobeditor.ExternalStorageException;
 import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.Series;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.apps.music.TouchInterceptor;
-
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
-import android.content.DialogInterface;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,11 +24,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.apps.music.TouchInterceptor;
+
 public class SerieEditActivity extends ListActivity {
 	static final String TAG = "SerieEditActivity";
 	static final int DIALOG_NEWLVL_ID = 0;
-	static final int DIALOG_ERR_EXTERNAL = 1;
-	static final int DIALOG_ERR_EXPORT = 2;
 	
 	static final int REQUEST_LEVEL_EDITOR = 1;
 	
@@ -40,6 +36,8 @@ public class SerieEditActivity extends ListActivity {
 	private JSONArray levelsArray;
 	
 	private TextView debugText;
+	
+	private Uri serieUri;
 	
 	@Override
 	public void onCreate (Bundle bundle) {
@@ -49,9 +47,11 @@ public class SerieEditActivity extends ListActivity {
 		if (i == null)
 			Log.e("SerieEditActivity", "NULL INTENT");
     try {
-    	String serieString = i.getStringExtra("serie");
-    	if (serieString == null)
-    		throw new JSONException("null serie string");
+    	serieUri = i.getData();
+    	Cursor cur = managedQuery(serieUri, new String[]{Series.JSON}, null, null, null);
+    	if (cur.getCount() != 1 || !cur.moveToFirst())
+    		throw new JSONException("Unable to get serie from content provider");
+    	String serieString = cur.getString(cur.getColumnIndex(Series.JSON));
 	    serieObj = new JSONObject(serieString);
    
 	    setContentView(R.layout.serieedit);
@@ -145,20 +145,9 @@ public class SerieEditActivity extends ListActivity {
 	} 
 	
 	public void save () {
-		try {
-			Common.saveMySerie(serieObj);
-		} catch (ExternalStorageException e) {
-			showDialog(DIALOG_ERR_EXTERNAL);
-			return;
-		} catch (JSONException e) {
-    	e.printStackTrace();
-    	showDialog(DIALOG_ERR_EXPORT);
-    	return;
-    } catch (IOException e) {
-	    e.printStackTrace();
-	    showDialog(DIALOG_ERR_EXTERNAL);
-	    return;
-    }
+		ContentValues values = new ContentValues();
+		values.put(Series.JSON, serieObj.toString());
+		getContentResolver().update(serieUri, values, null, null);
 	}
 	
 	@Override
@@ -225,53 +214,16 @@ public class SerieEditActivity extends ListActivity {
     doLaunch(-1, obj);
 	}
 	
-	private Dialog createErrorDialog (final int dialogId, int messageRes) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(messageRes)
-					 .setCancelable(false)
-					 .setNeutralButton(android.R.string.ok,  new DialogInterface.OnClickListener() {
-						 	   public void onClick(DialogInterface dialog, int item) {
-						 	  	 dismissDialog(dialogId);
-						 	   }
-					 		 });
-		return builder.create();
-	}
-	
 	@Override
 	protected Dialog onCreateDialog (int id) {
 		switch (id) {
 			case DIALOG_NEWLVL_ID: {
-				/*final CharSequence[] items = {"8x8", "9x8"};
-				final int[][] itemsDim = {{8,8},{9,8}};
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.newlvl_dlg_title)
-							 .setItems(items,
-							    new DialogInterface.OnClickListener() {
-								    @Override
-								    public void onClick(DialogInterface dialog, int item) {
-								    	launchEditorNew(itemsDim[item][0], itemsDim[item][1]);
-								    }
-							    })
-							  .setCancelable(true)
-							  .setNegativeButton(android.R.string.cancel,
-							    new DialogInterface.OnClickListener() {
-								    public void onClick(DialogInterface dialog, int id) {
-									    dialog.cancel();
-								    }
-								  });
-				return builder.create();*/
 				return new LevelSizeDialog(this, DIALOG_NEWLVL_ID, this, new LevelSizeDialog.OnOkListener() {
 					@Override
 					public void onOK(int xdim, int ydim) {
 						launchEditorNew(xdim, ydim);
 					}
 				});
-			}
-			case DIALOG_ERR_EXTERNAL: {
-				return createErrorDialog(DIALOG_ERR_EXTERNAL, R.string.save_err_external);
-			}
-			case DIALOG_ERR_EXPORT: {
-				return createErrorDialog(DIALOG_ERR_EXPORT, R.string.save_err_export);
 			}
 			default:
 				return null;

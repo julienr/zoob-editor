@@ -18,14 +18,13 @@
 package com.google.android.apps.mytracks.io;
 
 
+import net.fhtagn.zoobeditor.R;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.util.Log;
-
-import net.fhtagn.zoobeditor.R;
 
 /**
  * Choose which account to upload track information to.

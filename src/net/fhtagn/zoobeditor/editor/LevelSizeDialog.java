@@ -1,14 +1,13 @@
 package net.fhtagn.zoobeditor.editor;
 
-import com.quietlycoding.widget.NumberPicker;
-
 import net.fhtagn.zoobeditor.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.view.View;
+
+import com.quietlycoding.widget.NumberPicker;
 
 public class LevelSizeDialog extends AlertDialog {
 	public interface OnOkListener {

@@ -1,18 +1,16 @@
 package net.fhtagn.zoobeditor.browser;
 
-import java.io.IOException;
+import net.fhtagn.zoobeditor.Common;
+import net.fhtagn.zoobeditor.EditorConstants;
+import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.Series;
+import net.fhtagn.zoobeditor.editor.MiniLevelView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import net.fhtagn.zoobeditor.Common;
-import net.fhtagn.zoobeditor.EditorConstants;
-import net.fhtagn.zoobeditor.R;
-import net.fhtagn.zoobeditor.browser.OnlineSeriesActivity.SeriesAdapter;
-import net.fhtagn.zoobeditor.editor.MiniLevelView;
-import net.fhtagn.zoobeditor.editor.SerieEditActivity;
-import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,8 +20,6 @@ import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class OnlineSerieViewActivity extends URLFetchActivity {
@@ -84,19 +80,17 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 					Log.e(TAG, "Trying to play with serieObj = null");
 					return;
 				}
-				try {
-					Common.saveCommunitySerie(serieObj);
-					Intent i = Common.playCommunitySerie(serieObj);
-					startActivity(i);
-				} catch (JSONException e) {
-					e.printStackTrace();
-					return;
-				} catch (IOException e) {
-					e.printStackTrace();
-					return;
-				}				
+				Intent i = Common.playSerie(saveSerie(serieObj));
+				startActivity(i);
       }
 		});
+	}
+	
+	private long saveSerie (JSONObject serie) {
+	  ContentValues values = new ContentValues();
+	  values.put(Series.JSON, serie.toString());
+	  values.put(Series.IS_MINE, 0); //FIXME: should check if author is owner of phone, in case of reinstall
+	  return Long.parseLong(getContentResolver().insert(Series.CONTENT_URI, values).getLastPathSegment());
 	}
 	
 	@Override

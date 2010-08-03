@@ -1,11 +1,5 @@
 package net.fhtagn.zoobeditor.editor;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import net.fhtagn.zoobeditor.Common;
-import net.fhtagn.zoobeditor.ExternalStorageException;
 import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.editor.tools.EraseTool;
 import net.fhtagn.zoobeditor.editor.tools.PathTool;
@@ -26,8 +20,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
