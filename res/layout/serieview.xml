@@ -6,15 +6,7 @@
   android:orientation="vertical">
   
   <TextView android:id="@+id/name"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:padding="5dp"
-    android:textSize="20sp"
-    android:textStyle="bold"
-    android:gravity="center" />
-  <!-- <ListView android:id="@android:id/list"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"/>-->
+    style="@style/TextView.Title" />
     
    <GridView  
      android:id="@android:id/list"
@@ -36,8 +28,7 @@
 	   <Button android:id="@+id/btn_play"
 	     android:layout_width="wrap_content"
 	     android:layout_height="wrap_content"
-	     android:text="@string/btn_play"
-	     android:padding="5dp"
+	     android:text="@string/btn_play_online_serie"
 	     android:layout_centerInParent="true" />
    </RelativeLayout>
 </LinearLayout>

@@ -1,6 +1,7 @@
 package net.fhtagn.zoobeditor.browser;
 
 import java.io.File;
+import java.util.Date;
 
 import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorConstants;
@@ -48,7 +49,7 @@ public class MySeriesActivity extends ListActivity {
 	
 	private long deleteID; //set when the confirm dialog for deletion is shown. Contains the item position 
 	
-	private String[] projection = new String[]{Series.ID, Series.JSON, Series.COMMUNITY_ID};
+	private String[] projection = new String[]{Series.ID, Series.JSON, Series.COMMUNITY_ID, Series.LAST_MODIFICATION, Series.UPLOAD_DATE};
 	
 	public void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -86,7 +87,7 @@ public class MySeriesActivity extends ListActivity {
     
     SerieAdapter adapter = (SerieAdapter)getListAdapter();
     menu.setHeaderTitle(adapter.getName(info.position));
-    menu.add(0, MENU_ITEM_PLAY, 0, R.string.menu_play);
+    menu.add(0, MENU_ITEM_PLAY, 0, R.string.menu_play_serie);
     menu.add(1, MENU_ITEM_EDIT, 1, R.string.menu_edit);
     menu.add(2, MENU_ITEM_UPLOAD, 2, R.string.menu_upload);
     menu.add(3, MENU_ITEM_DELETE, 3, R.string.menu_delete);
@@ -104,19 +105,15 @@ public class MySeriesActivity extends ListActivity {
     
     switch (item.getItemId()) {
     	case MENU_ITEM_PLAY: {
-    		SerieAdapter adapter = (SerieAdapter)getListAdapter();
         Intent i = Common.playSerie(info.id);
         startActivity(i);
         return true;
     	}
     	case MENU_ITEM_EDIT: {
-    		SerieAdapter adapter = (SerieAdapter)getListAdapter();
     		launchSerieEditor(ContentUris.withAppendedId(Series.CONTENT_URI, info.id));
     		return true;
     	}
     	case MENU_ITEM_UPLOAD: {
-    		SerieAdapter adapter = (SerieAdapter)getListAdapter();
-    		Browser parent = (Browser)getParent();
     		Intent i = new Intent(getApplicationContext(), UploadActivity.class);
     		i.putExtra("id", info.id);
     		startActivityForResult(i, EditorConstants.SEND_TO_ZOOB_WEB);
@@ -175,7 +172,7 @@ public class MySeriesActivity extends ListActivity {
 			case DIALOG_CONFIRM_DELETE: {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.delete_dlg_title)
-							 .setMessage(R.string.confirm_delete)
+							 .setMessage(R.string.confirm_delete_serie)
 							  .setCancelable(true)
 							  .setPositiveButton(android.R.string.ok,
 							  		new DialogInterface.OnClickListener() {
@@ -237,8 +234,15 @@ public class MySeriesActivity extends ListActivity {
 			TextView uploadStatus = (TextView)view.findViewById(R.id.upload_status);
 			boolean uploaded = !cursor.isNull(cursor.getColumnIndex(Series.COMMUNITY_ID));
 			if (uploaded) {
-				uploadStatus.setText(R.string.uploaded);
-				uploadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);
+				Date uploadDate = Common.dateFromDB(cursor.getString(cursor.getColumnIndex(Series.UPLOAD_DATE)));
+				Date lastModification = Common.dateFromDB(cursor.getString(cursor.getColumnIndex(Series.LAST_MODIFICATION)));
+				if (uploadDate.before(lastModification)) {
+					uploadStatus.setText(R.string.modified);
+					uploadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
+				} else {
+					uploadStatus.setText(R.string.uploaded);
+					uploadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);
+				}
 			} else {
 				uploadStatus.setText(R.string.not_uploaded);
 				uploadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);

@@ -10,8 +10,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -88,11 +91,22 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	
 	private long saveSerie (JSONObject serie) {
 	  try {
-		  ContentValues values = new ContentValues();
+	  	//Look if this serie has been downloaded
+	    int communityId = serie.getJSONObject("meta").getInt("id");
+	    Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID}, Series.COMMUNITY_ID+"="+communityId, null, null);
+	    ContentValues values = new ContentValues();
 		  values.put(Series.JSON, serie.toString());
 		  values.put(Series.IS_MINE, false); //FIXME: should check if author is owner of phone, in case of reinstall
 	    values.put(Series.COMMUNITY_ID, serie.getJSONObject("meta").getInt("id"));
-	    return Long.parseLong(getContentResolver().insert(Series.CONTENT_URI, values).getLastPathSegment());
+	    if (!cur.moveToFirst()) {
+		    return Long.parseLong(getContentResolver().insert(Series.CONTENT_URI, values).getLastPathSegment());
+	    } else {
+	    	//In our DB, update
+	    	long serieId = cur.getLong(cur.getColumnIndex(Series.ID));
+	    	Uri serieUri = ContentUris.withAppendedId(Series.CONTENT_URI, serieId);
+	    	getContentResolver().update(serieUri, values, null, null);
+	    	return serieId;
+	    }
     } catch (JSONException e) {
 	    e.printStackTrace();	   
 	    throw new IllegalArgumentException("saveSerie. Serie deson't have a community id");

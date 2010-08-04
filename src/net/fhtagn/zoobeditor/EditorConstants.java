@@ -27,8 +27,11 @@ public class EditorConstants {
 	 * Zoobweb
 	 */
 	private static final boolean production = false; 
-	private static final String SERVER_URL = "http://zoobweb.appspot.com";
-	private static final String LOCAL_URL = "http://192.168.0.2:8080";
+	private static final String SERVER_URL = "http://zoobweb.appspot.com/rest";
+	private static final String LOCAL_URL = "http://192.168.0.2:8080/rest";
+	
+	private static final String SERVER_LOGIN = "http://zoobweb.appspot.com"; 
+	private static final String LOCAL_LOGIN = "http://192.168.0.2:8080";
 	
 	public static boolean isProd () {
 		return production;
@@ -41,8 +44,19 @@ public class EditorConstants {
 			return LOCAL_URL;
 	}
 	
-	public static String getCreateUrl () {
-		return getServerUrl()+"/create";
+	public static String getLoginUrl () {
+		if (production)
+			return SERVER_LOGIN;
+		else
+			return LOCAL_LOGIN;
+	}
+	
+	public static String getPutUrl () {
+		return getServerUrl()+"/put";
+	}
+	
+	public static String getPutUrl (long id) {
+		return getServerUrl()+"/put?id="+id;
 	}
 	
 	public static String getListUrl () {

@@ -5,7 +5,8 @@
       android:versionName="1.0">
     <application android:icon="@drawable/icon" 
                  android:label="@string/app_name"
-                 android:theme="@style/Theme.Zoob">
+                 android:theme="@style/Theme.Zoob"
+                 android:name="EditorApplication">
         <activity android:name=".browser.Browser"
                   android:label="@string/app_name"
                   android:configChanges="orientation">
@@ -19,6 +20,7 @@
         <activity android:name=".browser.OnlineSerieViewActivity"/>
         <activity android:name=".browser.MySeriesActivity"/>
         <activity android:name=".browser.OnlineSeriesActivity"/>
+        <activity android:name="Preferences"/>
         <activity android:name=".editor.SerieEditActivity"
                   android:configChanges="orientation" />
                   

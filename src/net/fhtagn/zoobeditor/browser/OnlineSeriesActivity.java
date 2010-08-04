@@ -1,5 +1,8 @@
 package net.fhtagn.zoobeditor.browser;
 
+import java.util.Date;
+
+import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.Series;
@@ -11,6 +14,9 @@ import org.json.JSONObject;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -34,6 +40,23 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 	}
 	
 	@Override
+	public boolean onCreateOptionsMenu (Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.onlineserielist_menu, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected (MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.refresh:
+				toLoadingState();
+				return true;
+		}
+		return false;
+	}
+	
+	@Override
 	protected void onContentReady (String result) {
     try {
     	if (result != null)
@@ -46,14 +69,6 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 		ListView listView = (ListView)findViewById(android.R.id.list);
 		listView.setAdapter(new SeriesAdapter());
 		listView.setOnItemClickListener(OnlineSeriesActivity.this);
-		
-		Button refreshBtn = (Button)findViewById(R.id.btn_refresh);
-		refreshBtn.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick (View v) {
-				toLoadingState();
-			}
-		});
 	}
 	
 	@Override
@@ -116,14 +131,21 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 	        
 	        //Look if this serie has been downloaded
 	        int communityId = serieObj.getJSONObject("meta").getInt("id");
-	        Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID}, Series.COMMUNITY_ID+"="+communityId, null, null);
+	        Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID, Series.LAST_MODIFICATION}, Series.COMMUNITY_ID+"="+communityId, null, null);
 	  			TextView downloadStatus = (TextView)view.findViewById(R.id.download_status);
 	        if (!cur.moveToFirst()) {
 	        	downloadStatus.setText(R.string.not_downloaded);
 	        	downloadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
 	        } else {
-	        	downloadStatus.setText(R.string.downloaded);
-	        	downloadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);
+	        	Date localModification = Common.dateFromDB(cur.getString(cur.getColumnIndex(Series.LAST_MODIFICATION)));
+	        	Date serverModification = Common.dateFromDB(serieObj.getString("updated"));
+	        	if (localModification.before(serverModification)) {
+	        		downloadStatus.setText(R.string.update_available);
+	        		downloadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
+	        	} else {
+	        		downloadStatus.setText(R.string.downloaded);
+	        		downloadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);
+	        	}
 	        }
 	        cur.close();
 	        

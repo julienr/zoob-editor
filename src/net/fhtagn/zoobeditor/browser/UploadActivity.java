@@ -56,6 +56,8 @@ public class UploadActivity extends Activity {
 	private DefaultHttpClient httpClient = new DefaultHttpClient();
 	
 	private String toUploadContent = null;
+	//community id if the upload is an update
+	private long toUploadId = -1;
 	
 	private Uri serieUri;
 	
@@ -77,7 +79,7 @@ public class UploadActivity extends Activity {
 		
 		serieUri = ContentUris.withAppendedId(Series.CONTENT_URI, i.getExtras().getLong("id"));
 		
-		Cursor cur = this.managedQuery(serieUri, new String[]{Series.JSON}, null, null, null);
+		Cursor cur = this.managedQuery(serieUri, new String[]{Series.JSON, Series.COMMUNITY_ID}, null, null, null);
 		if (!cur.moveToFirst()) {
 			Log.e(TAG, "Couldn't find serie : " + i.getExtras().getLong("id"));
 			setResult(EditorConstants.RESULT_ERROR);
@@ -85,20 +87,12 @@ public class UploadActivity extends Activity {
 		}
 		
 		toUploadContent = cur.getString(cur.getColumnIndex(Series.JSON));
+		if (!cur.isNull(cur.getColumnIndex(Series.COMMUNITY_ID)))
+			toUploadId = cur.getLong(cur.getColumnIndex(Series.COMMUNITY_ID));
+		
 		
 		showDialog(DIALOG_PROGRESS);
 		authenticate(new Intent(), EditorConstants.SEND_TO_ZOOB_WEB);
-		
-		/*Button loginButton = new Button(this);
-		loginButton.setText("Login");
-		loginButton.setOnClickListener(new OnClickListener() {
-			@Override
-      public void onClick(View arg0) {
-				Intent i = new Intent(getApplicationContext(), Browser.class);
-				startActivityForResult(i, REQUEST_GOOGLE_LOGIN); 
-      }
-		});
-		setContentView(loginButton);*/
 	}
 
 	public static UploadActivity getInstance () {
@@ -116,8 +110,6 @@ public class UploadActivity extends Activity {
 	}
 	
 	public void authenticate (final Intent results, final int requestCode) {
-		final String service = "ah";
-		
 		accountChooser.chooseAccount(UploadActivity.this, new AccountChooser.AccountHandler() {
 			@Override
 			public void handleAccountSelected(Account account) {
@@ -197,7 +189,7 @@ public class UploadActivity extends Activity {
 				
 				final String continueURL = EditorConstants.getServerUrl();
 				httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);		
-				HttpGet httpGet = new HttpGet(EditorConstants.getServerUrl()+"/_ah/login?auth="
+				HttpGet httpGet = new HttpGet(EditorConstants.getLoginUrl()+"/_ah/login?auth="
 						+ token + "&continue="+continueURL);
 				Log.i(TAG, "GET : " + httpGet.getURI().toString());
 				
@@ -220,7 +212,7 @@ public class UploadActivity extends Activity {
 				}
 			} else {
 				httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);		
-				HttpGet httpGet = new HttpGet(EditorConstants.getServerUrl()+"/_ah/login?email="
+				HttpGet httpGet = new HttpGet(EditorConstants.getLoginUrl()+"/_ah/login?email="
 						+account.name + "&action=Login&continue="+EditorConstants.getServerUrl());
 				HttpResponse response;
 		    response = httpClient.execute(httpGet);
@@ -254,7 +246,12 @@ public class UploadActivity extends Activity {
 	
 	protected boolean doSerieUpload () {
 		try {
-			HttpPost httpPost = new HttpPost(EditorConstants.getCreateUrl());
+			HttpPost httpPost;
+			if (toUploadId != -1)
+				httpPost = new HttpPost(EditorConstants.getPutUrl(toUploadId));
+			else
+				httpPost = new HttpPost(EditorConstants.getPutUrl());
+			
 	    httpPost.setEntity(new StringEntity(toUploadContent));
 	    HttpResponse response = httpClient.execute(httpPost);
 	    if (response.getStatusLine().getStatusCode() != 200) {

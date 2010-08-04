@@ -1,5 +1,6 @@
 package net.fhtagn.zoobeditor.editor;
 
+import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.editor.tools.EraseTool;
 import net.fhtagn.zoobeditor.editor.tools.PathTool;
@@ -19,7 +20,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -45,11 +50,14 @@ public class EditorActivity extends Activity {
 	
 	private int levelNumber;
 	
+	private Uri serieUri;
+	
 	@Override
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		Intent i = getIntent();
 		levelNumber = i.getIntExtra("number", -1);
+		serieUri = i.getData();
 		
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);    
 		setContentView(R.layout.editor);
@@ -68,6 +76,29 @@ public class EditorActivity extends Activity {
 			textView.setText("Error loading level from JSON : " + e.getMessage());
 			levelFrame.addView(textView);
 		}
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu (Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.editor_menu, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected (MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.save:
+				saveToSerie();
+				return true;
+			case R.id.play:
+				Intent i = Common.playeSerie(Common.extractId(serieUri), levelNumber);
+        startActivity(i);
+				return true;
+			case R.id.help:
+				return true;
+		}
+		return false;
 	}
 	
 	private void toPathMode (PathTool tool) {
@@ -141,14 +172,6 @@ public class EditorActivity extends Activity {
 				PathTool tool = new PathTool();
 				levelView.setEditorTool(tool);
 				toPathMode(tool);
-			}
-		});
-		
-		Button saveButton = (Button)findViewById(R.id.btn_save);
-		saveButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				saveToSerie();
 			}
 		});
 	}

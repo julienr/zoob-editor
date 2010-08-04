@@ -4,10 +4,9 @@
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
   android:orientation="vertical">  
-  <Button android:id="@+id/new_level"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/btn_newlevel"/>
+  <TextView android:id="@+id/title"
+    style="@style/TextView.Title" />
+  
   <TextView android:id="@+id/debugmsg"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -17,14 +16,23 @@
         xmlns:ti="http://schemas.android.com/apk/res/net.fhtagn.zoobeditor"
         android:id="@android:id/list"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:drawSelectorOnTop="false"
         android:scrollbars="vertical"
+        android:layout_weight="1"
         ti:grabber="@+id/grabber"
         ti:remove_mode="none"
         ti:normal_height="64dip"
         ti:expanded_height="128dip" />
-  <!--<ListView android:id="@android:id/list"
+
+  <RelativeLayout 
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content" />-->
+    android:layout_height="wrap_content"
+    android:padding="2dip">
+    <Button android:id="@+id/new_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_newlevel"
+            android:layout_centerInParent="true"/>  
+   </RelativeLayout>
 </LinearLayout>

@@ -1,11 +1,15 @@
 package net.fhtagn.zoobeditor.browser;
 
+import net.fhtagn.zoobeditor.Preferences;
 import net.fhtagn.zoobeditor.R;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 
@@ -48,5 +52,23 @@ public class Browser extends TabActivity {
 	protected void onResume () {
 		super.onResume();
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu (Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.base_menu, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected (MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.prefs:
+				Intent i = new Intent(getApplicationContext(), Preferences.class);
+				startActivity(i);
+				return true;
+		}
+		return false;
 	}
 }

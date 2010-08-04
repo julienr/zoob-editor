@@ -38,7 +38,7 @@ public class LevelView extends View {
 	private final int xdim;
 	private final int ydim;
 	
-	private int selectedCell[] = {-1,-1}; //contains coords of currently selected cell
+	private int selectedCell[] = {0,0}; //contains coords of currently selected cell
 	
 	//The cells 
 	private final GridCell grid[][];
@@ -261,10 +261,11 @@ public class LevelView extends View {
 			int y = (int)event.getY();
 			
 			//we subtract -sxy to recenter the click. looks like this is the best
-			x = (x-MARGIN-sxy)/sxy;
-			y = (y-MARGIN-sxy)/sxy;
+			x = (x-MARGIN)/sxy;
+			y = (y-MARGIN)/sxy;
 			
 			selectCell(x,y);
+			modifyCell();
 			return true;
 		}
 		return false;
