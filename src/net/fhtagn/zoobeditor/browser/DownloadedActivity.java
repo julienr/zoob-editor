@@ -19,7 +19,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class DownloadedActivity extends ListActivity {
-	private String[] projection = new String[]{Series.ID, Series.JSON, Series.LAST_MODIFICATION, Series.PROGRESS};
+	private String[] projection = new String[]{Series.ID, Series.NAME, Series.RATING, Series.NUM_LEVELS, Series.AUTHOR, Series.JSON, Series.LAST_MODIFICATION, Series.PROGRESS};
 	
 	@Override
 	public void onCreate (Bundle savedInstancestate) {
@@ -56,28 +56,20 @@ public class DownloadedActivity extends ListActivity {
 		
 		@Override
 		protected void fillView (View view, Cursor cursor) {
-			String json = cursor.getString(cursor.getColumnIndex(Series.JSON));
 			TextView textName = (TextView)view.findViewById(R.id.name);
-			try {
-				JSONObject serieObj = new JSONObject(json);
-				textName.setText(serieObj.getString("name"));
-				
-				//Progress
-				TextView progressView = (TextView)view.findViewById(R.id.progress);
-				progressView.setText(cursor.getInt(cursor.getColumnIndex(Series.PROGRESS)) + " / " + serieObj.getJSONArray("levels").length());
-				
-				//Rating
-        RatingBar ratingBar = (RatingBar)view.findViewById(R.id.rating);
-        if (serieObj.has("meta") && serieObj.getJSONObject("meta").has("rating")) {
-        	float rating = (float)serieObj.getJSONObject("meta").getDouble("rating");
-        	ratingBar.setRating(rating);
-        } else {
-        	ratingBar.setVisibility(View.INVISIBLE);
-        }
-			} catch (JSONException e) {
-				e.printStackTrace();
-				textName.setText("JSON error : " + e.getMessage());
-			}
+			textName.setText(cursor.getString(cursor.getColumnIndex(Series.NAME)));
+			
+			//Progress
+			TextView progressView = (TextView)view.findViewById(R.id.progress);
+			progressView.setText(cursor.getInt(cursor.getColumnIndex(Series.PROGRESS)) + " / " + cursor.getInt(cursor.getColumnIndex(Series.NUM_LEVELS)));
+			
+			//Rating
+      RatingBar ratingBar = (RatingBar)view.findViewById(R.id.rating);
+      Float rating = cursor.getFloat(cursor.getColumnIndex(Series.RATING));
+      if (rating != null)
+      	ratingBar.setRating(rating);
+      else
+      	ratingBar.setVisibility(View.INVISIBLE);
 		}
 	}
 }

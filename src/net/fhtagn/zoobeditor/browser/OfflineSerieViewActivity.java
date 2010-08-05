@@ -48,7 +48,7 @@ public class OfflineSerieViewActivity extends Activity {
 		}
 		
 		
-		Cursor cur = managedQuery(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), new String[]{Series.JSON, Series.PROGRESS}, null, null, null);
+		Cursor cur = managedQuery(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), new String[]{Series.JSON, Series.NAME, Series.PROGRESS}, null, null, null);
 		if (!cur.moveToFirst()) {
 			Log.e(TAG, "onCreate: !cur.moveToFirst");
 			finish();
@@ -61,7 +61,7 @@ public class OfflineSerieViewActivity extends Activity {
 			levelsArray = serieObj.getJSONArray("levels");
 			
 			TextView serieName = (TextView)findViewById(R.id.name);
-			serieName.setText(serieObj.getString("name"));
+			serieName.setText(cur.getString(cur.getColumnIndex(Series.NAME)));
 			GridView gridView = (GridView)findViewById(android.R.id.list);
 			gridView.setAdapter(new LevelsAdapter(this, serieObj.getJSONArray("levels")));
 			
@@ -75,6 +75,7 @@ public class OfflineSerieViewActivity extends Activity {
 						return;
 					}
 					Intent i = Common.playSerie(serieID);
+					startActivity(i);
 				}
 			});
 		} catch (JSONException e) {

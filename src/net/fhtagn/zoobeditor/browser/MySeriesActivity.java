@@ -49,7 +49,7 @@ public class MySeriesActivity extends ListActivity {
 	
 	private long deleteID; //set when the confirm dialog for deletion is shown. Contains the item position 
 	
-	private String[] projection = new String[]{Series.ID, Series.JSON, Series.COMMUNITY_ID, Series.LAST_MODIFICATION, Series.UPLOAD_DATE};
+	private String[] projection = new String[]{Series.ID, Series.NAME, Series.JSON, Series.COMMUNITY_ID, Series.LAST_MODIFICATION, Series.UPLOAD_DATE};
 	
 	public void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -194,16 +194,8 @@ public class MySeriesActivity extends ListActivity {
     
 		@Override
 		protected void fillView (View view, Cursor cursor) {
-			String json = cursor.getString(cursor.getColumnIndex(Series.JSON));
 			TextView textName = (TextView) view.findViewById(R.id.name);
-			try {
-				JSONObject serieObj = new JSONObject(json);
-				String name = serieObj.getString("name");
-				textName.setText(name);
-			} catch (JSONException e) {
-				e.printStackTrace();
-				textName.setText("JSON error : " + e.getMessage());
-			}		
+			textName.setText(cursor.getString(cursor.getColumnIndex(Series.NAME)));
 			
 			TextView uploadStatus = (TextView)view.findViewById(R.id.upload_status);
 			boolean uploaded = !cursor.isNull(cursor.getColumnIndex(Series.COMMUNITY_ID));

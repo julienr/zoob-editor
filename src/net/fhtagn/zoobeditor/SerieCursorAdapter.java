@@ -20,17 +20,8 @@ public abstract class SerieCursorAdapter extends CursorAdapter {
   }
 	
 	public String getName(int position) {
-		//FIXME: could use some caching
 		Cursor cur = (Cursor)this.getItem(position);
-		String json = cur.getString(cur.getColumnIndex(Series.JSON));
-		JSONObject levelObj;
-    try {
-      levelObj = new JSONObject(json);
-      return levelObj.getString("name");
-    } catch (JSONException e) {
-      e.printStackTrace();
-      return "";
-    }
+		return cur.getString(cur.getColumnIndex(Series.NAME));
 	}
 	
 	protected abstract void fillView (View view, Cursor cursor);
