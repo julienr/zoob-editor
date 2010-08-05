@@ -38,6 +38,8 @@ public class LevelView extends View {
 	private final int xdim;
 	private final int ydim;
 	
+	private int touchX = -1, touchY=-1;
+	
 	private int selectedCell[] = {0,0}; //contains coords of currently selected cell
 	
 	//The cells 
@@ -192,6 +194,8 @@ public class LevelView extends View {
 		paint.setColor(Color.BLACK);
 		paint.setTextSize(sxy/2.0f);
 		
+		canvas.drawCircle(touchX, touchY, 3.0f, paint);
+		
 		canvas.save();
 		canvas.translate(offsetX, offsetY);
 		canvas.scale(sxy, sxy);
@@ -260,12 +264,16 @@ public class LevelView extends View {
 			int x = (int)event.getX();
 			int y = (int)event.getY();
 			
-			//we subtract -sxy to recenter the click. looks like this is the best
-			x = (x-MARGIN)/sxy;
-			y = (y-MARGIN)/sxy;
+			touchX = x;
+			touchY = y;
+			
+			//transform the click to grid coords
+			x = (x-offsetX)/sxy;
+			y = (y-offsetY)/sxy;
 			
 			selectCell(x,y);
 			modifyCell();
+			postInvalidate(); // FIXME: remove, just to debug touch
 			return true;
 		}
 		return false;
