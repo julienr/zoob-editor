@@ -138,7 +138,7 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 	        	downloadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
 	        } else {
 	        	Date localModification = Common.dateFromDB(cur.getString(cur.getColumnIndex(Series.LAST_MODIFICATION)));
-	        	Date serverModification = Common.dateFromDB(serieObj.getString("updated"));
+	        	Date serverModification = Common.dateFromDB(serieObj.getJSONObject("meta").getString("updated"));
 	        	if (localModification.before(serverModification)) {
 	        		downloadStatus.setText(R.string.update_available);
 	        		downloadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
