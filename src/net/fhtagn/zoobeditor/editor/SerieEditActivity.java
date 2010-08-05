@@ -5,6 +5,7 @@ import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.Series;
 import net.fhtagn.zoobeditor.browser.Browser;
+import net.fhtagn.zoobeditor.browser.NameDialog;
 import net.fhtagn.zoobeditor.browser.UploadActivity;
 import net.fhtagn.zoobeditor.browser.MySeriesActivity.SerieAdapter;
 
@@ -43,6 +44,7 @@ public class SerieEditActivity extends ListActivity {
 	static final String TAG = "SerieEditActivity";
 	static final int DIALOG_NEWLVL_ID = 0;
 	static final int DIALOG_CONFIRM_DELETE = 1;
+	static final int DIALOG_RENAME = 2;
 	
 	static final int REQUEST_LEVEL_EDITOR = 1;
 	
@@ -156,6 +158,9 @@ public class SerieEditActivity extends ListActivity {
         startActivity(i);
 				return true;
 			case R.id.help:
+				return true;
+			case R.id.rename:
+				showDialog(DIALOG_RENAME);
 				return true;
 		}
 		return false;
@@ -342,6 +347,22 @@ public class SerieEditActivity extends ListActivity {
 								    }
 								  });
 				return builder.create();
+			}
+			case DIALOG_RENAME: {
+				return new NameDialog(this, DIALOG_RENAME, this, new NameDialog.OnOkListener() {
+					@Override
+					public void onOK(String enteredText) {
+						try {
+	            serieObj.put("name", enteredText);
+	            serieName = enteredText;
+	      	    TextView titleView = (TextView)findViewById(R.id.title);
+	      	    titleView.setText(serieName);
+	      	    save();
+            } catch (JSONException e) {
+	            e.printStackTrace();
+            }
+					}
+				});
 			}
 			default:
 				return null;

@@ -234,14 +234,21 @@ public class MySeriesActivity extends ListActivity {
 			TextView uploadStatus = (TextView)view.findViewById(R.id.upload_status);
 			boolean uploaded = !cursor.isNull(cursor.getColumnIndex(Series.COMMUNITY_ID));
 			if (uploaded) {
-				Date uploadDate = Common.dateFromDB(cursor.getString(cursor.getColumnIndex(Series.UPLOAD_DATE)));
-				Date lastModification = Common.dateFromDB(cursor.getString(cursor.getColumnIndex(Series.LAST_MODIFICATION)));
-				if (uploadDate.before(lastModification)) {
-					uploadStatus.setText(R.string.modified);
-					uploadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
-				} else {
+				String sUploadDate = cursor.getString(cursor.getColumnIndex(Series.UPLOAD_DATE));
+				//At first upload, UPLOAD_DATE field of the DB will be null
+				if (sUploadDate == null) {
 					uploadStatus.setText(R.string.uploaded);
-					uploadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);
+					uploadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);	
+				} else {
+					Date uploadDate = Common.dateFromDB(sUploadDate);
+					Date lastModification = Common.dateFromDB(cursor.getString(cursor.getColumnIndex(Series.LAST_MODIFICATION)));
+					if (uploadDate.before(lastModification)) {
+						uploadStatus.setText(R.string.modified);
+						uploadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
+					} else {
+						uploadStatus.setText(R.string.uploaded);
+						uploadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);
+					}
 				}
 			} else {
 				uploadStatus.setText(R.string.not_uploaded);

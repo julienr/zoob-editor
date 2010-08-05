@@ -7,7 +7,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 
 public class Preferences extends PreferenceActivity {
-	static final String ACCOUNT_TYPE = "com.google";
 	
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
@@ -19,7 +18,7 @@ public class Preferences extends PreferenceActivity {
 	}
 	
 	protected void fillAccountsList (ListPreference accountsList) {
-		final Account[] accounts = AccountManager.get(this).getAccountsByType(ACCOUNT_TYPE);
+		final Account[] accounts = AccountManager.get(this).getAccountsByType(EditorConstants.ACCOUNT_TYPE);
 		final String[] accountsNames = new String[accounts.length];
 		for (int i=0; i<accounts.length; i++)
 			accountsNames[i] = accounts[i].name;

@@ -20,7 +20,7 @@ public class NameDialog extends AlertDialog {
 	
 	private final OnOkListener listener;
 
-	protected NameDialog(Context context, final int thisID, final Activity sourceActivity, final OnOkListener listener) {
+	public NameDialog(Context context, final int thisID, final Activity sourceActivity, final OnOkListener listener) {
 	  super(context);
 	  
 	  this.listener = listener;

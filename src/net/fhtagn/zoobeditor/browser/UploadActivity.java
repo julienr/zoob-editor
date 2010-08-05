@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import net.fhtagn.zoobeditor.Common;
+import net.fhtagn.zoobeditor.EditorApplication;
 import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.Series;
@@ -39,19 +40,14 @@ import android.util.Log;
 
 import com.google.android.apps.mytracks.io.AccountChooser;
 
-public class UploadActivity extends Activity {
+public class UploadActivity extends Activity implements EditorApplication.OnAuthenticatedCallback {
 	static final String TAG = "UploadActivity";
 	
 	static final int DIALOG_PROGRESS = 1;
-	static final int DIALOG_LOGIN_ERROR = 2;
+	static final int DIALOG_ERROR = 2;
 	static final int DIALOG_SUCCESS = 3;
-
-	private AccountManager accountManager = null;
-	private AccountChooser accountChooser = new AccountChooser();
 	
 	private ProgressDialog progressDialog = null;
-	
-	private static UploadActivity instance = null;
 	
 	private DefaultHttpClient httpClient = new DefaultHttpClient();
 	
@@ -61,14 +57,14 @@ public class UploadActivity extends Activity {
 	
 	private Uri serieUri;
 	
-	private Account account = null;
+	private EditorApplication app;
+	
+	//This message will be shown in the error dialog
+	private String errorDialogMsg = ""; 
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		instance = this;
-		
-		accountManager = AccountManager.get(this);
 		
 		Intent i = getIntent();
 		if (i == null || !i.hasExtra("id")) {
@@ -92,36 +88,28 @@ public class UploadActivity extends Activity {
 		
 		
 		showDialog(DIALOG_PROGRESS);
-		authenticate(new Intent(), EditorConstants.SEND_TO_ZOOB_WEB);
-	}
-
-	public static UploadActivity getInstance () {
-		return instance;
+		app = (EditorApplication)getApplication();
+		app.authenticate(this, httpClient, this);
 	}
 	
-	public AccountChooser getAccountChooser () {
-		return accountChooser;
+	private void errorDialog (String errorMsg) {
+		Log.e(TAG, "errorDialog : " + errorMsg);
+		errorDialogMsg = errorMsg;
+		dismissDialogSafely(DIALOG_PROGRESS);
+		showDialog(DIALOG_ERROR);
 	}
 	
-	public void sendToWeb (String content) {
-		toUploadContent = content;
-		showDialog(DIALOG_PROGRESS);
-		authenticate(new Intent(), EditorConstants.SEND_TO_ZOOB_WEB);
-	}
-	
-	public void authenticate (final Intent results, final int requestCode) {
-		accountChooser.chooseAccount(UploadActivity.this, new AccountChooser.AccountHandler() {
-			@Override
-			public void handleAccountSelected(Account account) {
-				UploadActivity.this.account = account;
-				if (account == null) {
-					Log.e(TAG, "No account chooser, account = null");
-					dismissDialogSafely(DIALOG_PROGRESS);
-					return;
+	@Override
+	protected void onPrepareDialog (int id, Dialog dialog) {
+		switch (id) {
+			case DIALOG_ERROR: {
+				AlertDialog alertDialog = (AlertDialog)dialog;
+				if (errorDialogMsg != null) {
+					alertDialog.setMessage(getResources().getString(R.string.upload_error)+errorDialogMsg);
+					errorDialogMsg = null;
 				}
-				onActivityResult(requestCode, RESULT_OK, results);
 			}
-		});
+		}
 	}
 	
 	@Override
@@ -131,14 +119,11 @@ public class UploadActivity extends Activity {
 				progressDialog = new ProgressDialog(this);
         progressDialog.setIcon(android.R.drawable.ic_dialog_info);
         progressDialog.setTitle(getString(R.string.progress_title));
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setMessage("");
-        progressDialog.setMax(100);
-        progressDialog.setProgress(10);
+        progressDialog.setIndeterminate(true);
         return progressDialog;
-			case DIALOG_LOGIN_ERROR: {
+			case DIALOG_ERROR: {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setMessage(R.string.login_error)
+				builder.setMessage("")
 							 .setCancelable(true)
 							 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 								 @Override
@@ -169,93 +154,21 @@ public class UploadActivity extends Activity {
 		}
 	}
 	
-	//Try to exchange the auth token obtained using google's authentication
-	//against a cookie to access the zoobweb app
-	//Returns true on success, false on failure
-	protected boolean getCookieFromAuthToken () {
-		if (account == null)
-			return false;
-		
-		try {
-			if (EditorConstants.isProd()) {
-				AccountManagerFuture<Bundle> authToken = accountManager.getAuthToken(account, "ah", null, UploadActivity.this, null, null);
-				Bundle bundle = authToken.getResult();
-				String token = bundle.get(AccountManager.KEY_AUTHTOKEN).toString();
-				//invalidate and get new, otherwise we might have an expired cached token, leading to authentication failure
-				accountManager.invalidateAuthToken(account.type, token);
-				authToken = accountManager.getAuthToken(account, "ah", null, UploadActivity.this, null, null);
-				bundle = authToken.getResult();
-				token = bundle.get(AccountManager.KEY_AUTHTOKEN).toString();
-				
-				final String continueURL = EditorConstants.getServerUrl();
-				httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);		
-				HttpGet httpGet = new HttpGet(EditorConstants.getLoginUrl()+"/_ah/login?auth="
-						+ token + "&continue="+continueURL);
-				Log.i(TAG, "GET : " + httpGet.getURI().toString());
-				
-				HttpResponse response;
-		    response = httpClient.execute(httpGet);
-				if (response.getStatusLine().getStatusCode() != 302) {
-					//Response should be a redirect
-					Log.e(TAG, "Response not a redirect. Status code : " 
-										+ response.getStatusLine().getStatusCode() 
-										+ ", error message : " 
-										+ response.getStatusLine().getReasonPhrase());
-					return false;
-				}
-				
-				for (Cookie cookie: httpClient.getCookieStore().getCookies()) {
-					if (cookie.getName().equals("ACSID")) {
-						//Good, we found our cookie
-						return true;
-					}
-				}
-			} else {
-				httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);		
-				HttpGet httpGet = new HttpGet(EditorConstants.getLoginUrl()+"/_ah/login?email="
-						+account.name + "&action=Login&continue="+EditorConstants.getServerUrl());
-				HttpResponse response;
-		    response = httpClient.execute(httpGet);
-				if (response.getStatusLine().getStatusCode() != 302) {
-					//Response should be a redirect
-					Log.e(TAG, "Response not a redirect. Status code : " 
-										+ response.getStatusLine().getStatusCode() 
-										+ ", error message : " 
-										+ response.getStatusLine().getReasonPhrase());
-					return false;
-				}
-				
-				for (Cookie cookie: httpClient.getCookieStore().getCookies()) {
-					if (cookie.getName().equals("dev_appserver_login")) {
-						//Good, we found our cookie
-						return true;
-					}
-				}
-			}
-    } catch (ClientProtocolException e) {
-	    e.printStackTrace();
-    } catch (IOException e) {
-	    e.printStackTrace();
-    } catch (OperationCanceledException e) {
-	    e.printStackTrace();
-    } catch (AuthenticatorException e) {
-	    e.printStackTrace();
-    }
-    return false;
-	}
-	
 	protected boolean doSerieUpload () {
 		try {
 			HttpPost httpPost;
-			if (toUploadId != -1)
+			if (toUploadId != -1) {
+				Log.i(TAG, "Updating existing serie, communityID=" + toUploadId);
 				httpPost = new HttpPost(EditorConstants.getPutUrl(toUploadId));
-			else
+			} else {
+				Log.i(TAG, "Creating new serie");
 				httpPost = new HttpPost(EditorConstants.getPutUrl());
+			}
 			
 	    httpPost.setEntity(new StringEntity(toUploadContent));
 	    HttpResponse response = httpClient.execute(httpPost);
 	    if (response.getStatusLine().getStatusCode() != 200) {
-	    	Log.e(TAG, "Error uploading : " + response.getStatusLine().getReasonPhrase());
+	    	errorDialog("Error uploading : " + response.getStatusLine().getReasonPhrase());
 	    	return false;
 	    }
 	    
@@ -278,70 +191,25 @@ public class UploadActivity extends Activity {
     return false;
 	}
 	
-	@Override
-	protected void onActivityResult (int requestCode, int resultCode, final Intent results) {
-		switch (requestCode) {
-/*			case EditorConstants.GET_LOGIN: {
-				if (resultCode == RESULT_OK && auth != null) {
-					if (!auth.authResult(resultCode, results)) {
-						dismissDialogSafely(DIALOG_PROGRESS);
-					} 
-				} else {
-					dismissDialogSafely(DIALOG_PROGRESS);
-				}
-				break;
-			}*/
-			case EditorConstants.SEND_TO_ZOOB_WEB: {
-				if (resultCode == RESULT_OK) {
-					(new Thread() {
-						public void run() {
-							if (getCookieFromAuthToken()) {
-								Log.i(TAG, "Got cookie for zoobweb");
-								if (doSerieUpload()) {
-									dismissDialogSafely(DIALOG_PROGRESS);
-									showDialogSafely(DIALOG_SUCCESS);
-								} else { 
-									Log.e(TAG, "Serie upload failed");
-									dismissDialogSafely(DIALOG_PROGRESS);
-									showDialogSafely(DIALOG_LOGIN_ERROR);
-								}
-							} else {
-								Log.e(TAG, "Couldn't get cookie");
-								dismissDialogSafely(DIALOG_PROGRESS);
-								showDialogSafely(DIALOG_LOGIN_ERROR);
-							}
-						}
-					}).start();
-				} else {
-					dismissDialogSafely(DIALOG_PROGRESS);
-					showDialogSafely(DIALOG_LOGIN_ERROR);
-				}
-				break;
-			}
-			default:
-				Log.w(EditorConstants.TAG, "Warning unhandled request code : " + requestCode);
-		}
-	}
-	
 	public void dismissDialogSafely(final int id) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run () {
-        try {
-          dismissDialog(id);
-        } catch (IllegalArgumentException e) {
-          // This will be thrown if this dialog was not shown before.
-        }
-			}
-		});
+    try {
+      dismissDialog(id);
+    } catch (IllegalArgumentException e) {
+      // This will be thrown if this dialog was not shown before.
+    }
 	}
-	
-	public void showDialogSafely (final int id) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run () {
-				showDialog(id);
-			}
-		});
-	}
+
+	@Override
+  public void authenticated(DefaultHttpClient httpClient) {
+		if (doSerieUpload()) {
+			dismissDialog(DIALOG_PROGRESS);
+			showDialog(DIALOG_SUCCESS);
+		} //Otherwise, error dialog handled by doSerieUpload
+  }
+
+	@Override
+  public void authenticationError(DefaultHttpClient httpClient, String error) {
+		dismissDialog(DIALOG_PROGRESS);
+		errorDialog(error);
+  }
 }
