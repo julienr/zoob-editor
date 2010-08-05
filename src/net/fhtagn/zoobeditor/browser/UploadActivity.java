@@ -6,25 +6,17 @@ import java.io.UnsupportedEncodingException;
 import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorApplication;
 import net.fhtagn.zoobeditor.EditorConstants;
-import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.Series;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
+import net.fhtagn.zoobeditor.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -37,8 +29,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-
-import com.google.android.apps.mytracks.io.AccountChooser;
 
 public class UploadActivity extends Activity implements EditorApplication.OnAuthenticatedCallback {
 	static final String TAG = "UploadActivity";
@@ -125,7 +115,7 @@ public class UploadActivity extends Activity implements EditorApplication.OnAuth
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setMessage("")
 							 .setCancelable(true)
-							 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+							 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 								 @Override
 								 public void onClick(DialogInterface dialog, int id) {
 									 dialog.cancel();
@@ -139,7 +129,7 @@ public class UploadActivity extends Activity implements EditorApplication.OnAuth
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setMessage(R.string.upload_success)
 							 .setCancelable(true)
-							 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+							 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 								 @Override
 								 public void onClick(DialogInterface dialog, int id) {
 									 setResult(RESULT_OK);
@@ -201,8 +191,8 @@ public class UploadActivity extends Activity implements EditorApplication.OnAuth
 
 	@Override
   public void authenticated(DefaultHttpClient httpClient) {
+		dismissDialog(DIALOG_PROGRESS);
 		if (doSerieUpload()) {
-			dismissDialog(DIALOG_PROGRESS);
 			showDialog(DIALOG_SUCCESS);
 		} //Otherwise, error dialog handled by doSerieUpload
   }
@@ -211,5 +201,11 @@ public class UploadActivity extends Activity implements EditorApplication.OnAuth
   public void authenticationError(DefaultHttpClient httpClient, String error) {
 		dismissDialog(DIALOG_PROGRESS);
 		errorDialog(error);
+  }
+
+	@Override
+  public void authenticationCanceled(DefaultHttpClient httpClient) {
+	  dismissDialog(DIALOG_PROGRESS);
+	  finish();
   }
 }

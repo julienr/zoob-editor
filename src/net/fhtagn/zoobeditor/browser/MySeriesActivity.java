@@ -1,17 +1,17 @@
 package net.fhtagn.zoobeditor.browser;
 
-import java.io.File;
 import java.util.Date;
 
 import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorConstants;
-import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.SerieCursorAdapter;
 import net.fhtagn.zoobeditor.Series;
 import net.fhtagn.zoobeditor.editor.SerieEditActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.fhtagn.zoobeditor.R;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +33,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class MySeriesActivity extends ListActivity {
@@ -70,9 +70,8 @@ public class MySeriesActivity extends ListActivity {
 	}
 	
 	private void refreshList () {
-		Cursor cur = managedQuery(Series.CONTENT_URI, projection, Series.IS_MINE+"=1", null, null);
 		SerieAdapter adapter = (SerieAdapter)getListAdapter();
-		adapter.changeCursor(cur);
+		adapter.getCursor().requery();
 	}
 	
 	@Override
@@ -170,23 +169,11 @@ public class MySeriesActivity extends ListActivity {
 				});
 			}
 			case DIALOG_CONFIRM_DELETE: {
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.delete_dlg_title)
-							 .setMessage(R.string.confirm_delete_serie)
-							  .setCancelable(true)
-							  .setPositiveButton(android.R.string.ok,
-							  		new DialogInterface.OnClickListener() {
-							  			public void onClick (DialogInterface dialog, int id) {
-							  				deleteSerie();
-							  			}
-							  	})
-							  .setNegativeButton(android.R.string.cancel,
-							    new DialogInterface.OnClickListener() {
-								    public void onClick(DialogInterface dialog, int id) {
-									    dialog.cancel();
-								    }
-								  });
-				return builder.create();
+				return Common.createConfirmDeleteDialog(this, R.string.confirm_delete_serie, new DialogInterface.OnClickListener() {
+	  			public void onClick (DialogInterface dialog, int id) {
+	  				deleteSerie();
+	  			}
+				});
 			}
 			default:
 				return null;
@@ -200,35 +187,22 @@ public class MySeriesActivity extends ListActivity {
 		refreshList();
 	}
 	
-	public class SerieAdapter extends CursorAdapter {	
+	public class SerieAdapter extends SerieCursorAdapter {	
 		public SerieAdapter(Context context, Cursor c) {
-	    super(context, c);
+	    super(context, c, R.layout.serielist_item);
     }
-		
-		public String getName(int position) {
-			//FIXME: could use some caching
-			Cursor cur = (Cursor)this.getItem(position);
-			String json = cur.getString(cur.getColumnIndex(Series.JSON));
-			JSONObject levelObj;
-      try {
-	      levelObj = new JSONObject(json);
-	      return levelObj.getString("name");
-      } catch (JSONException e) {
-	      e.printStackTrace();
-	      return "";
-      }
-		}
     
-		private void fillView (View view, Cursor cursor) {
+		@Override
+		protected void fillView (View view, Cursor cursor) {
 			String json = cursor.getString(cursor.getColumnIndex(Series.JSON));
 			TextView textName = (TextView) view.findViewById(R.id.name);
 			try {
-				JSONObject levelObj = new JSONObject(json);
-				String name = levelObj.getString("name");
+				JSONObject serieObj = new JSONObject(json);
+				String name = serieObj.getString("name");
 				textName.setText(name);
 			} catch (JSONException e) {
 				e.printStackTrace();
-				textName.setText("JSON error");
+				textName.setText("JSON error : " + e.getMessage());
 			}		
 			
 			TextView uploadStatus = (TextView)view.findViewById(R.id.upload_status);
@@ -256,17 +230,7 @@ public class MySeriesActivity extends ListActivity {
 			}
 		}
 
-		@Override
-    public void bindView(View view, Context context, Cursor cursor) {
-			fillView(view, cursor);
-    }
-
-		@Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-			View view = getLayoutInflater().inflate(R.layout.serielist_item, null);
-			fillView(view, cursor);
-	    return view;
-    }
+	
 	}
 
 }

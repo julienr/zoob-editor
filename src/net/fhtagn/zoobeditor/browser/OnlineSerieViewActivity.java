@@ -2,7 +2,6 @@ package net.fhtagn.zoobeditor.browser;
 
 import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorConstants;
-import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.Series;
 import net.fhtagn.zoobeditor.editor.MiniLevelView;
 
@@ -10,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.fhtagn.zoobeditor.R;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -29,7 +29,6 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	static final String TAG = "OnlineSerieViewActivity";
 	
 	private JSONObject serieObj = null;
-	private JSONArray levelsArray = null;
 	
 	private int serieID;
 	
@@ -57,7 +56,6 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 		try {
 			if (result != null) {
 				serieObj = new JSONObject(result);
-				levelsArray = serieObj.getJSONArray("levels");
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -69,7 +67,7 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 		try {
 	    serieName.setText(serieObj.getString("name"));
 			GridView gridView = (GridView)findViewById(android.R.id.list);
-			gridView.setAdapter(new LevelsAdapter());
+			gridView.setAdapter(new LevelsAdapter(this, serieObj.getJSONArray("levels")));
     } catch (JSONException e) {
     	serieName.setText("Error loading serie from JSON");
 	    e.printStackTrace();
@@ -96,13 +94,15 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	    Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID}, Series.COMMUNITY_ID+"="+communityId, null, null);
 	    ContentValues values = new ContentValues();
 		  values.put(Series.JSON, serie.toString());
-		  values.put(Series.IS_MINE, false); //FIXME: should check if author is owner of phone, in case of reinstall
+		  values.put(Series.IS_MINE, false); 
 	    values.put(Series.COMMUNITY_ID, serie.getJSONObject("meta").getInt("id"));
 	    if (!cur.moveToFirst()) {
+	    	cur.close();
 		    return Long.parseLong(getContentResolver().insert(Series.CONTENT_URI, values).getLastPathSegment());
 	    } else {
 	    	//In our DB, update
 	    	long serieId = cur.getLong(cur.getColumnIndex(Series.ID));
+	    	cur.close();
 	    	Uri serieUri = ContentUris.withAppendedId(Series.CONTENT_URI, serieId);
 	    	getContentResolver().update(serieUri, values, null, null);
 	    	return serieId;
@@ -117,49 +117,5 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	@Override
 	protected String getURL() {
 		return EditorConstants.getDetailsUrl(serieID);
-	}
-	
-	class LevelsAdapter extends BaseAdapter {				
-		@Override
-    public int getCount() {
-			return levelsArray.length();
-    }
-
-		@Override
-    public Object getItem(int position) {
-	    try {
-	      return levelsArray.get(position);
-      } catch (JSONException e) {
-	      e.printStackTrace();
-	      return null;
-      }
-    }
-
-		@Override
-    public long getItemId(int position) {
-			return position;
-    }
-		
-		@Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-			View view;
-			if (convertView != null)
-				view = convertView;
-			else
-				view = getLayoutInflater().inflate(R.layout.serieview_item, null);
-			
-			MiniLevelView levelView = (MiniLevelView)view.findViewById(R.id.minilevel);
-			try {
-	      JSONObject levelObj = levelsArray.getJSONObject(position);
-	      levelView.setLevel(levelObj);
-      } catch (JSONException e) {
-      	TextView textView = new TextView(OnlineSerieViewActivity.this);
-      	textView.setText("Error reading level");
-	      e.printStackTrace();
-	      return textView;	
-      }
-	    return view;
-    }
-		
 	}
 }

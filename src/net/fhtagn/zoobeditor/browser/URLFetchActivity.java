@@ -4,7 +4,6 @@ import java.io.InputStream;
 
 import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorConstants;
-import net.fhtagn.zoobeditor.R;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -13,6 +12,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import net.fhtagn.zoobeditor.R;
 import android.app.Activity;
 import android.util.Log;
 import android.widget.ProgressBar;

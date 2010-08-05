@@ -7,6 +7,7 @@
         android:key="@string/pref_key_account"
         android:title="@string/title_account_preference"
         android:summary="@string/summary_account_preference"
-        android:dialogTitle="@string/dialog_title_account_preference" />
+        android:dialogTitle="@string/dialog_title_account_preference"
+        android:persistent="true" />
   </PreferenceCategory>
 </PreferenceScreen>

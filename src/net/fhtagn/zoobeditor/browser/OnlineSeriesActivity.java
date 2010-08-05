@@ -4,13 +4,13 @@ import java.util.Date;
 
 import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorConstants;
-import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.Series;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.fhtagn.zoobeditor.R;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -19,10 +19,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -43,6 +41,7 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 	public boolean onCreateOptionsMenu (Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.onlineserielist_menu, menu);
+		Common.createCommonOptionsMenu(this, menu);
 		return true;
 	}
 	
@@ -53,7 +52,7 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 				toLoadingState();
 				return true;
 		}
-		return false;
+		return Common.commonOnOptionsItemSelected(this, item);
 	}
 	
 	@Override

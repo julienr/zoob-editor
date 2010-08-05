@@ -1,5 +1,6 @@
 package net.fhtagn.zoobeditor.browser;
 
+import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.Preferences;
 import net.fhtagn.zoobeditor.R;
 import android.app.TabActivity;
@@ -31,6 +32,12 @@ public class Browser extends TabActivity {
 								  .setContent(intent);
 		tabHost.addTab(spec);
 		
+		//Downloaded
+		intent = new Intent().setClass(this, DownloadedActivity.class);
+		spec = tabHost.newTabSpec("downloaded").setIndicator(res.getString(R.string.downloaded_tab)/*, res.getDrawable(android.R.drawable.ic_menu_myplaces)*/)
+								  .setContent(intent);
+		tabHost.addTab(spec);
+		
 		//Online levels
 		intent = new Intent().setClass(this, OnlineSeriesActivity.class);
 		spec = tabHost.newTabSpec("online").setIndicator(res.getString(R.string.online_tab)/*, res.getDrawable(android.R.drawable.ic_menu_mapmode)*/)
@@ -56,19 +63,12 @@ public class Browser extends TabActivity {
 	
 	@Override
 	public boolean onCreateOptionsMenu (Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.base_menu, menu);
+		Common.createCommonOptionsMenu(this, menu);
 		return true;
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected (MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.prefs:
-				Intent i = new Intent(getApplicationContext(), Preferences.class);
-				startActivity(i);
-				return true;
-		}
-		return false;
+		return Common.commonOnOptionsItemSelected(this, item);
 	}
 }

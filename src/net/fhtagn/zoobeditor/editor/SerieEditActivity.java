@@ -1,22 +1,17 @@
 package net.fhtagn.zoobeditor.editor;
 
 import net.fhtagn.zoobeditor.Common;
-import net.fhtagn.zoobeditor.EditorConstants;
-import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.Series;
-import net.fhtagn.zoobeditor.browser.Browser;
 import net.fhtagn.zoobeditor.browser.NameDialog;
-import net.fhtagn.zoobeditor.browser.UploadActivity;
-import net.fhtagn.zoobeditor.browser.MySeriesActivity.SerieAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.fhtagn.zoobeditor.R;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -143,6 +138,7 @@ public class SerieEditActivity extends ListActivity {
 	public boolean onCreateOptionsMenu (Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.serieedit_menu, menu);
+		Common.createCommonOptionsMenu(this, menu);
 		return true;
 	}
 	
@@ -163,7 +159,7 @@ public class SerieEditActivity extends ListActivity {
 				showDialog(DIALOG_RENAME);
 				return true;
 		}
-		return false;
+		return Common.commonOnOptionsItemSelected(this, item);
 	}
 	
 	@Override
@@ -330,23 +326,11 @@ public class SerieEditActivity extends ListActivity {
 				});
 			}
 			case DIALOG_CONFIRM_DELETE: {
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.delete_dlg_title)
-							 .setMessage(R.string.confirm_delete_level)
-							  .setCancelable(true)
-							  .setPositiveButton(android.R.string.ok,
-							  		new DialogInterface.OnClickListener() {
-							  			public void onClick (DialogInterface dialog, int id) {
-							  				deleteLevel();
-							  			}
-							  	})
-							  .setNegativeButton(android.R.string.cancel,
-							    new DialogInterface.OnClickListener() {
-								    public void onClick(DialogInterface dialog, int id) {
-									    dialog.cancel();
-								    }
-								  });
-				return builder.create();
+				return Common.createConfirmDeleteDialog(this, R.string.confirm_delete_level, new DialogInterface.OnClickListener() {
+	  			public void onClick (DialogInterface dialog, int id) {
+	  				deleteLevel();
+	  			}
+				});
 			}
 			case DIALOG_RENAME: {
 				return new NameDialog(this, DIALOG_RENAME, this, new NameDialog.OnOkListener() {

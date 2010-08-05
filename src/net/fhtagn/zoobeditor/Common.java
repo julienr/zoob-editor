@@ -8,9 +8,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
-import android.text.format.DateFormat;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 public class Common {	
 	static final String TAG = "Common";
@@ -76,5 +85,56 @@ public class Common {
 	    return new Date();
     }
 	}
+	
+	/*
+	*@return boolean return true if the application can access the internet
+	*/
+	public static boolean hasInternet(Context ctx){
+		NetworkInfo info=((ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+		if(info==null || !info.isConnected()){
+			return false;
+		}
+		if(info.isRoaming()){
+			//here is the roaming option you can change it if you want to disable internet while roaming, just return false
+			//FIXME: add a preference for that
+			return true;
+		}
+		return true;
+	}
 
+	
+	//These two functions can be used to create and handle the common options
+	//menu that should be available on all menu
+	public static void createCommonOptionsMenu (Activity activity, Menu menu) {
+		MenuInflater inflater = activity.getMenuInflater();
+		inflater.inflate(R.menu.base_menu, menu);
+	}
+	
+	public static boolean commonOnOptionsItemSelected (Activity activity, MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.prefs:
+				Intent i = new Intent(activity, Preferences.class);
+				activity.startActivity(i);
+				return true;
+			case R.id.help:
+				//FIXME: show help
+				return true;
+		}
+		return false;
+	}
+	
+	public static Dialog createConfirmDeleteDialog (Activity activity, int msgID, DialogInterface.OnClickListener listener) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+		builder.setTitle(R.string.delete_dlg_title)
+					 .setMessage(msgID)
+					  .setCancelable(true)
+					  .setPositiveButton(android.R.string.ok, listener)
+					  .setNegativeButton(android.R.string.cancel,
+					    new DialogInterface.OnClickListener() {
+						    public void onClick(DialogInterface dialog, int id) {
+							    dialog.cancel();
+						    }
+						  });
+		return builder.create();
+	}
 }

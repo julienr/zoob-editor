@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+<string name="ok">Ok</string>
+<string name="cancel">Cancel</string>
     
 <string name="app_name">ZoobEditor</string>
 <string name="btn_newlevel">New level</string>
@@ -28,7 +31,8 @@
 <string name="save_err_export">Error during level export</string>
 <string name="save_success">Saved succesfully </string>
 <string name="myseries_tab">My levels</string>
-<string name="online_tab">Community levels</string>
+<string name="online_tab">Community</string>
+<string name="downloaded_tab">Downloaded</string>
 <string name="menu_edit">Edit</string>
 <string name="menu_upload">Upload</string>
 <string name="menu_delete">Delete</string>
@@ -51,11 +55,16 @@
 <string name="modified">Modified</string>
 <string name="update_available">Updated</string>
 
+<string name="dlg_no_account_title">Google account required</string>
+<string name="dlg_no_account_msg">This functionnality requires that you define a Google account to use with this application. Please do so in the preferences.</string>
+<string name="goto_prefs">Open preferences</string>
+
 <!-- Preferences -->
 <string name="account_preferences">Account</string>
 <string name="title_account_preference">Account</string>
 <string name="summary_account_preference">The account used to upload and share levels.</string>
 <string name="dialog_title_account_preference">Choose account</string>
+<string name="no_account_defined_summary">No Google account found on this phone. Please set up one in your phone\'s parameters.</string>
 
 <!--  Pref keys ( DO NOT TRANSLATE ) -->
 <string name="pref_key_account">account</string>

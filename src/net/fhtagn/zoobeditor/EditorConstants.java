@@ -1,5 +1,6 @@
 package net.fhtagn.zoobeditor;
 
+import android.accounts.Account;
 import android.app.Activity;
 import android.graphics.Color;
 
@@ -7,6 +8,7 @@ public class EditorConstants {
 	public static final String TAG  = "ZoobEditor";
 	
 	public static final String ACCOUNT_TYPE = "com.google";
+	public static final String AUTH_TOKEN_TYPE = "ah";
 	
 	/**
 	 * onActivityResult request code
@@ -26,7 +28,7 @@ public class EditorConstants {
 	/**
 	 * Zoobweb
 	 */
-	private static final boolean production = true; 
+	private static final boolean production = false; 
 	private static final String SERVER_URL = "http://zoobweb.appspot.com/rest";
 	private static final String LOCAL_URL = "http://192.168.0.2:8080/rest";
 	
@@ -61,6 +63,15 @@ public class EditorConstants {
 	
 	public static String getListUrl () {
 		return getServerUrl()+"/";
+	}
+	
+	//Return a string that can be used to identify this author to the remote server (usually the email address)
+	public static String getAuthorIdentification (Account author) {
+		return author.name;
+	}
+	
+	public static String getByAuthorListUrl (Account author) { 
+		return getServerUrl()+"/?author="+getAuthorIdentification(author);
 	}
 	
 	public static String getDetailsUrl (int serieId) {

@@ -17,7 +17,6 @@
 //Copied from mytracks
 package com.google.android.apps.mytracks.io;
 
-
 import net.fhtagn.zoobeditor.R;
 import android.accounts.Account;
 import android.accounts.AccountManager;

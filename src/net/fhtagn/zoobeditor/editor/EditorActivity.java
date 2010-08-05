@@ -1,7 +1,6 @@
 package net.fhtagn.zoobeditor.editor;
 
 import net.fhtagn.zoobeditor.Common;
-import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.editor.tools.EraseTool;
 import net.fhtagn.zoobeditor.editor.tools.PathTool;
 import net.fhtagn.zoobeditor.editor.tools.TankTool;
@@ -13,6 +12,7 @@ import net.fhtagn.zoobeditor.editor.utils.WallView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.fhtagn.zoobeditor.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -82,6 +82,7 @@ public class EditorActivity extends Activity {
 	public boolean onCreateOptionsMenu (Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.editor_menu, menu);
+		Common.createCommonOptionsMenu(this, menu);
 		return true;
 	}
 	
@@ -98,7 +99,7 @@ public class EditorActivity extends Activity {
 			case R.id.help:
 				return true;
 		}
-		return false;
+		return Common.commonOnOptionsItemSelected(this, item);
 	}
 	
 	private void toPathMode (PathTool tool) {

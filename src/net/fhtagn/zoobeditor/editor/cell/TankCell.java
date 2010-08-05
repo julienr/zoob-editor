@@ -2,9 +2,9 @@ package net.fhtagn.zoobeditor.editor.cell;
 
 import java.util.ArrayList;
 
-import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.editor.utils.Coords;
 import net.fhtagn.zoobeditor.editor.utils.Types;
+import net.fhtagn.zoobeditor.R;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;

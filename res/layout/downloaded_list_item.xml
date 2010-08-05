@@ -17,12 +17,10 @@
     android:isIndicator="true"
     android:numStars="5" />
     
-  <TextView android:id="@+id/download_status"
+  <TextView android:id="@+id/progress"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_below="@id/rating"
     android:layout_alignParentRight="true"
-    android:textStyle="bold"
-    android:textColor="#FF50AB86"
-    android:text="Downloaded" />
+    android:textStyle="bold" />
 </RelativeLayout>
