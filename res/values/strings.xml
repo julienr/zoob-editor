@@ -54,6 +54,7 @@
 <string name="not_downloaded">Not downloaded</string>
 <string name="modified">Modified</string>
 <string name="update_available">Updated</string>
+<string name="select_tool">Select tool</string>
 
 <string name="dlg_no_account_title">Google account required</string>
 <string name="dlg_no_account_msg">This functionnality requires that you define a Google account to use with this application. Please do so in the preferences.</string>

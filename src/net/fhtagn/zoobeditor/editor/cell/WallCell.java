@@ -22,6 +22,7 @@ public class WallCell extends GridCell {
 	
 	public static RectF getRectFor (Types.WallType type) {
 		switch (type) {
+			case E: return null;
 			case T: return new RectF(0, 0, 1, 0.5f);
 			case B: return new RectF(0, 0.5f, 1, 1);
 			case L: return new RectF(0, 0, 0.5f, 1);
@@ -51,7 +52,8 @@ public class WallCell extends GridCell {
 	
 	public void draw (Canvas canvas) {
 		//canvas.drawText(wall2str(type), 0, 0, paint);
-		canvas.drawRect(drawRect, drawPaint);
+		if (drawRect != null)
+			canvas.drawRect(drawRect, drawPaint);
 	}
 
 	@Override
@@ -61,7 +63,7 @@ public class WallCell extends GridCell {
 
 	@Override
   public boolean isValidWaypoint() {
-	  return false;
+	  return type == Types.WallType.E;
   }
 	
 }

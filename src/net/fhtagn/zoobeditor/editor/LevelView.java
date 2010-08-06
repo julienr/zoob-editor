@@ -2,7 +2,6 @@ package net.fhtagn.zoobeditor.editor;
 
 import java.util.ArrayList;
 
-import net.fhtagn.zoobeditor.editor.cell.EmptyCell;
 import net.fhtagn.zoobeditor.editor.cell.GridCell;
 import net.fhtagn.zoobeditor.editor.cell.TankCell;
 import net.fhtagn.zoobeditor.editor.cell.WallCell;
@@ -38,7 +37,7 @@ public class LevelView extends View {
 	private final int xdim;
 	private final int ydim;
 	
-	private int touchX = -1, touchY=-1;
+	//private int touchX = -1, touchY=-1;
 	
 	private int selectedCell[] = {0,0}; //contains coords of currently selected cell
 	
@@ -59,12 +58,8 @@ public class LevelView extends View {
 				JSONArray row = tilesArr.getJSONArray(y);
 				for (int x=0; x<xdim; x++) {
 					String v = row.getString(x);
-					if (Types.isEmpty(v)) {
-						grid[x][y] = new EmptyCell(new Coords(x,y));
-					} else {
-						Types.WallType t = Types.str2wall(v);
-						grid[x][y] = new WallCell(new Coords(x,y), t);
-					}
+					Types.WallType t = Types.str2wall(v);
+					grid[x][y] = new WallCell(new Coords(x,y), t);
 				}
 			}
 			/** TANKS **/
@@ -107,7 +102,7 @@ public class LevelView extends View {
 					else if (x == xdim - 1)
 						grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.R);
 					else
-						grid[x][y] = new EmptyCell(new Coords(x, y));
+						grid[x][y] = new WallCell(new Coords(x, y), Types.WallType.E);
 				}
 			}
 		}
@@ -194,7 +189,7 @@ public class LevelView extends View {
 		paint.setColor(Color.BLACK);
 		paint.setTextSize(sxy/2.0f);
 		
-		canvas.drawCircle(touchX, touchY, 3.0f, paint);
+		//canvas.drawCircle(touchX, touchY, 3.0f, paint);
 		
 		canvas.save();
 		canvas.translate(offsetX, offsetY);
@@ -264,8 +259,8 @@ public class LevelView extends View {
 			int x = (int)event.getX();
 			int y = (int)event.getY();
 			
-			touchX = x;
-			touchY = y;
+			/*touchX = x;
+			touchY = y;*/
 			
 			//transform the click to grid coords
 			x = (x-offsetX)/sxy;
@@ -273,7 +268,7 @@ public class LevelView extends View {
 			
 			selectCell(x,y);
 			modifyCell();
-			postInvalidate(); // FIXME: remove, just to debug touch
+			//postInvalidate(); // FIXME: remove, just to debug touch
 			return true;
 		}
 		return false;

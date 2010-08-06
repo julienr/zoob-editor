@@ -7,7 +7,7 @@ public class Types {
 	static final String TAG = "Types";
 	/** WALL */
 	public enum WallType {
-		T, L, B, R, W, M 
+		E, T, L, B, R, W, M 
 	}
 	
 	static public boolean isEmpty (String str) {
@@ -27,6 +27,8 @@ public class Types {
 			return WallType.M;
 		else if (str.equals("R"))
 			return WallType.R;
+		else if (str.equals("E"))
+			return WallType.E;
 		else {
 			Log.e(TAG, "Unhandled wall type : " + str);
 			return WallType.W;
@@ -41,6 +43,7 @@ public class Types {
 			case R: return "R";
 			case W: return "W";
 			case M: return "M";
+			case E: return "E";
 			default:
 				Log.e(TAG, "Unhandled wall type : " + t);
 				return "";
