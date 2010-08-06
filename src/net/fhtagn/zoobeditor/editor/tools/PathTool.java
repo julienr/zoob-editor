@@ -67,7 +67,8 @@ public class PathTool extends EditorTool {
 	}
 	
 	public void savePath () {
-		selectedCell.setPath(waypoints);
+		if (selectedCell != null)
+			selectedCell.setPath(waypoints);
 	}
 	
 	@Override
