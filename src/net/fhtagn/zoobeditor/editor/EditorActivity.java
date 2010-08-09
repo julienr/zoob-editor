@@ -50,10 +50,15 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 
 public class EditorActivity extends Activity {
+	//returned if the user requested the level's deletion. The calling activity
+	//should proceed with the deleteion
+	public static final int RESULT_DELETE = Activity.RESULT_FIRST_USER;
+	
 	static final String TAG = "Editor";
-	static final int DIALOG_WALL_ID = 0;
-	static final int DIALOG_TANK_ID = 1;
-	static final int DIALOG_TOOL_TYPE = 2;
+	static final int DIALOG_TOOL_TYPE = 1;
+	static final int DIALOG_CONFIRM_DELETE = 2;
+	
+	static final int REQUEST_LEVEL_OPTIONS = 1;
 	
 	private LevelView levelView;
 	
@@ -112,6 +117,13 @@ public class EditorActivity extends Activity {
 				levelFrame.addView(textView);
 			}
 		}
+		toWallMode();
+	}
+	
+	@Override
+	public void finish () {
+		saveToSerie();
+		super.finish();
 	}
 	
 	@Override
@@ -125,15 +137,25 @@ public class EditorActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected (MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.save:
-				saveToSerie();
+			case R.id.advanced: {
+				Intent i = new Intent(getApplicationContext(), LevelOptionsActivity.class);
+				try {
+	        i.putExtra("json", levelView.toJSON().toString());
+        } catch (JSONException e) {
+	        e.printStackTrace();
+	        return false;
+        }
+        startActivityForResult(i, REQUEST_LEVEL_OPTIONS);
 				return true;
-			case R.id.play:
-				Intent i = Common.playeSerie(Common.extractId(serieUri), levelNumber);
-        startActivity(i);
+			}
+			case R.id.play: {
+				Common.Level.play(this, Common.extractId(serieUri), levelNumber);
 				return true;
-			case R.id.help:
+			}
+			case R.id.delete: {
+				showDialog(DIALOG_CONFIRM_DELETE);
 				return true;
+			}
 		}
 		return Common.commonOnOptionsItemSelected(this, item);
 	}
@@ -198,7 +220,80 @@ public class EditorActivity extends Activity {
 			//FIXME: display error to user ?
 			setResult(RESULT_CANCELED);
 		}
-		finish();
+	}
+	
+	private void toWallMode () {
+		RadioGroup toolsLayout = (RadioGroup)findViewById(R.id.tools);
+		toolsLayout.removeAllViews();
+		toolsLayout.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+      public void onCheckedChanged(RadioGroup group, int btnId) {
+				if (btnId == -1)
+					return;
+				Types.WallType type = Types.WallType.values()[btnId];
+				levelView.setEditorTool(new WallTool(type));
+      }
+		});
+		final int len = Types.WallType.values().length;
+		for (int i=0; i<len; i++) {
+			Types.WallType type = Types.WallType.values()[i];
+			WallView view = new WallView(EditorActivity.this, type);
+			view.setId(i); //ids are used in the onchecklistener to identify the clicked type
+			view.setLayoutParams(new RadioGroup.LayoutParams(50, 50));
+			view.setPadding(8,8,8,8);
+			toolsLayout.addView(view);
+		}
+	}
+	
+	private void toTankMode () {
+		RadioGroup toolsLayout = (RadioGroup)findViewById(R.id.tools);
+		toolsLayout.removeAllViews();
+		toolsLayout.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+      public void onCheckedChanged(RadioGroup group, int btnId) {
+				if (btnId == -1)
+					return;
+				Types.TankType type = Types.TankType.values()[btnId];
+				levelView.setEditorTool(new TankTool(EditorActivity.this, type));
+      }
+		});
+		final int len = Types.TankType.values().length;
+		for (int i=0; i<len; i++) {
+			Types.TankType type = Types.TankType.values()[i];
+			TankView view = new TankView(EditorActivity.this, type);
+			view.setId(i); //ids are used in the onchecklistener to identify the clicked type
+			view.setLayoutParams(new RadioGroup.LayoutParams(50, 50));
+			view.setPadding(8,8,8,8);
+			toolsLayout.addView(view);
+		}
+	}
+	
+	private void toPathMode () {
+		PathTool tool = new PathTool();
+		levelView.setEditorTool(tool);
+		toPathMode(tool);
+	}
+	
+	@Override
+	protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case REQUEST_LEVEL_OPTIONS: {
+				if (resultCode != RESULT_OK) {
+					Log.e(TAG, "REQUEST_LEVEL_OPTIONS: unhandled resultCode = " + resultCode);
+					return;
+				}
+				if (!data.hasExtra("json")) {
+					Log.e(TAG, "REQUEST_LEVEL_OPTIONS : got not json in response");
+					return;
+				}
+				try {
+	        JSONObject obj = new JSONObject(data.getStringExtra("json"));
+	        levelView = new LevelView(getApplicationContext(), obj);
+        } catch (JSONException e) {
+	        e.printStackTrace();
+        }
+			}
+		}
 	}
 	
 	@Override
@@ -216,56 +311,24 @@ public class EditorActivity extends Activity {
 					public void onClick(DialogInterface dialog, int item) {
 						dialog.dismiss();
 						if (item == 0) { //Wall
-							RadioGroup toolsLayout = (RadioGroup)findViewById(R.id.tools);
-							toolsLayout.removeAllViews();
-							toolsLayout.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-								@Override
-                public void onCheckedChanged(RadioGroup group, int btnId) {
-									if (btnId == -1)
-										return;
-									Types.WallType type = Types.WallType.values()[btnId];
-									levelView.setEditorTool(new WallTool(type));
-                }
-							});
-							final int len = Types.WallType.values().length;
-							for (int i=0; i<len; i++) {
-								Types.WallType type = Types.WallType.values()[i];
-								WallView view = new WallView(EditorActivity.this, type);
-								view.setId(i); //ids are used in the onchecklistener to identify the clicked type
-								view.setLayoutParams(new RadioGroup.LayoutParams(50, 50));
-								view.setPadding(8,8,8,8);
-								toolsLayout.addView(view);
-							}
+							toWallMode();
 						} else if (item == 1) { //Tank
-							RadioGroup toolsLayout = (RadioGroup)findViewById(R.id.tools);
-							toolsLayout.removeAllViews();
-							toolsLayout.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-								@Override
-                public void onCheckedChanged(RadioGroup group, int btnId) {
-									if (btnId == -1)
-										return;
-									Types.TankType type = Types.TankType.values()[btnId];
-									levelView.setEditorTool(new TankTool(EditorActivity.this, type));
-                }
-							});
-							final int len = Types.TankType.values().length;
-							for (int i=0; i<len; i++) {
-								Types.TankType type = Types.TankType.values()[i];
-								TankView view = new TankView(EditorActivity.this, type);
-								view.setId(i); //ids are used in the onchecklistener to identify the clicked type
-								view.setLayoutParams(new RadioGroup.LayoutParams(50, 50));
-								view.setPadding(8,8,8,8);
-								toolsLayout.addView(view);
-							}
+							toTankMode();
 						} else { //Path
-							PathTool tool = new PathTool();
-							levelView.setEditorTool(tool);
-							toPathMode(tool);
+							toPathMode();
 						}
 				  }
 				});
 				AlertDialog alert = builder.create();
 				return alert;
+			}
+			case DIALOG_CONFIRM_DELETE: {
+				return Common.createConfirmDeleteDialog(this, R.string.confirm_delete_level, new DialogInterface.OnClickListener() {
+	  			public void onClick (DialogInterface dialog, int id) {
+	  				setResult(RESULT_DELETE);
+	  				EditorActivity.super.finish(); //use super to avoid the implicit save by finish()
+	  			}
+				});
 			}
 			default:
 				return null;

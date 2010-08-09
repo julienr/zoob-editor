@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory
+    android:title="@string/level_pref_general">
+   <CheckBoxPreference
+        android:key="shadows"
+        android:title="@string/level_pref_title_shadows"
+        android:summary="@string/level_pref_summary_shadows"
+        android:persistent="false" />
+   <CheckBoxPreference
+        android:key="boss"
+        android:title="@string/level_pref_title_boss"
+        android:summary="@string/level_pref_summary_boss"
+        android:persistent="false" />
+  </PreferenceCategory>
+  
+  <PreferenceCategory
+    android:title="@string/level_pref_items"
+    android:summary="@string/level_pref_items_summary">
+   <CheckBoxPreference
+        android:key="bombs"
+        android:title="@string/level_pref_title_bombs"
+        android:persistent="false" />
+   <CheckBoxPreference
+        android:key="shield"
+        android:title="@string/level_pref_title_shield"
+        android:persistent="false" />
+   <CheckBoxPreference
+        android:key="bounce"
+        android:title="@string/level_pref_title_bounce"
+        android:persistent="false" />
+   <CheckBoxPreference
+        android:key="improved_firing"
+        android:title="@string/level_pref_title_improved_firing"
+        android:summary="@string/level_pref_summary_improved_firing"
+        android:persistent="false" />
+  </PreferenceCategory>
+</PreferenceScreen>

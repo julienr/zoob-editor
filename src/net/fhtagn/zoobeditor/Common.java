@@ -8,9 +8,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import net.fhtagn.zoobeditor.browser.UploadActivity;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -136,5 +139,34 @@ public class Common {
 						    }
 						  });
 		return builder.create();
+	}
+	
+	public static final class Level {
+		public static final void play (Activity sourceActivity, long serieID, int level) {
+			Intent i = Common.playeSerie(serieID, level);
+	    sourceActivity.startActivity(i);
+		}
+	}
+	
+	//Regroup common actions on series
+	public static final class Serie {
+		public static final int REQUEST_UPLOAD = 1;
+		
+		public static final void upload (Activity sourceActivity, long serieID) {
+			Intent i = new Intent(sourceActivity.getApplicationContext(), UploadActivity.class);
+			i.putExtra("id", serieID);
+			sourceActivity.startActivityForResult(i, REQUEST_UPLOAD);
+		}
+		
+		public static final void play (Activity sourceActivity, long serieID) {
+			Intent i = Common.playSerie(serieID);
+	    sourceActivity.startActivity(i);
+		}
+		
+		
+		public static final void deleteSerie (Activity sourceActivity, long serieID) {
+			Uri deleteUri = ContentUris.withAppendedId(Series.CONTENT_URI, serieID);
+			sourceActivity.getContentResolver().delete(deleteUri, null, null);
+		}
 	}
 }

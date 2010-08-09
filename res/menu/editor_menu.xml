@@ -2,8 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/play"
           android:icon="@android:drawable/ic_media_play"
-          android:title="@string/btn_play_level" />
-    <item android:id="@+id/save"
-          android:icon="@android:drawable/ic_menu_save"
-          android:title="@string/btn_save" />
+          android:title="@string/btn_play_level" />          
+    <item android:id="@+id/advanced"
+          android:icon="@android:drawable/ic_menu_info_details"
+          android:title="@string/btn_lvl_advanced" />
+    <item android:id="@+id/delete"
+          android:icon="@android:drawable/ic_menu_delete"
+          android:title="@string/menu_delete" />
 </menu>

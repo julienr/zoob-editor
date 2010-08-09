@@ -1,14 +1,17 @@
 package net.fhtagn.zoobeditor.editor;
 
 import net.fhtagn.zoobeditor.Common;
+import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.Series;
 import net.fhtagn.zoobeditor.browser.NameDialog;
+import net.fhtagn.zoobeditor.browser.UploadActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.fhtagn.zoobeditor.R;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -38,10 +41,12 @@ import com.google.android.apps.music.TouchInterceptor;
 public class SerieEditActivity extends ListActivity {
 	static final String TAG = "SerieEditActivity";
 	static final int DIALOG_NEWLVL_ID = 0;
-	static final int DIALOG_CONFIRM_DELETE = 1;
-	static final int DIALOG_RENAME = 2;
+	static final int DIALOG_CONFIRM_LEVEL_DELETE = 1;
+	static final int DIALOG_CONFIRM_SERIE_DELETE = 2;
+	static final int DIALOG_RENAME = 3;
 	
 	static final int REQUEST_LEVEL_EDITOR = 1;
+	static final int REQUEST_SERIE_OPTIONS = 2;
 	
 	static final int MENU_ITEM_PLAY = 0;
 	static final int MENU_ITEM_EDIT = 1;
@@ -143,21 +148,36 @@ public class SerieEditActivity extends ListActivity {
 	}
 	
 	@Override
+	public void finish () {
+		save();
+		super.finish();
+	}
+	
+	@Override
 	public boolean onOptionsItemSelected (MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.save:
-				save();
-				finish();
+			case R.id.play: {
+				Common.Serie.play(this, Common.extractId(serieUri));
 				return true;
-			case R.id.play:
-				Intent i = Common.playSerie(Common.extractId(serieUri));
-        startActivity(i);
+			}
+			case R.id.delete: {
+				showDialog(DIALOG_CONFIRM_SERIE_DELETE);
 				return true;
-			case R.id.help:
-				return true;
+			}
+			case R.id.upload: {
+				Common.Serie.upload(this, Common.extractId(serieUri));
+    		return true;
+			}
 			case R.id.rename:
 				showDialog(DIALOG_RENAME);
 				return true;
+			case R.id.advanced: {
+				Intent i = new Intent(getApplicationContext(), SerieOptionsActivity.class);
+				i.putExtra("json", serieObj.toString());
+				startActivityForResult(i, REQUEST_SERIE_OPTIONS);
+				return true;
+			}
+				
 		}
 		return Common.commonOnOptionsItemSelected(this, item);
 	}
@@ -222,7 +242,7 @@ public class SerieEditActivity extends ListActivity {
 	
 	@Override
 	public void onListItemClick (ListView l, View v, int position, long id) {
-		l.showContextMenuForChild(v);
+		launchEditor(position);
 	}
 	
 	@Override
@@ -237,8 +257,7 @@ public class SerieEditActivity extends ListActivity {
     
     switch (item.getItemId()) {
     	case MENU_ITEM_PLAY: {
-    		Intent i = Common.playeSerie(Common.extractId(serieUri), info.position);
-        startActivity(i);
+    		Common.Level.play(this, Common.extractId(serieUri), info.position);
         return true;
     	}
     	case MENU_ITEM_EDIT: {
@@ -247,7 +266,7 @@ public class SerieEditActivity extends ListActivity {
     	}
     	case MENU_ITEM_DELETE: {
     		levelToDelete = info.position;
-    		showDialog(DIALOG_CONFIRM_DELETE);
+    		showDialog(DIALOG_CONFIRM_LEVEL_DELETE);
     		return true;
     	}
     }
@@ -256,25 +275,46 @@ public class SerieEditActivity extends ListActivity {
 	
 	@Override
 	protected void onActivityResult (int requestCode, int resultCode, Intent data) {
-		if (requestCode != REQUEST_LEVEL_EDITOR)
-			return;
-		
-		if (resultCode == RESULT_OK) {
-			String levelJSON = data.getStringExtra("json");
-			int levelNumber = data.getIntExtra("number", -1);
-			try {
-	      JSONObject levelObj = new JSONObject(levelJSON);
-	      if (levelNumber != -1)
-	      	levelsArray.put(levelNumber, levelObj);
-	      else
-	      	levelsArray.put(levelObj);
-	      notifyAdapter();
-      } catch (JSONException e) {
-	      e.printStackTrace();
-	      return;
-      }
-		} else { //RESULT_CANCELED
-			
+		switch (requestCode) {
+			case REQUEST_LEVEL_EDITOR: {
+				if (resultCode == RESULT_OK) {
+					String levelJSON = data.getStringExtra("json");
+					int levelNumber = data.getIntExtra("number", -1);
+					try {
+			      JSONObject levelObj = new JSONObject(levelJSON);
+			      if (levelNumber != -1)
+			      	levelsArray.put(levelNumber, levelObj);
+			      else
+			      	levelsArray.put(levelObj);
+			      notifyAdapter();
+		      } catch (JSONException e) {
+			      e.printStackTrace();
+			      return;
+		      }
+				} else if (resultCode == EditorActivity.RESULT_DELETE) {
+					//deletion requested from editor
+					deleteLevel();
+				}
+				break;
+			}
+			case REQUEST_SERIE_OPTIONS: {
+				if (resultCode != RESULT_OK) {
+					Log.e(TAG, "REQUEST_LEVEL_OPTIONS: unhandled resultCode = " + resultCode);
+					return;
+				}
+				if (!data.hasExtra("json")) {
+					Log.e(TAG, "REQUEST_LEVEL_OPTIONS : got not json in response");
+					return;
+				}
+				try {
+					serieObj = new JSONObject("json");
+					levelsArray = serieObj.getJSONArray("levels");
+					notifyAdapter();
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				break;
+			}
 		}
 	}
 	
@@ -286,6 +326,7 @@ public class SerieEditActivity extends ListActivity {
 	
 	private void doLaunch (int position, JSONObject obj) {
 		Intent i = new Intent(this, EditorActivity.class);
+		levelToDelete = position; //in case we receive a RESULT_DELETE
 		i.putExtra("json", obj.toString());
 		i.putExtra("number", position);
 		i.setData(serieUri);
@@ -325,7 +366,15 @@ public class SerieEditActivity extends ListActivity {
 					}
 				});
 			}
-			case DIALOG_CONFIRM_DELETE: {
+			case DIALOG_CONFIRM_SERIE_DELETE: {
+				return Common.createConfirmDeleteDialog(this, R.string.confirm_delete_serie, new DialogInterface.OnClickListener() {
+	  			public void onClick (DialogInterface dialog, int id) {
+	  				Common.Serie.deleteSerie(SerieEditActivity.this, Common.extractId(serieUri));
+	  				SerieEditActivity.super.finish(); //use super to avoid the implicite save by finish()
+	  			}
+				});
+			}
+			case DIALOG_CONFIRM_LEVEL_DELETE: {
 				return Common.createConfirmDeleteDialog(this, R.string.confirm_delete_level, new DialogInterface.OnClickListener() {
 	  			public void onClick (DialogInterface dialog, int id) {
 	  				deleteLevel();
@@ -354,6 +403,10 @@ public class SerieEditActivity extends ListActivity {
 	}
 	
 	private void deleteLevel () {
+		//If we just created the level, we'll get a -1
+		if (levelToDelete == -1) 
+			return;
+		
 		try {
 			JSONArray newArray = new JSONArray();
 			// Copy all the objects between the beginning and min
@@ -364,6 +417,7 @@ public class SerieEditActivity extends ListActivity {
 			serieObj.put("levels", newArray);
 			levelsArray = newArray;
 			notifyAdapter();
+			levelToDelete = -1;
 		} catch (JSONException e) {
       e.printStackTrace();
     }

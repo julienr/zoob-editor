@@ -25,6 +25,10 @@
         <activity android:name="Preferences"/>
         <activity android:name=".editor.SerieEditActivity"
                   android:configChanges="orientation" />
+        <activity android:name=".editor.LevelOptionsActivity"
+                  android:configChanges="orientation" />
+        <activity android:name=".editor.SerieOptionsActivity"
+                  android:configChanges="orientation" />
                   
         
         <activity android:name=".editor.EditorActivity"

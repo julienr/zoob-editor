@@ -23,6 +23,8 @@
 <string name="btn_path_validate">Done</string>
 <string name="dlg_serie_name_title">Serie name</string>
 <string name="btn_play_level">Play level</string>
+<string name="btn_lvl_advanced">Options</string>
+<string name="btn_serie_advanced">Options</string>
 <string name="btn_play_serie">Play serie</string>
 <string name="menu_play_level">Play level</string>
 <string name="menu_play_serie">Play serie</string>
@@ -59,6 +61,37 @@
 <string name="dlg_no_account_title">Google account required</string>
 <string name="dlg_no_account_msg">This functionnality requires that you define a Google account to use with this application. Please do so in the preferences.</string>
 <string name="goto_prefs">Open preferences</string>
+
+<string name="item_whole_serie">All levels</string>
+
+<!--  Level Options -->
+<string name="level_pref_general">General</string>
+<string name="level_pref_title_shadows">Shadows</string>
+<string name="level_pref_summary_shadows">Toggle the use of the shadows effect on the level</string>
+<string name="level_pref_title_boss">Boss</string>
+<string name="level_pref_summary_boss">Toggle the use of the boss intro (displaying the ??)</string>
+
+<string name="level_pref_items">Available items</string>
+<string name="level_pref_items_summary">You can choose which items the player will be allowed to use in this level</string>
+
+<string name="level_pref_title_bombs">Bombs</string>
+<string name="level_pref_title_shield">Shield</string>
+<string name="level_pref_title_bounce">Bounce tank</string>
+<string name="level_pref_title_improved_firing">Improved firing</string>
+<string name="level_pref_summary_improved_firing">This is a passive bonus to firing rate and rockets speed</string>
+
+<!--  Serie Options -->
+<string name="serie_pref_items">Available items</string>
+<string name="serie_pref_items_summary">You can choose which items the player will be allowed to use in this level.
+You can also fine-tune this choice on a per-level basis. 
+WARNING: if you have already set per-level settings for that, they will be overriden !</string>
+
+<string name="serie_pref_title_bombs">Bombs</string>
+<string name="serie_pref_title_shield">Shield</string>
+<string name="serie_pref_title_bounce">Bounce</string>
+<string name="serie_pref_title_improved_firing">Improved firing</string>
+<string name="serie_pref_summary_improved_firing">This is a passive bonus to firing rate and rockets speed</string>
+
 
 <!-- Preferences -->
 <string name="account_preferences">Account</string>

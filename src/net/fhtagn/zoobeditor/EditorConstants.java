@@ -10,12 +10,6 @@ public class EditorConstants {
 	public static final String ACCOUNT_TYPE = "com.google";
 	public static final String AUTH_TOKEN_TYPE = "ah";
 	
-	/**
-	 * onActivityResult request code
-	 */
-	public static final int GET_LOGIN = 1;
-	public static final int SEND_TO_ZOOB_WEB = 2;
-	
 	public static final int RESULT_ERROR = Activity.RESULT_FIRST_USER;
 	
 	/**

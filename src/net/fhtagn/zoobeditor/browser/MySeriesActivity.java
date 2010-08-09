@@ -104,8 +104,7 @@ public class MySeriesActivity extends ListActivity {
     
     switch (item.getItemId()) {
     	case MENU_ITEM_PLAY: {
-        Intent i = Common.playSerie(info.id);
-        startActivity(i);
+    		Common.Serie.play(this, info.id);
         return true;
     	}
     	case MENU_ITEM_EDIT: {
@@ -113,9 +112,7 @@ public class MySeriesActivity extends ListActivity {
     		return true;
     	}
     	case MENU_ITEM_UPLOAD: {
-    		Intent i = new Intent(getApplicationContext(), UploadActivity.class);
-    		i.putExtra("id", info.id);
-    		startActivityForResult(i, EditorConstants.SEND_TO_ZOOB_WEB);
+    		Common.Serie.upload(this, info.id);
     		return true;
     	}
     	case MENU_ITEM_DELETE: {
@@ -135,7 +132,7 @@ public class MySeriesActivity extends ListActivity {
 	
 	@Override
 	public void onListItemClick (ListView l, View v, int position, long id) {
-		l.showContextMenuForChild(v);
+		launchSerieEditor(ContentUris.withAppendedId(Series.CONTENT_URI, id));
 	}
 	
 	protected void launchSerieEditor (Uri uri) {
@@ -171,20 +168,14 @@ public class MySeriesActivity extends ListActivity {
 			case DIALOG_CONFIRM_DELETE: {
 				return Common.createConfirmDeleteDialog(this, R.string.confirm_delete_serie, new DialogInterface.OnClickListener() {
 	  			public void onClick (DialogInterface dialog, int id) {
-	  				deleteSerie();
+	  				Common.Serie.deleteSerie(MySeriesActivity.this, deleteID);
+	  				refreshList();
 	  			}
 				});
 			}
 			default:
 				return null;
 		}
-	}
-	
-	private void deleteSerie () {
-		SerieAdapter adapter = (SerieAdapter)getListAdapter();
-		Uri deleteUri = ContentUris.withAppendedId(Series.CONTENT_URI, deleteID);
-		getContentResolver().delete(deleteUri, null, null);
-		refreshList();
 	}
 	
 	public class SerieAdapter extends SerieCursorAdapter {	

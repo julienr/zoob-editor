@@ -3,10 +3,16 @@
     <item android:id="@+id/play"
           android:icon="@android:drawable/ic_media_play"
           android:title="@string/btn_play_serie" />
-    <item android:id="@+id/save"
-          android:icon="@android:drawable/ic_menu_save"
-          android:title="@string/btn_save" />
     <item android:id="@+id/rename"
           android:icon="@android:drawable/ic_menu_edit"
           android:title="@string/btn_rename" />
+    <item android:id="@+id/upload"
+          android:icon="@android:drawable/ic_menu_upload"
+          android:title="@string/menu_upload" />
+    <item android:id="@+id/advanced"
+          android:icon="@android:drawable/ic_menu_info_details"
+          android:title="@string/btn_serie_advanced" />
+    <item android:id="@+id/delete"
+          android:icon="@android:drawable/ic_menu_delete"
+          android:title="@string/menu_delete" />
 </menu>

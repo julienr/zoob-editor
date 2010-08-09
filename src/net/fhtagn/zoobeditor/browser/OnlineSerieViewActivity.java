@@ -94,9 +94,9 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	    Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID}, Series.COMMUNITY_ID+"="+communityId, null, null);
 	    ContentValues values = new ContentValues();
 		  values.put(Series.JSON, serie.toString());
-		  values.put(Series.IS_MINE, false); 
 	    values.put(Series.COMMUNITY_ID, serie.getJSONObject("meta").getInt("id"));
 	    if (!cur.moveToFirst()) {
+	    	values.put(Series.IS_MINE, false); 
 	    	cur.close();
 		    return Long.parseLong(getContentResolver().insert(Series.CONTENT_URI, values).getLastPathSegment());
 	    } else {
