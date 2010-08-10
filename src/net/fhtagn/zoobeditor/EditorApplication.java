@@ -2,6 +2,7 @@ package net.fhtagn.zoobeditor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -24,6 +25,7 @@ import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -43,11 +45,13 @@ public class EditorApplication extends Application {
 		super.onCreate();
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		accountManager = AccountManager.get(getApplicationContext());
+		
+		if (Common.hasInternet(getApplicationContext()))
+			syncMySeries();
 	}
 	
 	/**
-	 * This is a task that will be run everytime the editor is launched.
-	 * It will synchronize the "my series list" with the list of series we have authored as stored on the server
+	 * This background task will synchronize the "my series list" with the list of series we have authored as stored on the server
 	 */
 	public void syncMySeries () {
 		final Account currentAccount = findAccount();
@@ -88,23 +92,44 @@ public class EditorApplication extends Application {
 	private void insertAsMineFromJSON (JSONArray arr, Account myAccount) {
 		try {
 			int len = arr.length();
+			HashSet<Long> remoteIDs = new HashSet<Long>();
+			//First step, insert series authored by the user but that aren't in the local DB
 			for (int i=0; i<len; i++) {
 				JSONObject serie = arr.getJSONObject(i);
 				JSONObject meta = serie.getJSONObject("meta");
 				String author = meta.getString("author");
 				if (!author.equals(EditorConstants.getAuthorIdentification(myAccount)))
 					continue; //wrong author
-				int communityID = meta.getInt("id");
+				long communityID = meta.getLong("id");
+				remoteIDs.add(communityID);
 				
 				Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID}, Series.COMMUNITY_ID+"="+communityID, null, null);
-				if (cur.getCount() > 0)
+				if (cur.getCount() > 0) {
+					Log.i("ServerSync", "serie with community id " + communityID + " already in local DB");
 					continue; //already in db, don't update because we might overwrite local uncommited changes
+				}
+				Log.i("ServerSync", "new serie with community id : " + communityID);
 				//prepare for insert
 				ContentValues values = new ContentValues();
 				values.put(Series.JSON, serie.toString());
 				values.put(Series.IS_MINE, true);
 				values.put(Series.COMMUNITY_ID, communityID);
 				getContentResolver().insert(Series.CONTENT_URI, values);
+			}
+			//Second step, for series in the local DB but that weren't found on the server, remove the uploaded status (if set)
+			Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID, Series.COMMUNITY_ID}, Series.IS_MINE+"=1", null, null);
+			if (cur.moveToFirst()) {
+				do {
+					long id = cur.getLong(cur.getColumnIndex(Series.COMMUNITY_ID));
+					if (!remoteIDs.contains(id)) {
+						long dbId = cur.getLong(cur.getColumnIndex(Series.ID));
+						Log.i("ServerSync", "serie " + dbId + " not found on remote server, removing uploaded status");
+						ContentValues values = new ContentValues();
+						values.putNull(Series.UPLOAD_DATE);
+						values.putNull(Series.COMMUNITY_ID);
+						getContentResolver().update(ContentUris.withAppendedId(Series.CONTENT_URI, dbId), values, null, null);
+					}
+				} while (cur.moveToNext());
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();

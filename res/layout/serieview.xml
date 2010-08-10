@@ -5,20 +5,66 @@
   android:layout_height="fill_parent"
   android:orientation="vertical">
   
-  <TextView android:id="@+id/name"
-    style="@style/TextView.Title" />
-    
-   <GridView  
-     android:id="@android:id/list"
-     android:layout_width="fill_parent" 
-     android:layout_height="wrap_content"
-     android:numColumns="auto_fit"
-     android:verticalSpacing="10dp"
-     android:horizontalSpacing="10dp"
-     android:columnWidth="90dp"
-     android:stretchMode="columnWidth"
-     android:gravity="center"
-     android:layout_weight="1" />
+  <RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    style="@style/Title">
+    <TextView android:id="@+id/name"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      style="@style/TextView.Title" />
+      
+    <RatingBar android:id="@+id/rating"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerVertical="true"
+      android:layout_alignParentRight="true"
+      style="?android:attr/ratingBarStyleSmall"
+      android:numStars="5"
+      android:rating="2.5" />
+  </RelativeLayout>
+  
+  <ScrollView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1" >
+    <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:orientation="vertical" >
+			  <TextView 
+			    style="@style/TextView.Separator"
+			    android:text="@string/my_rating" />
+			    
+			  <RatingBar android:id="@+id/my_rating"
+			      android:layout_width="wrap_content"
+			      android:layout_height="wrap_content"
+			      android:padding="2dip"
+			      style="?android:attr/ratingBarStyleIndicator"
+			      android:numStars="5"
+			      android:rating="2.5" />
+			      
+			   <TextView 
+			    style="@style/TextView.Separator"
+			    android:text="@string/serie_preview" />
+			    
+			   <!-- <GridView  
+			     android:id="@android:id/list"
+			     android:layout_width="fill_parent" 
+			     android:layout_height="wrap_content"
+			     android:numColumns="auto_fit"
+			     android:verticalSpacing="10dp"
+			     android:horizontalSpacing="10dp"
+			     android:columnWidth="90dp"
+			     android:stretchMode="columnWidth"
+			     android:gravity="center"/>-->
+			   <net.fhtagn.zoobeditor.browser.SeriePreviewGrid
+			     android:id="@+id/seriepreview"
+			     android:layout_width="fill_parent"
+			     android:layout_height="wrap_content"/>
+    </LinearLayout>
+   </ScrollView>
    
    
    <RelativeLayout 

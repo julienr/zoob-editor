@@ -5,18 +5,26 @@
   </style>
   
   <style name="TextView.Title" parent="android:Widget.TextView">
-    <item name="android:layout_width">fill_parent</item>
-    <item name="android:layout_height">40dip</item>
     <item name="android:textSize">15sp</item>
     <item name="android:gravity">center</item>
     <item name="android:textStyle">bold</item>
-    <item name="android:padding">1dip</item>
     <item name="android:textColor">#FFFFFF</item>
+  </style>
+  
+  <style name="Title">
+    <item name="android:padding">1dip</item>
+    <item name="android:layout_height">40dip</item>
     <item name="android:background">@drawable/header</item>
   </style>
   
   <style name="Footer">
     <item name="android:textColor">#FFFFFF</item>
     <item name="android:background">@drawable/footer</item>
+  </style>
+  
+  <style name="TextView.Separator" parent="android:Widget.TextView.ListSeparator">
+    <item name="android:textColor">#FFFFFF</item>
+    <item name="android:background">#656565</item>
+    <item name="android:textSize">10sp</item>
   </style>
 </resources>

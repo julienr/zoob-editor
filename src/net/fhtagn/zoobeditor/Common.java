@@ -8,6 +8,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import net.fhtagn.zoobeditor.browser.DeleteActivity;
+import net.fhtagn.zoobeditor.browser.RateActivity;
 import net.fhtagn.zoobeditor.browser.UploadActivity;
 
 import android.app.Activity;
@@ -30,6 +35,12 @@ public class Common {
 	public static final String LEVELS_DIR_NAME = "zoob_levels";
 	public static final String MY_LEVELS_SUBDIR = "mylevels";
 	public static final String ONLINE_LEVELS_SUBDIR = "community";
+	
+	public static final int dp2pixels (Context ctx, float dp) { 
+		final float scale = ctx.getResources().getDisplayMetrics().density;
+		return (int)(scale*dp);
+	}
+
 	
 	public static Intent playSerie (long id) {
  		Uri.Builder builder = new Uri.Builder();
@@ -150,12 +161,10 @@ public class Common {
 	
 	//Regroup common actions on series
 	public static final class Serie {
-		public static final int REQUEST_UPLOAD = 1;
-		
 		public static final void upload (Activity sourceActivity, long serieID) {
 			Intent i = new Intent(sourceActivity.getApplicationContext(), UploadActivity.class);
 			i.putExtra("id", serieID);
-			sourceActivity.startActivityForResult(i, REQUEST_UPLOAD);
+			sourceActivity.startActivityForResult(i, EditorConstants.REQUEST_UPLOAD);
 		}
 		
 		public static final void play (Activity sourceActivity, long serieID) {
@@ -163,10 +172,18 @@ public class Common {
 	    sourceActivity.startActivity(i);
 		}
 		
-		
 		public static final void deleteSerie (Activity sourceActivity, long serieID) {
-			Uri deleteUri = ContentUris.withAppendedId(Series.CONTENT_URI, serieID);
-			sourceActivity.getContentResolver().delete(deleteUri, null, null);
+			Intent i = new Intent(sourceActivity.getApplicationContext(), DeleteActivity.class);
+			i.putExtra("community_id", serieID);
+			sourceActivity.startActivityForResult(i, EditorConstants.REQUEST_DELETE);
+		}
+		
+		public static final void rateSerie (Activity sourceActivity, long serieID, int rating) {
+			
+			Intent i = new Intent(sourceActivity.getApplicationContext(), RateActivity.class);
+			i.putExtra("community_id", serieID);
+			i.putExtra("rating", rating);
+			sourceActivity.startActivityForResult(i, EditorConstants.REQUEST_RATE);
 		}
 	}
 }

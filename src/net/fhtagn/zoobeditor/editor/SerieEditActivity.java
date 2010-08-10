@@ -45,9 +45,6 @@ public class SerieEditActivity extends ListActivity {
 	static final int DIALOG_CONFIRM_SERIE_DELETE = 2;
 	static final int DIALOG_RENAME = 3;
 	
-	static final int REQUEST_LEVEL_EDITOR = 1;
-	static final int REQUEST_SERIE_OPTIONS = 2;
-	
 	static final int MENU_ITEM_PLAY = 0;
 	static final int MENU_ITEM_EDIT = 1;
 	static final int MENU_ITEM_DELETE = 2;
@@ -56,8 +53,6 @@ public class SerieEditActivity extends ListActivity {
 	private JSONArray levelsArray;
 	
 	private int levelToDelete = -1;
-	
-	private TextView debugText;
 	
 	private String serieName;
 	
@@ -84,8 +79,6 @@ public class SerieEditActivity extends ListActivity {
 	    serieName = serieObj.getString("name");
 	    TextView titleView = (TextView)findViewById(R.id.title);
 	    titleView.setText(serieName);
-	    
-	    debugText = (TextView)findViewById(R.id.debugmsg);
 	    
 			//Create levels array if not yet existing
 			JSONArray arr = serieObj.optJSONArray("levels");
@@ -119,7 +112,6 @@ public class SerieEditActivity extends ListActivity {
 	    listView.setDropListener(new TouchInterceptor.DropListener() {
 				@Override
         public void drop(int from, int to) {
-					debugText.setText("Drop from  " + from + " to " + to);
 					moveLevel(from, to);
         }
 	    });
@@ -174,7 +166,7 @@ public class SerieEditActivity extends ListActivity {
 			case R.id.advanced: {
 				Intent i = new Intent(getApplicationContext(), SerieOptionsActivity.class);
 				i.putExtra("json", serieObj.toString());
-				startActivityForResult(i, REQUEST_SERIE_OPTIONS);
+				startActivityForResult(i, EditorConstants.REQUEST_SERIE_OPTIONS);
 				return true;
 			}
 				
@@ -276,7 +268,7 @@ public class SerieEditActivity extends ListActivity {
 	@Override
 	protected void onActivityResult (int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
-			case REQUEST_LEVEL_EDITOR: {
+			case EditorConstants.REQUEST_LEVEL_EDITOR: {
 				if (resultCode == RESULT_OK) {
 					String levelJSON = data.getStringExtra("json");
 					int levelNumber = data.getIntExtra("number", -1);
@@ -297,7 +289,7 @@ public class SerieEditActivity extends ListActivity {
 				}
 				break;
 			}
-			case REQUEST_SERIE_OPTIONS: {
+			case EditorConstants.REQUEST_SERIE_OPTIONS: {
 				if (resultCode != RESULT_OK) {
 					Log.e(TAG, "REQUEST_LEVEL_OPTIONS: unhandled resultCode = " + resultCode);
 					return;
@@ -330,7 +322,7 @@ public class SerieEditActivity extends ListActivity {
 		i.putExtra("json", obj.toString());
 		i.putExtra("number", position);
 		i.setData(serieUri);
-		startActivityForResult(i, REQUEST_LEVEL_EDITOR);
+		startActivityForResult(i, EditorConstants.REQUEST_LEVEL_EDITOR);
 	}
 	
 	protected void launchEditor (int position) {

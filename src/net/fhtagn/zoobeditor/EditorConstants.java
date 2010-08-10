@@ -1,5 +1,7 @@
 package net.fhtagn.zoobeditor;
 
+import java.net.URI;
+
 import android.accounts.Account;
 import android.app.Activity;
 import android.graphics.Color;
@@ -11,6 +13,16 @@ public class EditorConstants {
 	public static final String AUTH_TOKEN_TYPE = "ah";
 	
 	public static final int RESULT_ERROR = Activity.RESULT_FIRST_USER;
+	
+	/** 
+	 * Request types
+	 */
+	public static final int REQUEST_LEVEL_EDITOR = 0;
+	public static final int REQUEST_SERIE_OPTIONS = 1;
+	public static final int REQUEST_UPLOAD = 2;
+	public static final int REQUEST_LEVEL_OPTIONS = 3;
+	public static final int REQUEST_DELETE = 4;
+	public static final int REQUEST_RATE = 5;
 	
 	/**
 	 * Colors
@@ -59,6 +71,10 @@ public class EditorConstants {
 		return getServerUrl()+"/";
 	}
 	
+	public static String getDeleteUrl (long id) {
+		return getServerUrl()+"/delete?id="+id;
+	}
+	
 	//Return a string that can be used to identify this author to the remote server (usually the email address)
 	public static String getAuthorIdentification (Account author) {
 		return author.name;
@@ -71,4 +87,8 @@ public class EditorConstants {
 	public static String getDetailsUrl (int serieId) {
 		return getServerUrl()+"/show?id="+serieId;
 	}
+
+	public static String getRateUrl(long serieID, int rating) {
+	  return getServerUrl()+"/rate?serie_id="+serieID+"&rating="+rating;
+  }
 }

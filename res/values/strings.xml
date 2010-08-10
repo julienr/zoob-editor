@@ -41,7 +41,7 @@
 <string name="menu_preferences">Preferences</string>
 <string name="btn_newserie">New levels serie</string>
 <string name="delete_dlg_title">Confirm Delete</string>
-<string name="confirm_delete_serie">Are you sure you want to delete that serie ?</string>
+<string name="confirm_delete_serie">Deleting a serie will completely erase it and there is no way to recover it. Are you sure you want to do that ?</string>
 <string name="confirm_delete_level">Are you sure you want to delete that level ?</string>
 <string name="no_account_found_title">No account found</string>
 <string name="no_account_found">No account found to upload tracks to.</string>
@@ -57,6 +57,10 @@
 <string name="modified">Modified</string>
 <string name="update_available">Updated</string>
 <string name="select_tool">Select tool</string>
+<string name="err_already_rated">You have already this serie</string>
+
+<string name="my_rating">My rating</string>
+<string name="serie_preview">Serie preview</string>
 
 <string name="dlg_no_account_title">Google account required</string>
 <string name="dlg_no_account_msg">This functionnality requires that you define a Google account to use with this application. Please do so in the preferences.</string>
@@ -82,7 +86,7 @@
 
 <!--  Serie Options -->
 <string name="serie_pref_items">Available items</string>
-<string name="serie_pref_items_summary">You can choose which items the player will be allowed to use in this level.
+<string name="serie_pref_items_summary">You can choose when the items will become available for the player.
 You can also fine-tune this choice on a per-level basis. 
 WARNING: if you have already set per-level settings for that, they will be overriden !</string>
 

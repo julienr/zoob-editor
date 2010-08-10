@@ -62,8 +62,10 @@ public class OfflineSerieViewActivity extends Activity {
 			
 			TextView serieName = (TextView)findViewById(R.id.name);
 			serieName.setText(cur.getString(cur.getColumnIndex(Series.NAME)));
-			GridView gridView = (GridView)findViewById(android.R.id.list);
-			gridView.setAdapter(new LevelsAdapter(this, serieObj.getJSONArray("levels")));
+			/*GridView gridView = (GridView)findViewById(android.R.id.list);
+			gridView.setAdapter(new LevelsAdapter(this, serieObj.getJSONArray("levels")));*/
+			SeriePreviewGrid previewGrid = (SeriePreviewGrid)findViewById(R.id.seriepreview);
+	    previewGrid.setSerie(serieObj);
 			
 			Button playBtn = (Button)findViewById(R.id.btn_play);
 			playBtn.setText(R.string.btn_play_serie);

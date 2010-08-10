@@ -30,16 +30,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
-public class UploadActivity extends Activity implements EditorApplication.OnAuthenticatedCallback {
+public class UploadActivity extends ServerRequestActivity {
 	static final String TAG = "UploadActivity";
-	
-	static final int DIALOG_PROGRESS = 1;
-	static final int DIALOG_ERROR = 2;
-	static final int DIALOG_SUCCESS = 3;
-	
-	private ProgressDialog progressDialog = null;
-	
-	private DefaultHttpClient httpClient = new DefaultHttpClient();
 	
 	private String toUploadContent = null;
 	//community id if the upload is an update
@@ -47,18 +39,15 @@ public class UploadActivity extends Activity implements EditorApplication.OnAuth
 	
 	private Uri serieUri;
 	
-	private EditorApplication app;
-	
-	//This message will be shown in the error dialog
-	private String errorDialogMsg = ""; 
-	
 	@Override
 	public void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		setSuccessMessage(R.string.upload_success);
+		
 		Intent i = getIntent();
 		if (i == null || !i.hasExtra("id")) {
-			Log.e(TAG, "null intent");
+			Log.e(TAG, "no id in intent");
 			setResult(EditorConstants.RESULT_ERROR);
 			finish();
 		}
@@ -74,77 +63,11 @@ public class UploadActivity extends Activity implements EditorApplication.OnAuth
 		
 		toUploadContent = cur.getString(cur.getColumnIndex(Series.JSON));
 		if (!cur.isNull(cur.getColumnIndex(Series.COMMUNITY_ID)))
-			toUploadId = cur.getLong(cur.getColumnIndex(Series.COMMUNITY_ID));
-		
-		
-		showDialog(DIALOG_PROGRESS);
-		app = (EditorApplication)getApplication();
-		app.authenticate(this, httpClient, this);
-	}
-	
-	private void errorDialog (String errorMsg) {
-		Log.e(TAG, "errorDialog : " + errorMsg);
-		errorDialogMsg = errorMsg;
-		dismissDialogSafely(DIALOG_PROGRESS);
-		showDialog(DIALOG_ERROR);
+			toUploadId = cur.getLong(cur.getColumnIndex(Series.COMMUNITY_ID));	
 	}
 	
 	@Override
-	protected void onPrepareDialog (int id, Dialog dialog) {
-		switch (id) {
-			case DIALOG_ERROR: {
-				AlertDialog alertDialog = (AlertDialog)dialog;
-				if (errorDialogMsg != null) {
-					alertDialog.setMessage(getResources().getString(R.string.upload_error)+errorDialogMsg);
-					errorDialogMsg = null;
-				}
-			}
-		}
-	}
-	
-	@Override
-	protected Dialog onCreateDialog (int id) {
-		switch (id) {
-			case DIALOG_PROGRESS:
-				progressDialog = new ProgressDialog(this);
-        progressDialog.setIcon(android.R.drawable.ic_dialog_info);
-        progressDialog.setTitle(getString(R.string.progress_title));
-        progressDialog.setIndeterminate(true);
-        return progressDialog;
-			case DIALOG_ERROR: {
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setMessage("")
-							 .setCancelable(true)
-							 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-								 @Override
-								 public void onClick(DialogInterface dialog, int id) {
-									 dialog.cancel();
-									 setResult(EditorConstants.RESULT_ERROR);
-									 UploadActivity.this.finish();
-								 }
-							 	});
-				return builder.create();
-			}
-			case DIALOG_SUCCESS: {
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setMessage(R.string.upload_success)
-							 .setCancelable(true)
-							 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-								 @Override
-								 public void onClick(DialogInterface dialog, int id) {
-									 setResult(RESULT_OK);
-									 UploadActivity.this.finish();
-									 dialog.cancel();
-								 }
-							 	});
-				return builder.create();
-			}
-      default:
-      	return null;
-		}
-	}
-	
-	protected boolean doSerieUpload () {
+	protected boolean doRequest (DefaultHttpClient httpClient) {
 		try {
 			HttpPost httpPost;
 			if (toUploadId != -1) {
@@ -180,32 +103,4 @@ public class UploadActivity extends Activity implements EditorApplication.OnAuth
     }
     return false;
 	}
-	
-	public void dismissDialogSafely(final int id) {
-    try {
-      dismissDialog(id);
-    } catch (IllegalArgumentException e) {
-      // This will be thrown if this dialog was not shown before.
-    }
-	}
-
-	@Override
-  public void authenticated(DefaultHttpClient httpClient) {
-		dismissDialog(DIALOG_PROGRESS);
-		if (doSerieUpload()) {
-			showDialog(DIALOG_SUCCESS);
-		} //Otherwise, error dialog handled by doSerieUpload
-  }
-
-	@Override
-  public void authenticationError(DefaultHttpClient httpClient, String error) {
-		dismissDialog(DIALOG_PROGRESS);
-		errorDialog(error);
-  }
-
-	@Override
-  public void authenticationCanceled(DefaultHttpClient httpClient) {
-	  dismissDialog(DIALOG_PROGRESS);
-	  finish();
-  }
 }

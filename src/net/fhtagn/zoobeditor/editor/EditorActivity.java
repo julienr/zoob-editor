@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.fhtagn.zoobeditor.Common;
+import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.editor.tools.EraseTool;
 import net.fhtagn.zoobeditor.editor.tools.PathTool;
 import net.fhtagn.zoobeditor.editor.tools.TankTool;
@@ -57,8 +58,6 @@ public class EditorActivity extends Activity {
 	static final String TAG = "Editor";
 	static final int DIALOG_TOOL_TYPE = 1;
 	static final int DIALOG_CONFIRM_DELETE = 2;
-	
-	static final int REQUEST_LEVEL_OPTIONS = 1;
 	
 	private LevelView levelView;
 	
@@ -145,7 +144,7 @@ public class EditorActivity extends Activity {
 	        e.printStackTrace();
 	        return false;
         }
-        startActivityForResult(i, REQUEST_LEVEL_OPTIONS);
+        startActivityForResult(i, EditorConstants.REQUEST_LEVEL_OPTIONS);
 				return true;
 			}
 			case R.id.play: {
@@ -277,7 +276,7 @@ public class EditorActivity extends Activity {
 	@Override
 	protected void onActivityResult (int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
-			case REQUEST_LEVEL_OPTIONS: {
+			case EditorConstants.REQUEST_LEVEL_OPTIONS: {
 				if (resultCode != RESULT_OK) {
 					Log.e(TAG, "REQUEST_LEVEL_OPTIONS: unhandled resultCode = " + resultCode);
 					return;
