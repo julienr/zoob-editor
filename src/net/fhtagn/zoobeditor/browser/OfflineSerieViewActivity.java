@@ -40,6 +40,8 @@ public class OfflineSerieViewActivity extends Activity {
 	private JSONObject serieObj = null;
 	private JSONArray levelsArray = null;
 	
+	private long communityID;
+	
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,20 +57,26 @@ public class OfflineSerieViewActivity extends Activity {
 		}
 		
 		
-		Cursor cur = managedQuery(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), new String[]{Series.JSON, Series.RATING, Series.MY_RATING, Series.NAME, Series.PROGRESS}, null, null, null);
-		if (!cur.moveToFirst()) {
+		Cursor cursor = managedQuery(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), new String[]{Series.COMMUNITY_ID, Series.JSON, Series.RATING, Series.MY_RATING, Series.NAME, Series.PROGRESS}, null, null, null);
+		if (!cursor.moveToFirst()) {
 			Log.e(TAG, "onCreate: !cur.moveToFirst");
 			finish();
 		}
 		
+		if (cursor.isNull(cursor.getColumnIndex(Series.COMMUNITY_ID))) {
+			Log.e(TAG, "serie (local id : " + serieID + ") with NULL community_id");
+			finish();
+		}
+		communityID = cursor.getLong(cursor.getColumnIndex(Series.COMMUNITY_ID));
+		
 		setContentView(R.layout.serieview);
 		
 		try {
-			serieObj = new JSONObject(cur.getString(cur.getColumnIndex(Series.JSON)));
+			serieObj = new JSONObject(cursor.getString(cursor.getColumnIndex(Series.JSON)));
 			levelsArray = serieObj.getJSONArray("levels");
 			
 			TextView serieName = (TextView)findViewById(R.id.name);
-			serieName.setText(cur.getString(cur.getColumnIndex(Series.NAME)));
+			serieName.setText(cursor.getString(cursor.getColumnIndex(Series.NAME)));
 			/*GridView gridView = (GridView)findViewById(android.R.id.list);
 			gridView.setAdapter(new LevelsAdapter(this, serieObj.getJSONArray("levels")));*/
 			SeriePreviewGrid previewGrid = (SeriePreviewGrid)findViewById(R.id.seriepreview);
@@ -76,7 +84,6 @@ public class OfflineSerieViewActivity extends Activity {
 	    
 	    
 	    //BEGIN rating
-	    RatingBar communityRating = (RatingBar)findViewById(R.id.rating);
 	    RatingBar myRating = (RatingBar)findViewById(R.id.my_rating);
 	    myRating.setOnTouchListener(new OnTouchListener() {
 				@Override
@@ -87,22 +94,7 @@ public class OfflineSerieViewActivity extends Activity {
 	        return true;
         }
 	    });
-	    
-	    if (cur.isNull(cur.getColumnIndex(Series.RATING)))
-	    	communityRating.setVisibility(View.INVISIBLE);
-	    else
-	    	communityRating.setRating(cur.getFloat(cur.getColumnIndex(Series.RATING)));
-	    
-	    if (serieID == 1) { //special case for original serie, we cannot rate it
-	    	TextView sep = (TextView)findViewById(R.id.my_rating_separator);
-	    	sep.setVisibility(View.GONE);
-	    	myRating.setVisibility(View.GONE);
-	    } else {
-		    if (cur.isNull(cur.getColumnIndex(Series.MY_RATING)))
-		    	myRating.setRating(0);
-		    else
-		    	myRating.setRating(cur.getFloat(cur.getColumnIndex(Series.MY_RATING)));
-	    }
+	    refreshRating();
 	    //END rating
 	    
 			
@@ -125,6 +117,33 @@ public class OfflineSerieViewActivity extends Activity {
 		}
 	}
 	
+	private void refreshRating () {
+		RatingBar communityRating = (RatingBar)findViewById(R.id.rating);
+    RatingBar myRating = (RatingBar)findViewById(R.id.my_rating);
+		
+		Cursor cursor = managedQuery(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), new String[]{Series.RATING, Series.MY_RATING}, null, null, null);
+		if (!cursor.moveToFirst()) {
+			Log.e(TAG, "refreshRating: !cur.moveToFirst");
+			return;
+		}
+		
+    if (cursor.isNull(cursor.getColumnIndex(Series.RATING)))
+    	communityRating.setVisibility(View.INVISIBLE);
+    else
+    	communityRating.setRating(cursor.getFloat(cursor.getColumnIndex(Series.RATING)));
+    
+    if (serieID == 1) { //special case for original serie, we cannot rate it
+    	TextView sep = (TextView)findViewById(R.id.my_rating_separator);
+    	sep.setVisibility(View.GONE);
+    	myRating.setVisibility(View.GONE);
+    } else {
+	    if (cursor.isNull(cursor.getColumnIndex(Series.MY_RATING)))
+	    	myRating.setRating(0);
+	    else
+	    	myRating.setRating(cursor.getFloat(cursor.getColumnIndex(Series.MY_RATING)));
+    }
+	}
+	
 	@Override
 	protected Dialog onCreateDialog (int id) {
 		switch (id) {
@@ -138,10 +157,19 @@ public class OfflineSerieViewActivity extends Activity {
 				});
 			}
 			case DIALOG_RATE: {
-				return Common.createRateDialog(this, serieID);
+				return Common.createRateDialog(this, communityID);
 			}
 			default:
 				return null;
+		}
+	}
+	
+	@Override
+	protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case EditorConstants.REQUEST_RATE:
+				refreshRating();
+				break;
 		}
 	}
 	

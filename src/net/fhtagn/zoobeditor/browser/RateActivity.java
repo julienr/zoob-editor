@@ -27,6 +27,8 @@ public class RateActivity extends ServerRequestActivity {
 	public void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		setSuccessMessage(R.string.rate_success);
+		
 		Intent intent = getIntent();
 		if (!intent.hasExtra("community_id") || !intent.hasExtra("rating")) {
 			Log.e(TAG, "no community_id or rating in intent");
@@ -54,10 +56,9 @@ public class RateActivity extends ServerRequestActivity {
 	  	}
 	  	
 	  	//store updated my_rating in db
-	  	Uri updateUri = ContentUris.withAppendedId(Series.CONTENT_URI, communityID);
 	  	ContentValues values = new ContentValues();
 	  	values.put(Series.MY_RATING, rating);
-	  	getContentResolver().update(updateUri, values, null, null);
+	  	getContentResolver().update(Series.CONTENT_URI, values, Series.COMMUNITY_ID+"="+communityID, null);
 	  	
 	  	return true;
 	  } catch (IOException e) {

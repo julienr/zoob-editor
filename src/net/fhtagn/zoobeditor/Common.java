@@ -194,7 +194,7 @@ public class Common {
 		
 		public static final void deleteSerie (Activity sourceActivity, long serieID) {
 			Intent i = new Intent(sourceActivity.getApplicationContext(), DeleteActivity.class);
-			i.putExtra("community_id", serieID);
+			i.putExtra("id", serieID);
 			sourceActivity.startActivityForResult(i, EditorConstants.REQUEST_DELETE);
 		}
 		

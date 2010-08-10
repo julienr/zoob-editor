@@ -33,8 +33,6 @@ import android.widget.TextView;
 public class OnlineSerieViewActivity extends URLFetchActivity {
 	static final String TAG = "OnlineSerieViewActivity";
 	
-	static final int DIALOG_RATE = 0;
-	
 	private JSONObject serieObj = null;
 	
 	private int serieID;
@@ -56,17 +54,6 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 		}
 		
 		toLoadingState();
-	}
-	
-	@Override
-	protected Dialog onCreateDialog (int id) {
-		switch (id) {
-			case DIALOG_RATE: {
-				return Common.createRateDialog(this, serieID);
-			}
-			default:
-				return null;
-		}
 	}
 	
 	@Override
@@ -93,29 +80,20 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	    e.printStackTrace();
     }
     
-    RatingBar communityRating = (RatingBar)findViewById(R.id.rating);
+    //Disable "my" rating, only available when viewing from downloaded series
+    TextView sep = (TextView)findViewById(R.id.my_rating_separator);
     RatingBar myRating = (RatingBar)findViewById(R.id.my_rating);
-    myRating.setOnTouchListener(new OnTouchListener() {
-			@Override
-      public boolean onTouch(View view, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_UP) {
-					showDialog(DIALOG_RATE);
-				}
-        return true;
-      }
-    });
-    
-    try {
+  	sep.setVisibility(View.GONE);
+  	myRating.setVisibility(View.GONE);
+  	
+  	//Display community rating
+  	RatingBar communityRating = (RatingBar)findViewById(R.id.rating);
+  	try {
     	JSONObject meta = serieObj.getJSONObject("meta");
 	    if (!meta.has("rating"))
 	    	communityRating.setVisibility(View.INVISIBLE);
 	    else
 	    	communityRating.setRating((float)meta.getDouble("rating"));
-	    
-	    if (!meta.has("my_rating"))
-	    	myRating.setRating(0);
-	    else
-	    	myRating.setRating((float)meta.getDouble("my_rating"));
     } catch (JSONException e) {
     	e.printStackTrace();
     }
@@ -137,12 +115,14 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	private long saveSerie (JSONObject serie) {
 	  try {
 	  	//Look if this serie has been downloaded
-	    int communityId = serie.getJSONObject("meta").getInt("id");
+	  	JSONObject meta = serie.getJSONObject("meta");
+	    int communityId = meta.getInt("id");
 	    Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID}, Series.COMMUNITY_ID+"="+communityId, null, null);
 	    ContentValues values = new ContentValues();
 		  values.put(Series.JSON, serie.toString());
-	    values.put(Series.COMMUNITY_ID, serie.getJSONObject("meta").getInt("id"));
-	    values.put(Series.MY_RATING, (float)serie.getJSONObject("meta").getDouble("my_rating"));
+	    values.put(Series.COMMUNITY_ID, meta.getInt("id"));
+	    if (meta.has("my_rating"))
+	    	values.put(Series.MY_RATING, (float)meta.getDouble("my_rating"));
 	    if (!cur.moveToFirst()) {
 	    	values.put(Series.IS_MINE, false); 
 	    	cur.close();
@@ -159,7 +139,6 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	    e.printStackTrace();	   
 	    throw new IllegalArgumentException("saveSerie. Serie deson't have a community id");
     }
-	  
 	}
 	
 	@Override

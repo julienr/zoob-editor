@@ -50,6 +50,8 @@
 <string name="btn_refresh">Refresh</string>
 <string name="upload_error">Oops ! An error occured : </string>
 <string name="upload_success">Level serie uploaded !</string>
+<string name="rate_success">Level serie rated !</string>
+<string name="delete_success">Level serie deleted !</string>
 <string name="uploaded">Uploaded</string>
 <string name="not_uploaded">Not uploaded</string>
 <string name="downloaded">Downloaded</string>

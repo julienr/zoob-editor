@@ -31,9 +31,8 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 	private JSONArray series = null;
 	
 	@Override
-	public void onCreate (Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
+	public void onResume () {
+		super.onResume();
 		toLoadingState();
 	}
 	
