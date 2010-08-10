@@ -59,6 +59,8 @@
 <string name="select_tool">Select tool</string>
 <string name="err_already_rated">You have already this serie</string>
 
+<string name="dlg_rate_title">Rate this serie</string>
+
 <string name="my_rating">My rating</string>
 <string name="serie_preview">Serie preview</string>
 

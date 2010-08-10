@@ -17,6 +17,8 @@
         </activity>
         
         <activity android:name=".browser.UploadActivity"/>
+        <activity android:name=".browser.DeleteActivity"/>
+        <activity android:name=".browser.RateActivity"/>
         <activity android:name=".browser.OnlineSerieViewActivity"/>
         <activity android:name=".browser.OfflineSerieViewActivity"/>
         <activity android:name=".browser.DownloadedActivity"/>

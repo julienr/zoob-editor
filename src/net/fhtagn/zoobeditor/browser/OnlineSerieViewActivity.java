@@ -10,23 +10,30 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.fhtagn.zoobeditor.R;
+import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class OnlineSerieViewActivity extends URLFetchActivity {
 	static final String TAG = "OnlineSerieViewActivity";
+	
+	static final int DIALOG_RATE = 0;
 	
 	private JSONObject serieObj = null;
 	
@@ -52,6 +59,17 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	}
 	
 	@Override
+	protected Dialog onCreateDialog (int id) {
+		switch (id) {
+			case DIALOG_RATE: {
+				return Common.createRateDialog(this, serieID);
+			}
+			default:
+				return null;
+		}
+	}
+	
+	@Override
 	protected void onContentReady (String result) {
 		try {
 			if (result != null) {
@@ -73,6 +91,33 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
     } catch (JSONException e) {
     	serieName.setText("Error loading serie from JSON");
 	    e.printStackTrace();
+    }
+    
+    RatingBar communityRating = (RatingBar)findViewById(R.id.rating);
+    RatingBar myRating = (RatingBar)findViewById(R.id.my_rating);
+    myRating.setOnTouchListener(new OnTouchListener() {
+			@Override
+      public boolean onTouch(View view, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_UP) {
+					showDialog(DIALOG_RATE);
+				}
+        return true;
+      }
+    });
+    
+    try {
+    	JSONObject meta = serieObj.getJSONObject("meta");
+	    if (!meta.has("rating"))
+	    	communityRating.setVisibility(View.INVISIBLE);
+	    else
+	    	communityRating.setRating((float)meta.getDouble("rating"));
+	    
+	    if (!meta.has("my_rating"))
+	    	myRating.setRating(0);
+	    else
+	    	myRating.setRating((float)meta.getDouble("my_rating"));
+    } catch (JSONException e) {
+    	e.printStackTrace();
     }
 		
 		Button playBtn = (Button)findViewById(R.id.btn_play);
@@ -97,6 +142,7 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	    ContentValues values = new ContentValues();
 		  values.put(Series.JSON, serie.toString());
 	    values.put(Series.COMMUNITY_ID, serie.getJSONObject("meta").getInt("id"));
+	    values.put(Series.MY_RATING, (float)serie.getJSONObject("meta").getDouble("my_rating"));
 	    if (!cur.moveToFirst()) {
 	    	values.put(Series.IS_MINE, false); 
 	    	cur.close();

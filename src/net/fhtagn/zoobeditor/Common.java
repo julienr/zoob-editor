@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.RatingBar;
 
 public class Common {	
 	static final String TAG = "Common";
@@ -142,13 +143,32 @@ public class Common {
 		builder.setTitle(R.string.delete_dlg_title)
 					 .setMessage(msgID)
 					  .setCancelable(true)
-					  .setPositiveButton(android.R.string.ok, listener)
-					  .setNegativeButton(android.R.string.cancel,
+					  .setPositiveButton(R.string.ok, listener)
+					  .setNegativeButton(R.string.cancel,
 					    new DialogInterface.OnClickListener() {
 						    public void onClick(DialogInterface dialog, int id) {
-							    dialog.cancel();
+							    dialog.dismiss();
 						    }
 						  });
+		return builder.create();
+	}
+	
+	public static Dialog createRateDialog (final Activity activity, final long serieID) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+		final RatingBar ratingBar = new RatingBar(activity);
+		ratingBar.setNumStars(5);
+		builder.setTitle(R.string.dlg_rate_title)
+					 .setCancelable(true)
+					 .setView(ratingBar)
+					 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+						 public void onClick (DialogInterface dialog, int id) {
+							 dialog.dismiss();
+							 Intent i = new Intent(activity.getApplicationContext(), RateActivity.class);
+							 i.putExtra("community_id", serieID);
+							 i.putExtra("rating", ratingBar.getRating());
+							 activity.startActivityForResult(i, EditorConstants.REQUEST_RATE);
+						 }
+					 });
 		return builder.create();
 	}
 	

@@ -52,6 +52,7 @@ public class DeleteActivity extends ServerRequestActivity {
 	  		return false;
 	  	}
 	  	
+	  	//delete from local db
 	  	Uri deleteUri = ContentUris.withAppendedId(Series.CONTENT_URI, communityID);
 			getContentResolver().delete(deleteUri, null, null);
 			

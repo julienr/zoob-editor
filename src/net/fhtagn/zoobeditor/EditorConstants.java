@@ -88,7 +88,7 @@ public class EditorConstants {
 		return getServerUrl()+"/show?id="+serieId;
 	}
 
-	public static String getRateUrl(long serieID, int rating) {
+	public static String getRateUrl(long serieID, float rating) {
 	  return getServerUrl()+"/rate?serie_id="+serieID+"&rating="+rating;
   }
 }
