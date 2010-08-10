@@ -33,7 +33,7 @@
       android:layout_width="fill_parent"
       android:layout_height="fill_parent"
       android:orientation="vertical" >
-			  <TextView 
+			  <TextView android:id="@+id/my_rating_separator"
 			    style="@style/TextView.Separator"
 			    android:text="@string/my_rating" />
 			    

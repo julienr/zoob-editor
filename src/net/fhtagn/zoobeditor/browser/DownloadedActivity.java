@@ -65,11 +65,10 @@ public class DownloadedActivity extends ListActivity {
 			
 			//Rating
       RatingBar ratingBar = (RatingBar)view.findViewById(R.id.rating);
-      Float rating = cursor.getFloat(cursor.getColumnIndex(Series.RATING));
-      if (rating != null)
-      	ratingBar.setRating(rating);
-      else
+      if (cursor.isNull(cursor.getColumnIndex(Series.RATING)))
       	ratingBar.setVisibility(View.INVISIBLE);
+      else
+      	ratingBar.setRating(cursor.getFloat(cursor.getColumnIndex(Series.RATING)));
 		}
 	}
 }

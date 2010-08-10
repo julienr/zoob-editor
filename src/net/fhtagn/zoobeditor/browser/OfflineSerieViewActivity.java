@@ -93,10 +93,16 @@ public class OfflineSerieViewActivity extends Activity {
 	    else
 	    	communityRating.setRating(cur.getFloat(cur.getColumnIndex(Series.RATING)));
 	    
-	    if (cur.isNull(cur.getColumnIndex(Series.MY_RATING)))
-	    	myRating.setRating(0);
-	    else
-	    	myRating.setRating(cur.getFloat(cur.getColumnIndex(Series.MY_RATING)));
+	    if (serieID == 1) { //special case for original serie, we cannot rate it
+	    	TextView sep = (TextView)findViewById(R.id.my_rating_separator);
+	    	sep.setVisibility(View.GONE);
+	    	myRating.setVisibility(View.GONE);
+	    } else {
+		    if (cur.isNull(cur.getColumnIndex(Series.MY_RATING)))
+		    	myRating.setRating(0);
+		    else
+		    	myRating.setRating(cur.getFloat(cur.getColumnIndex(Series.MY_RATING)));
+	    }
 	    //END rating
 	    
 			

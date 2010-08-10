@@ -49,7 +49,7 @@ public class RateActivity extends ServerRequestActivity {
 	  	HttpGet httpGet = new HttpGet(EditorConstants.getRateUrl(communityID, rating));
 	  	HttpResponse response = httpClient.execute(httpGet);
 	  	if (response.getStatusLine().getStatusCode() != 200) {
-	  		errorDialog("Error deleting  : " + response.getStatusLine().getReasonPhrase());
+	  		errorDialog("Error rating  : " + response.getStatusLine().getReasonPhrase());
 	  		return false;
 	  	}
 	  	
