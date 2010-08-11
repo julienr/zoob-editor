@@ -256,7 +256,7 @@ public class LevelView extends View {
 		}
 		
 		if (currentTool != null)
-			currentTool.draw(canvas);
+			currentTool.draw(this, canvas);
 		
 		if (selectedCell[0] != -1) {
 			Log.v(TAG, "drawing selected");
@@ -269,6 +269,14 @@ public class LevelView extends View {
 		}
 		
 		canvas.restore();	
+	}
+	
+	public int getXDim () {
+		return xdim;
+	}
+	
+	public int getYDim () {
+		return ydim;
 	}
 	
 	private boolean insideGrid (int x, int y) {

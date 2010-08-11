@@ -1,5 +1,6 @@
 package net.fhtagn.zoobeditor.editor.tools;
 
+import net.fhtagn.zoobeditor.editor.LevelView;
 import net.fhtagn.zoobeditor.editor.cell.GridCell;
 import android.graphics.Canvas;
 
@@ -13,6 +14,6 @@ public abstract class EditorTool {
 	
 	//Can be used to draw tool-specific informations
 	//The canvas has its origin at level top-right corner and is scaled to sxy,sxy
-	public void draw (Canvas canvas) {
+	public void draw (LevelView view, Canvas canvas) {
 	}
 }
