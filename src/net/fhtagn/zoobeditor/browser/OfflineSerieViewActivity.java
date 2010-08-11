@@ -151,6 +151,7 @@ public class OfflineSerieViewActivity extends Activity {
 						JSONObject serieUpdated = new JSONObject(result);
 						ContentValues values = new ContentValues();
 						values.put(Series.JSON, serieUpdated.toString());
+						values.put(Series.UPDATE_AVAILABLE, false);
 						getContentResolver().update(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), values, null, null);
 						dismissProgressDialog();
 						Intent i = Common.playSerie(serieID);
