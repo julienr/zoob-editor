@@ -103,7 +103,7 @@ public class EditorApplication extends Application {
 								if (lastLocalModif.before(updated)) {
 									ContentValues values = new ContentValues();
 									values.put(Series.UPDATE_AVAILABLE, true);
-									getContentResolver().insert(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), values);
+									getContentResolver().update(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), values, null, null);
 								}
 							} catch (JSONException e) {
 								e.printStackTrace();
