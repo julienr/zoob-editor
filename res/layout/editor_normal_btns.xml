@@ -20,4 +20,8 @@
       android:scrollbars="vertical"
       android:scrollbarAlwaysDrawVerticalTrack="true" />  
   </ScrollView>
+  <Button android:id="@+id/undo"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/btn_undo" />
 </LinearLayout>

@@ -14,6 +14,11 @@ public class WallTool extends EditorTool {
 	}
 	
 	@Override
+	public boolean supportHistory () {
+		return true;
+	}
+	
+	@Override
   public GridCell apply(GridCell cell) {
 		return new WallCell(cell.getCoords(), type);
   }

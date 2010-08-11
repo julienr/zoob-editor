@@ -46,8 +46,54 @@ public class LevelView extends View {
 	
 	private EditorTool currentTool = null;
 	
-	public LevelView (Context context, JSONObject levelObj) throws JSONException {
+	//Undo stuff
+	//We basically store, in a queue, the pair (point, old gridcell). This pair means that
+	//at the given point, the given old gridcell was replaced by a new one
+	class HistoryEntry {
+		private final int x;
+		private final int y;
+		private final GridCell cell;
+		public HistoryEntry (int x, int y, GridCell oldCell) {
+			this.x = x;
+			this.y = y;
+			this.cell = oldCell;
+		}
+		public int getX() { return x; }
+		public int getY() { return y; }
+		public GridCell getCell() { return cell; }
+	}
+	private final ArrayList<HistoryEntry> undoHistory = new ArrayList<HistoryEntry>();
+	private final static int HISTORY_SIZE = 5;
+	
+	private void addToHistory(HistoryEntry e) {
+		if (undoHistory.size() == HISTORY_SIZE)
+			undoHistory.remove(undoHistory.size()-1);
+		undoHistory.add(0, e);
+		undoListener.enableUndo(true);
+	}
+	
+	public boolean canUndo () {
+		return undoHistory.size() > 0;
+	}
+	
+	public void undo () {
+		Log.i(TAG, "undo");
+		HistoryEntry e = undoHistory.get(0);
+		grid[e.getX()][e.getY()] = e.getCell();
+		undoHistory.remove(0);
+		undoListener.enableUndo(canUndo());
+		postInvalidate();
+	}
+	
+	//Used to notify when it is possible to undo and when it isn't
+	public interface UndoListener {
+		public void enableUndo(boolean enable);
+	}
+	private UndoListener undoListener;
+	
+	public LevelView (Context context, JSONObject levelObj, UndoListener listener) throws JSONException {
 		super(context);
+		this.undoListener = listener;
 		this.xdim = levelObj.getInt("xdim");
 		this.ydim = levelObj.getInt("ydim");
 		grid = new GridCell[xdim][ydim];
@@ -245,6 +291,9 @@ public class LevelView extends View {
 		final int x = selectedCell[0];
 		final int y = selectedCell[1];
 		Log.i(TAG, "modify Cell ("+x+","+y+")");
+		if (currentTool.supportHistory())
+			addToHistory(new HistoryEntry(x, y, grid[x][y]));
+		
 		grid[x][y] = currentTool.apply(grid[x][y]);
 		postInvalidate();
 	}

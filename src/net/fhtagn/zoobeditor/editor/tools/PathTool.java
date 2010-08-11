@@ -72,6 +72,11 @@ public class PathTool extends EditorTool {
 	}
 	
 	@Override
+	public boolean supportHistory () {
+		return false;
+	}
+	
+	@Override
   public GridCell apply(GridCell cell) {
 		if (state == STATE_NO_TANK && cell.canHavePath()) {
 			state = STATE_DRAWING_PATH;

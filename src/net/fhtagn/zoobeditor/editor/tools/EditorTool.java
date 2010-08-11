@@ -6,8 +6,10 @@ import android.graphics.Canvas;
 //And editor tool specify the action to take when the user click on a cell 
 //(such as erasing its content, putting something in, etc...)
 public abstract class EditorTool {
-	//Apply the tool on the given cell, it should the new cell used to replace the old cell
+	//Apply the tool on the given cell, it should return the new cell used to replace the old cell
 	public abstract GridCell apply (GridCell cell);
+	
+	public abstract boolean supportHistory ();
 	
 	//Can be used to draw tool-specific informations
 	//The canvas has its origin at level top-right corner and is scaled to sxy,sxy

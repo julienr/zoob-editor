@@ -20,4 +20,9 @@ public class TankTool extends EditorTool {
 	public GridCell apply(GridCell cell) {
 		return new TankCell(cell.getCoords(), context, type);
 	}
+	
+	@Override
+	public boolean supportHistory () {
+		return true;
+	}
 }

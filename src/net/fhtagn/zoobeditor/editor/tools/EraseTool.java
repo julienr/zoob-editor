@@ -9,4 +9,9 @@ public class EraseTool extends EditorTool {
   public GridCell apply(GridCell cell) {
 	  return new WallCell(cell.getCoords(), Types.WallType.E);
   }
+	
+	@Override
+	public boolean supportHistory() {
+		return true;
+	}
 }

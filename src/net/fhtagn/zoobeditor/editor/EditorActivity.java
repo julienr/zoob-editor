@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.EditorConstants;
+import net.fhtagn.zoobeditor.editor.LevelView.UndoListener;
 import net.fhtagn.zoobeditor.editor.tools.EraseTool;
 import net.fhtagn.zoobeditor.editor.tools.PathTool;
 import net.fhtagn.zoobeditor.editor.tools.TankTool;
@@ -69,6 +70,16 @@ public class EditorActivity extends Activity {
 	
 	private Uri serieUri;
 	
+	private Button undoButton = null;
+	
+	private UndoListener undoListener = new UndoListener() {
+		@Override
+		public void enableUndo(boolean enabled) {
+			if (undoButton != null)
+				undoButton.setEnabled(enabled);
+		}
+	};
+	
 	@Override
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -85,7 +96,7 @@ public class EditorActivity extends Activity {
 				JSONObject levelObj = new JSONObject();
 				levelObj.put("xdim", 12);
 				levelObj.put("ydim", 8);
-				levelView = new LevelView(getApplicationContext(), levelObj);
+				levelView = new LevelView(getApplicationContext(), levelObj, undoListener);
 				levelFrame.addView(levelView);
 				toNormalMode();
 				levelView.requestFocus(); //force trackball focus on level view
@@ -106,7 +117,7 @@ public class EditorActivity extends Activity {
 			FrameLayout levelFrame = (FrameLayout)findViewById(R.id.levelframe);
 			try {
 				JSONObject levelObj = new JSONObject(i.getStringExtra("json"));
-				levelView = new LevelView(getApplicationContext(), levelObj);
+				levelView = new LevelView(getApplicationContext(), levelObj, undoListener);
 				levelFrame.addView(levelView);
 				toNormalMode();
 				levelView.requestFocus(); //force trackball focus on level view
@@ -116,7 +127,6 @@ public class EditorActivity extends Activity {
 				levelFrame.addView(textView);
 			}
 		}
-		toWallMode();
 	}
 	
 	@Override
@@ -174,10 +184,13 @@ public class EditorActivity extends Activity {
 		levelView.postInvalidate();
 		buttonsLayout.addView(getLayoutInflater().inflate(R.layout.editor_normal_btns, null));
 		setupNormalCallbacks();
+		toWallMode();
 	}
 	
 	//Path editing mode buttons
 	private void setupPathCallbacks () {
+		undoButton = null;
+		
 		Button resetButton = (Button)findViewById(R.id.btn_path_reset);
 		resetButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -204,6 +217,15 @@ public class EditorActivity extends Activity {
 			@Override
 			public void onClick(View view) {
 				showDialog(DIALOG_TOOL_TYPE);
+			}
+		});
+		
+		undoButton = (Button)findViewById(R.id.undo);
+		undoButton.setEnabled(levelView.canUndo());
+		undoButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick (View view) {
+				levelView.undo();
 			}
 		});
 	}
@@ -287,7 +309,7 @@ public class EditorActivity extends Activity {
 				}
 				try {
 	        JSONObject obj = new JSONObject(data.getStringExtra("json"));
-	        levelView = new LevelView(getApplicationContext(), obj);
+	        levelView = new LevelView(getApplicationContext(), obj, undoListener);
         } catch (JSONException e) {
 	        e.printStackTrace();
         }
