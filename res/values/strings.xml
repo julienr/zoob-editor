@@ -29,6 +29,7 @@
 <string name="menu_play_level">Play level</string>
 <string name="menu_play_serie">Play serie</string>
 <string name="btn_play_online_serie">Download and play</string>
+<string name="btn_update">Update and play</string>
 <string name="save_err_external">Error writing to the external directory</string>
 <string name="save_err_export">Error during level export</string>
 <string name="save_success">Saved succesfully </string>

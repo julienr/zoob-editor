@@ -8,7 +8,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import net.fhtagn.zoobeditor.browser.DeleteActivity;
@@ -22,9 +26,11 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -115,6 +121,28 @@ public class Common {
 			return true;
 		}
 		return true;
+	}
+	
+	//Run a GET query at the specified url and returns the content. returns null if status code != 200 or on error
+	public static String urlQuery (HttpClient httpClient, String url) {
+		HttpGet httpGet = new HttpGet(url);
+		try {
+			HttpResponse response = httpClient.execute(httpGet);
+			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+				HttpEntity entity = response.getEntity();
+				if (entity == null) {
+					Log.e(TAG, "urlQuery() : Entity = null");
+					return null; 
+				}
+				InputStream instream = entity.getContent();
+				return Common.convertStreamToString(instream);
+			} else {
+				Log.e(TAG, "Error during urlQuery : " + response.getStatusLine().getStatusCode());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	

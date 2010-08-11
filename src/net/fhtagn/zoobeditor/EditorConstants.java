@@ -84,8 +84,12 @@ public class EditorConstants {
 		return getServerUrl()+"/?author="+getAuthorIdentification(author);
 	}
 	
-	public static String getDetailsUrl (int serieId) {
+	public static String getDetailsUrl (long serieId) {
 		return getServerUrl()+"/show?id="+serieId;
+	}
+	
+	public static String getSummaryUrl (long serieId) {
+		return getServerUrl()+"/show?id="+serieId+"&full=0";
 	}
 
 	public static String getRateUrl(long serieID, float rating) {

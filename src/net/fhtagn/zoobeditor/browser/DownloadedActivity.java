@@ -3,6 +3,7 @@ package net.fhtagn.zoobeditor.browser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.R;
 import net.fhtagn.zoobeditor.SerieCursorAdapter;
 import net.fhtagn.zoobeditor.Series;
@@ -19,7 +20,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class DownloadedActivity extends ListActivity {
-	private String[] projection = new String[]{Series.ID, Series.NAME, Series.RATING, Series.NUM_LEVELS, Series.AUTHOR, Series.JSON, Series.LAST_MODIFICATION, Series.PROGRESS};
+	private String[] projection = new String[]{Series.ID, Series.NAME, Series.RATING, Series.UPDATE_AVAILABLE, Series.NUM_LEVELS, Series.AUTHOR, Series.JSON, Series.LAST_MODIFICATION, Series.PROGRESS};
 	
 	@Override
 	public void onCreate (Bundle savedInstancestate) {
@@ -62,6 +63,16 @@ public class DownloadedActivity extends ListActivity {
 			//Progress
 			TextView progressView = (TextView)view.findViewById(R.id.progress);
 			progressView.setText(cursor.getInt(cursor.getColumnIndex(Series.PROGRESS)) + " / " + cursor.getInt(cursor.getColumnIndex(Series.NUM_LEVELS)));
+			
+			//Update available notification
+			TextView statusView = (TextView)view.findViewById(R.id.status);
+			boolean updateAvailable = cursor.getInt(cursor.getColumnIndex(Series.UPDATE_AVAILABLE)) == 1;
+			if (updateAvailable) {
+				statusView.setText(R.string.update_available);
+				statusView.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
+			} else {
+				statusView.setVisibility(View.INVISIBLE);
+			}
 			
 			//Rating
       RatingBar ratingBar = (RatingBar)view.findViewById(R.id.rating);

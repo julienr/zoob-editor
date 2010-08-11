@@ -11,6 +11,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.editor.SerieEditActivity;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -77,10 +80,25 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 	@Override
   public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
 	  try {
-	    int serieId = series.getJSONObject(position).getJSONObject("meta").getInt("id");
-	    Intent i = new Intent(getApplicationContext(), OnlineSerieViewActivity.class);
-	    i.putExtra("serieid", serieId);
-	    startActivity(i);
+	    long communityId = series.getJSONObject(position).getJSONObject("meta").getLong("id");
+	    Cursor cur = managedQuery(Series.CONTENT_URI, new String[]{Series.ID, Series.IS_MINE}, Series.COMMUNITY_ID+"="+communityId, null, null);
+	    Intent intent;
+	    if (cur.moveToFirst()) {
+	    	//exists in local DB, display the offline serie view
+	    	int isMine = cur.getInt(cur.getColumnIndex(Series.IS_MINE));
+	    	if (isMine == 1) { //we are the owner => start editor
+	    		intent = new Intent(getApplicationContext(), SerieEditActivity.class);
+	    		intent.setData(ContentUris.withAppendedId(Series.CONTENT_URI, cur.getLong(cur.getColumnIndex(Series.ID))));
+	    	} else { //standard offline view
+	    		intent = new Intent(getApplicationContext(), OfflineSerieViewActivity.class);
+		    	intent.putExtra("serieid", cur.getLong(cur.getColumnIndex(Series.ID)));
+	    	}
+	    } else {
+	    	//not found in local DB
+		    intent = new Intent(getApplicationContext(), OnlineSerieViewActivity.class);
+		    intent.putExtra("communityID", communityId);
+	    }
+	    startActivity(intent);
     } catch (JSONException e) {
 	    e.printStackTrace();
     }
@@ -129,7 +147,7 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 	        
 	        //Look if this serie has been downloaded
 	        int communityId = serieObj.getJSONObject("meta").getInt("id");
-	        Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID, Series.LAST_MODIFICATION}, Series.COMMUNITY_ID+"="+communityId, null, null);
+	        Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID, Series.IS_MINE, Series.LAST_MODIFICATION}, Series.COMMUNITY_ID+"="+communityId, null, null);
 	  			TextView downloadStatus = (TextView)view.findViewById(R.id.download_status);
 	        if (!cur.moveToFirst()) {
 	        	downloadStatus.setText(R.string.not_downloaded);
@@ -138,6 +156,11 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 	        	Date localModification = Common.dateFromDB(cur.getString(cur.getColumnIndex(Series.LAST_MODIFICATION)));
 	        	Date serverModification = Common.dateFromDB(serieObj.getJSONObject("meta").getString("updated"));
 	        	if (localModification.before(serverModification)) {
+	        		//mark this serie as updated
+	        		ContentValues values = new ContentValues();
+	        		values.put(Series.UPDATE_AVAILABLE, true);
+	        		getContentResolver().insert(ContentUris.withAppendedId(Series.CONTENT_URI, cur.getLong(cur.getColumnIndex(Series.ID))), values);
+	        		
 	        		downloadStatus.setText(R.string.update_available);
 	        		downloadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
 	        	} else {

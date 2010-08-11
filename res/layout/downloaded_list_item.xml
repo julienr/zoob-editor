@@ -9,6 +9,14 @@
     android:layout_height="wrap_content"
     android:layout_alignParentLeft="true" />
     
+  <TextView android:id="@+id/status"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/name"
+    android:layout_alignParentLeft="true"
+    android:textStyle="bold"
+    android:textColor="#FF50AB86"/>
+    
   <RatingBar android:id="@+id/rating"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"

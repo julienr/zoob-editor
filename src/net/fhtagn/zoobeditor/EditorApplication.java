@@ -2,6 +2,7 @@ package net.fhtagn.zoobeditor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.HashSet;
 
 import org.apache.http.HttpEntity;
@@ -46,8 +47,10 @@ public class EditorApplication extends Application {
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		accountManager = AccountManager.get(getApplicationContext());
 		
-		if (Common.hasInternet(getApplicationContext()))
+		if (Common.hasInternet(getApplicationContext())) {
+			syncDownloadedSeries();
 			syncMySeries();
+		}
 	}
 	
 	/**
@@ -63,27 +66,53 @@ public class EditorApplication extends Application {
 			public void run () {
 				Log.i(TAG, "Launching background syncMySeries() for account : " + EditorConstants.getAuthorIdentification(currentAccount));
 				HttpClient httpClient = new DefaultHttpClient();
-				HttpGet httpGet = new HttpGet(EditorConstants.getByAuthorListUrl(currentAccount));
-				
-				try {
-					HttpResponse response = httpClient.execute(httpGet);
-					if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-						HttpEntity entity = response.getEntity();
-						if (entity == null) {
-							Log.e(TAG, "syncMySeries() : Entity = null");
-							return;
-						}
-						InputStream instream = entity.getContent();
-						String result = Common.convertStreamToString(instream);
-						
-						insertAsMineFromJSON(new JSONArray(result), currentAccount);
+				String result = Common.urlQuery(httpClient, EditorConstants.getByAuthorListUrl(currentAccount));
+				if (result != null) {
+					try {
+	          insertAsMineFromJSON(new JSONArray(result), currentAccount);
 						Log.i(TAG, "syncMySeries done");
-					} else {
-						Log.e(TAG, "Error during background syncMySeries() : " + response.getStatusLine().getStatusCode());
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
+          } catch (JSONException e) {
+	          e.printStackTrace();
+          }
+				} else 
+					Log.e(TAG, "Error during background syncMySeries()");
+			}
+		}).start();
+	}
+	
+	/**
+	 * This background task synchronize the downloaded series list (download updates)
+	 */
+	public void syncDownloadedSeries () {
+		(new Thread() {
+			@Override
+			public void run () {
+				HttpClient httpClient = new DefaultHttpClient();
+				Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID, Series.COMMUNITY_ID, Series.LAST_MODIFICATION}, Series.IS_MINE+"=0 AND "+Series.COMMUNITY_ID+" NOT NULL", null, null);
+				if (cur.moveToFirst()) {
+					do {
+						long communityID = cur.getLong(cur.getColumnIndex(Series.COMMUNITY_ID));
+						long serieID = cur.getLong(cur.getColumnIndex(Series.ID));
+						Log.i(TAG, "checking for update for serie with communityID="+communityID);
+						String result = Common.urlQuery(httpClient, EditorConstants.getSummaryUrl(communityID));
+						if (result != null) {
+							try {
+								JSONObject summary = new JSONObject(result);
+								Date updated = Common.dateFromDB(summary.getJSONObject("meta").getString("updated"));
+								Date lastLocalModif = Common.dateFromDB(cur.getString(cur.getColumnIndex(Series.LAST_MODIFICATION)));
+								if (lastLocalModif.before(updated)) {
+									ContentValues values = new ContentValues();
+									values.put(Series.UPDATE_AVAILABLE, true);
+									getContentResolver().insert(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), values);
+								}
+							} catch (JSONException e) {
+								e.printStackTrace();
+							}
+						}
+					} while(cur.moveToNext());
+					Log.i(TAG, "syncDownloadedSeries done");
 				}
+				cur.close();
 			}
 		}).start();
 	}
@@ -106,8 +135,10 @@ public class EditorApplication extends Application {
 				Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID}, Series.COMMUNITY_ID+"="+communityID, null, null);
 				if (cur.getCount() > 0) {
 					Log.i("ServerSync", "serie with community id " + communityID + " already in local DB");
+					cur.close();
 					continue; //already in db, don't update because we might overwrite local uncommited changes
 				}
+				cur.close();
 				Log.i("ServerSync", "new serie with community id : " + communityID);
 				//prepare for insert
 				ContentValues values = new ContentValues();
@@ -131,6 +162,7 @@ public class EditorApplication extends Application {
 					}
 				} while (cur.moveToNext());
 			}
+			cur.close();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

@@ -35,7 +35,7 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	
 	private JSONObject serieObj = null;
 	
-	private int serieID;
+	private int communityID;
 	
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
@@ -47,8 +47,8 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 			finish();
 		}
 		
-		serieID = i.getIntExtra("serieid", -1);
-		if (serieID == -1) {
+		communityID = i.getIntExtra("communityID", -1);
+		if (communityID == -1) {
 			Log.e(TAG, "onCreate : serieid = -1");
 			finish();
 		}
@@ -97,6 +97,9 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
     } catch (JSONException e) {
     	e.printStackTrace();
     }
+    
+    Button updateBtn = (Button)findViewById(R.id.btn_update);
+    updateBtn.setVisibility(View.GONE);
 		
 		Button playBtn = (Button)findViewById(R.id.btn_play);
 		playBtn.setOnClickListener(new OnClickListener() {
@@ -143,6 +146,6 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	
 	@Override
 	protected String getURL() {
-		return EditorConstants.getDetailsUrl(serieID);
+		return EditorConstants.getDetailsUrl(communityID);
 	}
 }

@@ -1,5 +1,13 @@
 package net.fhtagn.zoobeditor.browser;
 
+import java.io.InputStream;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,8 +19,10 @@ import net.fhtagn.zoobeditor.Series;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.AlertDialog.Builder;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -35,6 +45,7 @@ public class OfflineSerieViewActivity extends Activity {
 	static final String TAG = "OfflineSerieViewActivity";
 	static final int DIALOG_CONFIRM_DELETE = 0;
 	static final int DIALOG_RATE = 1;
+	static final int DIALOG_PROGRESS = 2;
 	private long serieID;
 	
 	private JSONObject serieObj = null;
@@ -56,8 +67,7 @@ public class OfflineSerieViewActivity extends Activity {
 			finish();
 		}
 		
-		
-		Cursor cursor = managedQuery(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), new String[]{Series.COMMUNITY_ID, Series.JSON, Series.RATING, Series.MY_RATING, Series.NAME, Series.PROGRESS}, null, null, null);
+		Cursor cursor = managedQuery(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), new String[]{Series.UPDATE_AVAILABLE, Series.COMMUNITY_ID, Series.JSON, Series.RATING, Series.MY_RATING, Series.NAME, Series.PROGRESS}, null, null, null);
 		if (!cursor.moveToFirst()) {
 			Log.e(TAG, "onCreate: !cur.moveToFirst");
 			finish();
@@ -74,9 +84,8 @@ public class OfflineSerieViewActivity extends Activity {
 		try {
 			serieObj = new JSONObject(cursor.getString(cursor.getColumnIndex(Series.JSON)));
 			levelsArray = serieObj.getJSONArray("levels");
-			
 			TextView serieName = (TextView)findViewById(R.id.name);
-			serieName.setText(cursor.getString(cursor.getColumnIndex(Series.NAME)));
+			serieName.setText(cursor.getShort(cursor.getColumnIndex(Series.NAME)));
 			/*GridView gridView = (GridView)findViewById(android.R.id.list);
 			gridView.setAdapter(new LevelsAdapter(this, serieObj.getJSONArray("levels")));*/
 			SeriePreviewGrid previewGrid = (SeriePreviewGrid)findViewById(R.id.seriepreview);
@@ -87,16 +96,30 @@ public class OfflineSerieViewActivity extends Activity {
 	    RatingBar myRating = (RatingBar)findViewById(R.id.my_rating);
 	    myRating.setOnTouchListener(new OnTouchListener() {
 				@Override
-        public boolean onTouch(View view, MotionEvent event) {
+	      public boolean onTouch(View view, MotionEvent event) {
 					if (event.getAction() == MotionEvent.ACTION_UP) {
 						showDialog(DIALOG_RATE);
 					}
 	        return true;
-        }
+	      }
 	    });
 	    refreshRating();
 	    //END rating
 	    
+	    
+	    Button updateBtn = (Button)findViewById(R.id.btn_update);
+	    boolean updateAvailable = cursor.getInt(cursor.getColumnIndex(Series.UPDATE_AVAILABLE)) == 1;
+			if (!updateAvailable) {
+				updateBtn.setVisibility(View.GONE);
+			} else {
+				updateBtn.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick (View view) {
+						downloadUpdateAndPlay();
+					}
+				});
+			}
+			
 			
 			Button playBtn = (Button)findViewById(R.id.btn_play);
 			playBtn.setText(R.string.btn_play_serie);
@@ -116,6 +139,41 @@ public class OfflineSerieViewActivity extends Activity {
 			finish();
 		}
 	}
+	
+	private void downloadUpdateAndPlay () {
+		showDialog(DIALOG_PROGRESS);
+		(new Thread() {
+			@Override
+			public void run() {
+				String result = Common.urlQuery(new DefaultHttpClient(), EditorConstants.getDetailsUrl(serieID));
+				if (result != null) {
+					try {
+						JSONObject serieUpdated = new JSONObject(result);
+						ContentValues values = new ContentValues();
+						values.put(Series.JSON, serieUpdated.toString());
+						getContentResolver().update(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), values, null, null);
+						dismissProgressDialog();
+						Intent i = Common.playSerie(serieID);
+						startActivity(i);
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				} else {
+					Log.e(TAG, "Unable to fetch update, result = null");
+				}
+				dismissProgressDialog();
+			}
+		}).start();
+	}
+	
+	private void dismissProgressDialog () {
+		runOnUiThread(new Runnable() {
+			public void run () {
+				dismissDialog(DIALOG_PROGRESS);
+			}
+		});
+	}
+	
 	
 	private void refreshRating () {
 		RatingBar communityRating = (RatingBar)findViewById(R.id.rating);
@@ -158,6 +216,13 @@ public class OfflineSerieViewActivity extends Activity {
 			}
 			case DIALOG_RATE: {
 				return Common.createRateDialog(this, communityID);
+			}
+			case DIALOG_PROGRESS: {
+				ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setIcon(android.R.drawable.ic_dialog_info);
+        progressDialog.setTitle(getString(R.string.progress_title));
+        progressDialog.setIndeterminate(true);
+        return progressDialog;
 			}
 			default:
 				return null;

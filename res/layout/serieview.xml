@@ -67,14 +67,19 @@
    </ScrollView>
    
    
-   <RelativeLayout 
+   <LinearLayout 
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:gravity="center"
     style="@style/Footer">
 	   <Button android:id="@+id/btn_play"
 	     android:layout_width="wrap_content"
 	     android:layout_height="wrap_content"
-	     android:text="@string/btn_play_online_serie"
-	     android:layout_centerInParent="true" />
-   </RelativeLayout>
+	     android:text="@string/btn_play_online_serie"/>
+	   <Button android:id="@+id/btn_update"
+	     android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="@string/btn_update" />
+	     
+   </LinearLayout>
 </LinearLayout>
