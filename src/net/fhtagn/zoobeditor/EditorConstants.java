@@ -13,6 +13,9 @@ public class EditorConstants {
 	public static final String AUTH_TOKEN_TYPE = "ah";
 	
 	public static final int RESULT_ERROR = Activity.RESULT_FIRST_USER;
+	//Used by level editor when returning a level to serieedit. The level should be inserted in the serie
+	//and then the serie saved and the newly inserted level played
+	public static final int RESULT_OK_PLAY = RESULT_ERROR+1;
 	
 	/** 
 	 * Request types
@@ -23,6 +26,10 @@ public class EditorConstants {
 	public static final int REQUEST_LEVEL_OPTIONS = 3;
 	public static final int REQUEST_DELETE = 4;
 	public static final int REQUEST_RATE = 5;
+	
+	//Used to control the behaviour of SerieEdit when a particular level of a serie is played
+	public static final int REQUEST_PLAY_RETURN_TO_SERIE = 6; //return to serie editing 
+	public static final int REQUEST_PLAY_RETURN_TO_EDITOR = 7; //return directly to level editing
 	
 	/**
 	 * Colors

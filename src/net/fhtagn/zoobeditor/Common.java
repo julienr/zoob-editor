@@ -62,13 +62,23 @@ public class Common {
 		return Long.parseLong(serieUri.getLastPathSegment());
 	}
 	
-	public static Intent playeSerie (long serieId, int level) {
+	public static Intent playSerie (long serieId, int level) {
 		Uri.Builder builder = new Uri.Builder();
 		builder.scheme("content");
 		builder.authority("net.fhtagn.zoobgame");
 		builder.path("/series/"+serieId);
 		builder.appendQueryParameter("startlevel", ""+level);
 		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", builder.build());
+		return i;
+	}
+	
+	public static Intent playLevel (String json) {
+		Uri.Builder builder = new Uri.Builder();
+		builder.scheme("content");
+		builder.authority("net.fhtagn.zoobgame");
+		builder.path("/level/");
+		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", builder.build());
+		i.putExtra("json", json);
 		return i;
 	}
 	
@@ -201,9 +211,9 @@ public class Common {
 	}
 	
 	public static final class Level {
-		public static final void play (Activity sourceActivity, long serieID, int level) {
-			Intent i = Common.playeSerie(serieID, level);
-	    sourceActivity.startActivity(i);
+		public static final void play (Activity sourceActivity, long serieID, int level, int requestCode) {
+			Intent i = Common.playSerie(serieID, level);
+	    sourceActivity.startActivityForResult(i, requestCode);
 		}
 	}
 	

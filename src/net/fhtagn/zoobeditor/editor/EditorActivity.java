@@ -131,8 +131,7 @@ public class EditorActivity extends Activity {
 	
 	@Override
 	public void finish () {
-		saveToSerie();
-		super.finish();
+		returnToSerie(RESULT_OK);
 	}
 	
 	@Override
@@ -158,7 +157,7 @@ public class EditorActivity extends Activity {
 				return true;
 			}
 			case R.id.play: {
-				Common.Level.play(this, Common.extractId(serieUri), levelNumber);
+				returnToSerie(EditorConstants.RESULT_OK_PLAY);
 				return true;
 			}
 			case R.id.delete: {
@@ -230,17 +229,18 @@ public class EditorActivity extends Activity {
 		});
 	}
 	
-	public void saveToSerie () {
+	public void returnToSerie (int resultCode) {
 		Intent i = new Intent(this, SerieEditActivity.class);
 		try {
 			i.putExtra("json", levelView.toJSON().toString());
 			i.putExtra("number", levelNumber);
-			setResult(RESULT_OK, i);
+			setResult(resultCode, i);
 		} catch (JSONException e) {
 			e.printStackTrace();
 			//FIXME: display error to user ?
 			setResult(RESULT_CANCELED);
 		}
+		super.finish();
 	}
 	
 	private void toWallMode () {

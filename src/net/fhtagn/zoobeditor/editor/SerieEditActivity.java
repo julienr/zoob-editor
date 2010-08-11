@@ -54,6 +54,9 @@ public class SerieEditActivity extends ListActivity {
 	
 	private int levelToDelete = -1;
 	
+	//When returning from a REQUEST_PLAY_RETURN_TO_EDITOR, will open the editor on this level
+	private int levelToEdit = -1;
+	
 	private String serieName;
 	
 	private Uri serieUri;
@@ -149,6 +152,7 @@ public class SerieEditActivity extends ListActivity {
 	public boolean onOptionsItemSelected (MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.play: {
+				save();
 				Common.Serie.play(this, Common.extractId(serieUri));
 				return true;
 			}
@@ -249,7 +253,8 @@ public class SerieEditActivity extends ListActivity {
     
     switch (item.getItemId()) {
     	case MENU_ITEM_PLAY: {
-    		Common.Level.play(this, Common.extractId(serieUri), info.position);
+    		save();
+    		Common.Level.play(this, Common.extractId(serieUri), info.position, EditorConstants.REQUEST_PLAY_RETURN_TO_SERIE);
         return true;
     	}
     	case MENU_ITEM_EDIT: {
@@ -269,16 +274,23 @@ public class SerieEditActivity extends ListActivity {
 	protected void onActivityResult (int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 			case EditorConstants.REQUEST_LEVEL_EDITOR: {
-				if (resultCode == RESULT_OK) {
+				if (resultCode == RESULT_OK || resultCode == EditorConstants.RESULT_OK_PLAY) {
 					String levelJSON = data.getStringExtra("json");
 					int levelNumber = data.getIntExtra("number", -1);
 					try {
 			      JSONObject levelObj = new JSONObject(levelJSON);
 			      if (levelNumber != -1)
 			      	levelsArray.put(levelNumber, levelObj);
-			      else
+			      else {
 			      	levelsArray.put(levelObj);
+			      	levelNumber = levelsArray.length()-1;
+			      }
 			      notifyAdapter();
+			      if (resultCode == EditorConstants.RESULT_OK_PLAY) {
+			      	save();
+			      	Common.Level.play(this, Common.extractId(serieUri), levelNumber, EditorConstants.REQUEST_PLAY_RETURN_TO_EDITOR);
+			      	levelToEdit = levelNumber;
+			      }
 		      } catch (JSONException e) {
 			      e.printStackTrace();
 			      return;
@@ -306,6 +318,13 @@ public class SerieEditActivity extends ListActivity {
 					e.printStackTrace();
 				}
 				break;
+			}
+			case EditorConstants.REQUEST_PLAY_RETURN_TO_EDITOR: {
+				if (levelToEdit != -1) {
+					final int level = levelToEdit;
+					levelToEdit = -1;
+					launchEditor(level);
+				}
 			}
 		}
 	}
