@@ -49,9 +49,8 @@ public class OfflineSerieViewActivity extends Activity {
 	private long serieID;
 	
 	private JSONObject serieObj = null;
-	private JSONArray levelsArray = null;
 	
-	private long communityID;
+	private long communityID = -1;
 	
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
@@ -73,17 +72,13 @@ public class OfflineSerieViewActivity extends Activity {
 			finish();
 		}
 		
-		if (cursor.isNull(cursor.getColumnIndex(Series.COMMUNITY_ID))) {
-			Log.e(TAG, "serie (local id : " + serieID + ") with NULL community_id");
-			finish();
-		}
-		communityID = cursor.getLong(cursor.getColumnIndex(Series.COMMUNITY_ID));
+		if (!cursor.isNull(cursor.getColumnIndex(Series.COMMUNITY_ID)))
+			communityID = cursor.getLong(cursor.getColumnIndex(Series.COMMUNITY_ID));
 		
 		setContentView(R.layout.serieview);
 		
 		try {
 			serieObj = new JSONObject(cursor.getString(cursor.getColumnIndex(Series.JSON)));
-			levelsArray = serieObj.getJSONArray("levels");
 			TextView serieName = (TextView)findViewById(R.id.name);
 			serieName.setText(serieObj.getString("name"));
 			/*GridView gridView = (GridView)findViewById(android.R.id.list);
