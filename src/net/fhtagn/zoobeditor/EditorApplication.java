@@ -69,7 +69,7 @@ public class EditorApplication extends Application {
 				String result = Common.urlQuery(httpClient, EditorConstants.getByAuthorListUrl(currentAccount));
 				if (result != null) {
 					try {
-	          insertAsMineFromJSON(new JSONArray(result), currentAccount);
+	          insertAsMineFromJSON(httpClient, new JSONArray(result), currentAccount);
 						Log.i(TAG, "syncMySeries done");
           } catch (JSONException e) {
 	          e.printStackTrace();
@@ -118,7 +118,7 @@ public class EditorApplication extends Application {
 	}
 	
 	//Will insert in the local database all the series in arr that aren't yet in the DB
-	private void insertAsMineFromJSON (JSONArray arr, Account myAccount) {
+	private void insertAsMineFromJSON (HttpClient httpClient, JSONArray arr, Account myAccount) {
 		try {
 			int len = arr.length();
 			HashSet<Long> remoteIDs = new HashSet<Long>();
@@ -141,12 +141,19 @@ public class EditorApplication extends Application {
 				cur.close();
 				Log.i("ServerSync", "new serie with community id : " + communityID);
 				//prepare for insert
+				//have to fetch the whole json using the details view to get levels array
+				String result = Common.urlQuery(httpClient, EditorConstants.getDetailsUrl(communityID));
+				if (result == null) {
+					Log.e("ServerSync", "Error fetching details for community id : " + communityID);
+					continue;
+				}
 				ContentValues values = new ContentValues();
-				values.put(Series.JSON, serie.toString());
+				values.put(Series.JSON, new JSONObject(result).toString());
 				values.put(Series.IS_MINE, true);
 				values.put(Series.COMMUNITY_ID, communityID);
 				getContentResolver().insert(Series.CONTENT_URI, values);
 			}
+			
 			//Second step, for series in the local DB but that weren't found on the server, remove the uploaded status (if set)
 			Cursor cur = getContentResolver().query(Series.CONTENT_URI, new String[]{Series.ID, Series.COMMUNITY_ID}, Series.IS_MINE+"=1", null, null);
 			if (cur.moveToFirst()) {

@@ -85,7 +85,7 @@ public class OfflineSerieViewActivity extends Activity {
 			serieObj = new JSONObject(cursor.getString(cursor.getColumnIndex(Series.JSON)));
 			levelsArray = serieObj.getJSONArray("levels");
 			TextView serieName = (TextView)findViewById(R.id.name);
-			serieName.setText(cursor.getShort(cursor.getColumnIndex(Series.NAME)));
+			serieName.setText(serieObj.getString("name"));
 			/*GridView gridView = (GridView)findViewById(android.R.id.list);
 			gridView.setAdapter(new LevelsAdapter(this, serieObj.getJSONArray("levels")));*/
 			SeriePreviewGrid previewGrid = (SeriePreviewGrid)findViewById(R.id.seriepreview);

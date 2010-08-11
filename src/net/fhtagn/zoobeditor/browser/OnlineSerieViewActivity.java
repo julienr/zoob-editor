@@ -35,7 +35,7 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	
 	private JSONObject serieObj = null;
 	
-	private int communityID;
+	private long communityID;
 	
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
@@ -47,7 +47,7 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 			finish();
 		}
 		
-		communityID = i.getIntExtra("communityID", -1);
+		communityID = i.getLongExtra("communityID", -1);
 		if (communityID == -1) {
 			Log.e(TAG, "onCreate : serieid = -1");
 			finish();
@@ -58,18 +58,16 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 	
 	@Override
 	protected void onContentReady (String result) {
-		try {
-			if (result != null) {
-				serieObj = new JSONObject(result);
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
+		if (result == null) {
+			Log.e(TAG, "onContentReady : null result");
+			finish();
 		}
 		
 		setContentView(R.layout.serieview);
 		
 		TextView serieName = (TextView)findViewById(R.id.name);
 		try {
+			serieObj = new JSONObject(result);
 	    serieName.setText(serieObj.getString("name"));
 			/*GridView gridView = (GridView)findViewById(android.R.id.list);
 			gridView.setAdapter(new LevelsAdapter(this, serieObj.getJSONArray("levels")));*/
