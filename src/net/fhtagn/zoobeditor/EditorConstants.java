@@ -41,7 +41,7 @@ public class EditorConstants {
 	/**
 	 * Zoobweb
 	 */
-	private static final boolean production = false; 
+	private static final boolean production = true; 
 	private static final String SERVER_URL = "http://zoobweb.appspot.com/rest";
 	private static final String LOCAL_URL = "http://192.168.0.2:8080/rest";
 	

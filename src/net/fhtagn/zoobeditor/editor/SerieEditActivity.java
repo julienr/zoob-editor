@@ -50,7 +50,6 @@ public class SerieEditActivity extends ListActivity {
 	static final int MENU_ITEM_DELETE = 2;
 	
 	private JSONObject serieObj;
-	private JSONArray levelsArray;
 	
 	private int levelToDelete = -1;
 	
@@ -89,7 +88,6 @@ public class SerieEditActivity extends ListActivity {
 				arr = new JSONArray();
 				serieObj.put("levels", arr);
 			}
-			levelsArray  = arr;
 	    
 	    setListAdapter(new SerieAdapter());
 	    getListView().setOnCreateContextMenuListener(this);
@@ -201,6 +199,7 @@ public class SerieEditActivity extends ListActivity {
 		try {
       JSONArray newArray = new JSONArray();
       //Copy all the objects between the beginning and min
+      final JSONArray levelsArray = serieObj.getJSONArray("levels");
       for (int i=0; i<levelsArray.length(); i++) {
       	if (i == from) {
       		
@@ -218,7 +217,6 @@ public class SerieEditActivity extends ListActivity {
       	}
       }
       serieObj.put("levels", newArray);
-      levelsArray = newArray;
       /*Log.i(TAG, "newArray : ");
       for (int i=0; i<newArray.length(); i++) {
       	Log.i(TAG, "" + i + ":"+newArray.getJSONObject(i).getInt("xdim")+"*"+newArray.getJSONObject(i).getInt("ydim"));
@@ -279,17 +277,26 @@ public class SerieEditActivity extends ListActivity {
 					int levelNumber = data.getIntExtra("number", -1);
 					try {
 			      JSONObject levelObj = new JSONObject(levelJSON);
+			      final JSONArray levelsArray = serieObj.getJSONArray("levels");
 			      if (levelNumber != -1)
 			      	levelsArray.put(levelNumber, levelObj);
 			      else {
 			      	levelsArray.put(levelObj);
 			      	levelNumber = levelsArray.length()-1;
 			      }
+			      serieObj.put("levels", levelsArray);
 			      notifyAdapter();
 			      if (resultCode == EditorConstants.RESULT_OK_PLAY) {
-			      	save();
-			      	Common.Level.play(this, Common.extractId(serieUri), levelNumber, EditorConstants.REQUEST_PLAY_RETURN_TO_EDITOR);
 			      	levelToEdit = levelNumber;
+			      	//FIXME: This is REALLY ugly, but this is because it looks like the save() called from notifyAdapter()
+			      	//isn't blocking. And therefore, Zoob is launched and queries the content provider for the serie, but 
+			      	//the old serie WITHOUT any new level is sent back
+			      	try {
+	              Thread.sleep(500);
+              } catch (InterruptedException e) {
+	              e.printStackTrace();
+              }
+			      	Common.Level.play(this, Common.extractId(serieUri), levelNumber, EditorConstants.REQUEST_PLAY_RETURN_TO_EDITOR);
 			      }
 		      } catch (JSONException e) {
 			      e.printStackTrace();
@@ -311,8 +318,7 @@ public class SerieEditActivity extends ListActivity {
 					return;
 				}
 				try {
-					serieObj = new JSONObject("json");
-					levelsArray = serieObj.getJSONArray("levels");
+					serieObj = new JSONObject(data.getStringExtra("json"));
 					notifyAdapter();
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -346,7 +352,7 @@ public class SerieEditActivity extends ListActivity {
 	
 	protected void launchEditor (int position) {
 		try {
-	    JSONObject obj = levelsArray.getJSONObject(position);
+	    JSONObject obj = serieObj.getJSONArray("levels").getJSONObject(position);
 	    doLaunch(position, obj);
     } catch (JSONException e) {
 	    e.printStackTrace();
@@ -421,12 +427,12 @@ public class SerieEditActivity extends ListActivity {
 		try {
 			JSONArray newArray = new JSONArray();
 			// Copy all the objects between the beginning and min
+			final JSONArray levelsArray = serieObj.getJSONArray("levels");
 			for (int i = 0; i < levelsArray.length(); i++) {
 				if (i != levelToDelete)
 					newArray.put(levelsArray.getJSONObject(i));
 			}
 			serieObj.put("levels", newArray);
-			levelsArray = newArray;
 			notifyAdapter();
 			levelToDelete = -1;
 		} catch (JSONException e) {
@@ -438,13 +444,18 @@ public class SerieEditActivity extends ListActivity {
 	class SerieAdapter extends BaseAdapter {				
 		@Override
     public int getCount() {
-			return levelsArray.length();
+			try {
+	      return serieObj.getJSONArray("levels").length();
+      } catch (JSONException e) {
+	      e.printStackTrace();
+	      return 0;
+      }
     }
 
 		@Override
     public Object getItem(int position) {
 	    try {
-	      return levelsArray.get(position);
+	      return serieObj.getJSONArray("levels").get(position);
       } catch (JSONException e) {
 	      e.printStackTrace();
 	      return null;
@@ -467,7 +478,7 @@ public class SerieEditActivity extends ListActivity {
 			//TextView textName = (TextView)view.findViewById(R.id.name);
 			MiniLevelView levelView = (MiniLevelView)view.findViewById(R.id.minilevel);
 			try {
-	      JSONObject levelObj = levelsArray.getJSONObject(position);
+	      JSONObject levelObj = serieObj.getJSONArray("levels").getJSONObject(position);
 	      //textName.setText("Level " + position + " ["+levelObj.getInt("xdim")+","+levelObj.getInt("ydim")+"]");
 	      levelView.setLevel(levelObj);
       } catch (JSONException e) {
