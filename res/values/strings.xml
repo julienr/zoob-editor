@@ -61,6 +61,7 @@
 <string name="update_available">Updated</string>
 <string name="select_tool">Select tool</string>
 <string name="err_already_rated">You have already this serie</string>
+<string name="loading">Loading...</string>
 
 <string name="dlg_rate_title">Rate this serie</string>
 

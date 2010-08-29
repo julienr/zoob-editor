@@ -2,9 +2,11 @@ package net.fhtagn.zoobeditor;
 
 import java.net.URI;
 
-import android.accounts.Account;
+import com.google.android.accounts.Account;
+
 import android.app.Activity;
 import android.graphics.Color;
+import android.os.Build;
 
 public class EditorConstants {
 	public static final String TAG  = "ZoobEditor";
@@ -37,6 +39,11 @@ public class EditorConstants {
 	
 	public static final int COLOR_UPLOADED = Color.parseColor("#FF50AB86");
 	public static final int COLOR_NOT_UPLOADED = Color.parseColor("#FFBC3300");
+	
+	public static boolean hasAccountManager() {
+    return Integer.parseInt(Build.VERSION.SDK) >= 7;
+  }
+
 	
 	/**
 	 * Zoobweb

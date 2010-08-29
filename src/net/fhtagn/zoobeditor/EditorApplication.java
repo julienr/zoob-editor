@@ -2,6 +2,7 @@ package net.fhtagn.zoobeditor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -18,11 +19,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.android.accounts.Account;
+import com.google.android.accounts.AccountManager;
+import com.google.android.accounts.AuthenticatorException;
+import com.google.android.accounts.OperationCanceledException;
+
 import net.fhtagn.zoobeditor.R;
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -34,6 +36,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.MotionEvent;
 
 public class EditorApplication extends Application {
 	static final String TAG = "EditorApplication";
@@ -51,6 +54,8 @@ public class EditorApplication extends Application {
 			syncDownloadedSeries();
 			syncMySeries();
 		}
+		
+		//FIXME: check if zoob is installed and display an error if not
 	}
 	
 	/**
