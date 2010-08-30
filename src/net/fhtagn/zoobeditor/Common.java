@@ -22,6 +22,7 @@ import net.fhtagn.zoobeditor.browser.UploadActivity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -51,6 +52,7 @@ public class Common {
 	
 	public static Intent playSerie (long id) {
 		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", ContentUris.withAppendedId(Series.CONTENT_URI, id));
+		i.setClassName("net.fhtagn.zoobgame", "net.fhtagn.zoobgame.Zoob");
 		return i;
 	}
 	
@@ -65,12 +67,14 @@ public class Common {
 		builder.path("/series/"+serieId);
 		builder.appendQueryParameter("startlevel", ""+level);
 		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", builder.build());
+		i.setClassName("net.fhtagn.zoobgame", "net.fhtagn.zoobgame.Zoob");
 		return i;
 	}
 	
 	public static Intent playLevel (String json) {
 		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", Uri.parse("content://net.fhtagn.zoobgame.SerieContentProvider/level"));
 		i.putExtra("json", json);
+		i.setClassName("net.fhtagn.zoobgame", "net.fhtagn.zoobgame.Zoob");
 		return i;
 	}
 	
