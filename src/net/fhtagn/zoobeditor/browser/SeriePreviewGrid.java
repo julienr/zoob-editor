@@ -1,6 +1,7 @@
 package net.fhtagn.zoobeditor.browser;
 
 import net.fhtagn.zoobeditor.Common;
+import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.editor.LevelView;
 import net.fhtagn.zoobeditor.editor.cell.WallCell;
 import net.fhtagn.zoobeditor.editor.utils.Coords;
@@ -40,6 +41,8 @@ public class SeriePreviewGrid extends View {
 	//number of levels we can put on the same row
 	private int numHoriz;
 	
+	private int numLevels;
+	
 	private final static Paint blackPaint = new Paint();
 	private final static Paint whitePaint = new Paint();
 	static {
@@ -65,15 +68,6 @@ public class SeriePreviewGrid extends View {
     }
 
     determineColumns (widthSize);
-    
-    
-    int numLevels = 0;
-    try {
-			JSONArray levels = serieObj.getJSONArray("levels");
-			numLevels = levels.length();
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
 
     heightSize = 0;
     for (int i = 0; i < numLevels; i += numHoriz) {
@@ -90,6 +84,13 @@ public class SeriePreviewGrid extends View {
 		Log.i(TAG, "availableSpace : " + availableSpace);
 		numHoriz = availableSpace/(Common.dp2pixels(getContext(), cellSize) + Common.dp2pixels(getContext(), horizontalMargin));
 		Log.i(TAG, "num horiz series : " + numHoriz);
+		
+		//Limit the number of levels shown
+		try {
+			numLevels = Math.min(serieObj.getJSONArray("levels").length(), numHoriz*EditorConstants.PREVIEW_NUMROWS);
+		} catch (JSONException e) {
+			numLevels = 0;
+		}
 	}
 	
 	@Override
@@ -114,7 +115,7 @@ public class SeriePreviewGrid extends View {
     offsetY = (levelHeightPx - LevelView.LEVEL_MAX_HEIGHT * size) / 2;
 
     bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-    drawBitmap();
+    createBitmap();
 	}
 	
 	public void setSerie (JSONObject serieObj) {
@@ -163,7 +164,7 @@ public class SeriePreviewGrid extends View {
 		}
 	}
 	
-	protected void drawBitmap () {
+	protected void createBitmap () {
 		if (serieObj == null || bitmap == null) 
 			return;
 		try {
@@ -179,7 +180,7 @@ public class SeriePreviewGrid extends View {
 			int currentX = horizMargin;
 			int currentY = vertMargin;
 			
-			for (int i=0; i<levels.length(); i++) {
+			for (int i=0; i<numLevels; i++) {
 				JSONObject levelObj = levels.getJSONObject(i);
 				
 				canvas.save();

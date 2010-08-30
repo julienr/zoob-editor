@@ -33,33 +33,74 @@
       android:layout_width="fill_parent"
       android:layout_height="fill_parent"
       android:orientation="vertical" >
+        <!--  RATING -->
 			  <TextView android:id="@+id/my_rating_separator"
 			    style="@style/TextView.Separator"
 			    android:text="@string/my_rating" />
 			    
-			  <RatingBar android:id="@+id/my_rating"
-			      android:layout_width="wrap_content"
-			      android:layout_height="wrap_content"
-			      android:padding="2dip"
-			      style="?android:attr/ratingBarStyleIndicator"
-			      android:numStars="5"
-			      android:rating="2.5" />
-			      
-			   <TextView 
+			  <LinearLayout
+			   android:layout_width="fill_parent"
+			   android:layout_height="wrap_content"
+			   android:background="#656565">
+				  <RatingBar android:id="@+id/my_rating"
+				      android:layout_width="wrap_content"
+				      android:layout_height="wrap_content"
+				      android:padding="2dip"
+				      style="?android:attr/ratingBarStyleIndicator"
+				      android:numStars="5"
+				      android:rating="2.5" />
+			 </LinearLayout>
+			  
+			  <!--  GENERAL INFOS -->    
+			  <TextView 
+          style="@style/TextView.Separator"
+          android:text="@string/serie_infos" />
+        <TableLayout 
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:gravity="left"
+          android:stretchColumns="2">
+          <!--  author -->
+          <TableRow>
+	          <TextView android:text="@string/author"
+	            android:textStyle="bold"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content" 
+	            android:padding="5dip"/>
+	          <TextView android:id="@+id/serie_author"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content" />
+          </TableRow>
+          <!--  num levels -->
+          <TableRow>
+	          <TextView android:text="@string/num_levels"
+	            android:layout_width="wrap_content"
+	            android:textStyle="bold"
+	            android:padding="5dip"
+	            android:layout_height="wrap_content" />
+	          <TextView android:id="@+id/serie_num_levels"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content" />
+          </TableRow>
+          <!--  progress -->
+          <TableRow>
+	          <TextView android:text="@string/your_progress"
+	            android:textStyle="bold"
+	            android:padding="5dip"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content" />
+	          <TextView android:id="@+id/progress"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content" />
+          </TableRow>
+        </TableLayout>
+			  
+			  <!--  LEVELS PREVIEW -->    
+			  <TextView 
 			    style="@style/TextView.Separator"
 			    android:text="@string/serie_preview" />
 			    
-			   <!-- <GridView  
-			     android:id="@android:id/list"
-			     android:layout_width="fill_parent" 
-			     android:layout_height="wrap_content"
-			     android:numColumns="auto_fit"
-			     android:verticalSpacing="10dp"
-			     android:horizontalSpacing="10dp"
-			     android:columnWidth="90dp"
-			     android:stretchMode="columnWidth"
-			     android:gravity="center"/>-->
-			   <net.fhtagn.zoobeditor.browser.SeriePreviewGrid
+			  <net.fhtagn.zoobeditor.browser.SeriePreviewGrid
 			     android:id="@+id/seriepreview"
 			     android:layout_width="fill_parent"
 			     android:layout_height="wrap_content"/>

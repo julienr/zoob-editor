@@ -73,6 +73,15 @@ public class OnlineSerieViewActivity extends URLFetchActivity {
 			gridView.setAdapter(new LevelsAdapter(this, serieObj.getJSONArray("levels")));*/
 	    SeriePreviewGrid previewGrid = (SeriePreviewGrid)findViewById(R.id.seriepreview);
 	    previewGrid.setSerie(serieObj);
+	    
+	    TextView authorView = (TextView)findViewById(R.id.serie_author);
+	    authorView.setText(serieObj.getJSONObject("meta").getString("author"));
+	    
+	    TextView numLvlView = (TextView)findViewById(R.id.serie_num_levels);
+	    numLvlView.setText(""+serieObj.getJSONArray("levels").length());
+	    
+	    TextView progressView = (TextView)findViewById(R.id.progress);
+	    progressView.setText(R.string.no_progress);
     } catch (JSONException e) {
     	serieName.setText("Error loading serie from JSON");
 	    e.printStackTrace();

@@ -163,6 +163,9 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 	        		
 	        		downloadStatus.setText(R.string.update_available);
 	        		downloadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
+	        	} else if (cur.getInt(cur.getColumnIndex(Series.IS_MINE)) == 1) {
+	        		downloadStatus.setText(R.string.mine);
+	        		downloadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);
 	        	} else {
 	        		downloadStatus.setText(R.string.downloaded);
 	        		downloadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);

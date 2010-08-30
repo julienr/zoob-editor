@@ -45,6 +45,11 @@ public class EditorConstants {
 	public static final int COLOR_NOT_UPLOADED = Color.parseColor("#FFBC3300");
 	
 	/**
+	 * Maximum number of rows of levels displayed in preview
+	 */
+	public static final int PREVIEW_NUMROWS = 2;
+	
+	/**
 	 * Zoobweb
 	 */
 	private static final boolean production = true; 

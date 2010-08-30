@@ -50,11 +50,7 @@ public class Common {
 
 	
 	public static Intent playSerie (long id) {
- 		Uri.Builder builder = new Uri.Builder();
-		builder.scheme("content");
-		builder.authority("net.fhtagn.zoobgame");
-		builder.path("/series/"+id);
-		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", builder.build());
+		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", ContentUris.withAppendedId(Series.CONTENT_URI, id));
 		return i;
 	}
 	
@@ -73,11 +69,7 @@ public class Common {
 	}
 	
 	public static Intent playLevel (String json) {
-		Uri.Builder builder = new Uri.Builder();
-		builder.scheme("content");
-		builder.authority("net.fhtagn.zoobgame");
-		builder.path("/level/");
-		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", builder.build());
+		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", Uri.parse("content://net.fhtagn.zoobgame.SerieContentProvider/level"));
 		i.putExtra("json", json);
 		return i;
 	}

@@ -57,6 +57,7 @@
 <string name="not_uploaded">Not uploaded</string>
 <string name="downloaded">Downloaded</string>
 <string name="not_downloaded">Not downloaded</string>
+<string name="mine">Your serie</string>
 <string name="modified">Modified</string>
 <string name="update_available">Updated</string>
 <string name="select_tool">Select tool</string>
@@ -73,6 +74,11 @@
 <string name="goto_prefs">Open preferences</string>
 
 <string name="item_whole_serie">All levels</string>
+<string name="author">Author</string>
+<string name="num_levels">Levels</string>
+<string name="serie_infos">General informations</string>
+<string name="no_progress">Not started yet</string>
+<string name="your_progress">Your progress</string>
 
 <!--  Level Options -->
 <string name="level_pref_general">General</string>

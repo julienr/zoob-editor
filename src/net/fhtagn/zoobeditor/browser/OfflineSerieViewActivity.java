@@ -66,7 +66,7 @@ public class OfflineSerieViewActivity extends Activity {
 			finish();
 		}
 		
-		Cursor cursor = managedQuery(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), new String[]{Series.UPDATE_AVAILABLE, Series.COMMUNITY_ID, Series.JSON, Series.RATING, Series.MY_RATING, Series.NAME, Series.PROGRESS}, null, null, null);
+		Cursor cursor = managedQuery(ContentUris.withAppendedId(Series.CONTENT_URI, serieID), new String[]{Series.UPDATE_AVAILABLE, Series.COMMUNITY_ID, Series.JSON, Series.RATING, Series.AUTHOR, Series.NUM_LEVELS, Series.MY_RATING, Series.NAME, Series.PROGRESS}, null, null, null);
 		if (!cursor.moveToFirst()) {
 			Log.e(TAG, "onCreate: !cur.moveToFirst");
 			finish();
@@ -81,11 +81,18 @@ public class OfflineSerieViewActivity extends Activity {
 			serieObj = new JSONObject(cursor.getString(cursor.getColumnIndex(Series.JSON)));
 			TextView serieName = (TextView)findViewById(R.id.name);
 			serieName.setText(serieObj.getString("name"));
-			/*GridView gridView = (GridView)findViewById(android.R.id.list);
-			gridView.setAdapter(new LevelsAdapter(this, serieObj.getJSONArray("levels")));*/
 			SeriePreviewGrid previewGrid = (SeriePreviewGrid)findViewById(R.id.seriepreview);
 	    previewGrid.setSerie(serieObj);
 	    
+	    TextView authorView = (TextView)findViewById(R.id.serie_author);
+	    authorView.setText(cursor.getString(cursor.getColumnIndex(Series.AUTHOR)));
+	    
+	    TextView numLvlView = (TextView)findViewById(R.id.serie_num_levels);
+	    int numLvls = cursor.getInt(cursor.getColumnIndex(Series.NUM_LEVELS));
+	    numLvlView.setText(""+numLvls);
+	    
+	    TextView progressView = (TextView)findViewById(R.id.progress);
+	    progressView.setText(""+cursor.getInt(cursor.getColumnIndex(Series.PROGRESS)) + "/"+numLvls);
 	    
 	    //BEGIN rating
 	    RatingBar myRating = (RatingBar)findViewById(R.id.my_rating);
