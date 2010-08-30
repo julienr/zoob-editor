@@ -16,6 +16,7 @@
             </intent-filter>
         </activity>
         
+        <activity android:name=".InstallZoob"/>
         <activity android:name=".browser.UploadActivity"/>
         <activity android:name=".browser.DeleteActivity"/>
         <activity android:name=".browser.RateActivity"/>

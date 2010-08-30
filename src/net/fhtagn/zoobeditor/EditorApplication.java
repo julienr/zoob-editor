@@ -52,12 +52,20 @@ public class EditorApplication extends Application {
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		authManager = AuthManager.getAuthManager(getApplicationContext());
 		
-		if (Common.hasInternet(getApplicationContext())) {
-			syncDownloadedSeries();
-			syncMySeries();
+		if (Common.isZoobInstalled(getApplicationContext())) {
+			if (Common.hasInternet(getApplicationContext())) {
+				syncDownloadedSeries();
+				syncMySeries();
+			}
 		}
-		
-		//FIXME: check if zoob is installed and display an error if not
+	}
+	
+	public boolean checkZoob (Activity activity) {
+		if (!Common.isZoobInstalled(getApplicationContext())) { 
+			activity.startActivity(new Intent(getApplicationContext(), InstallZoob.class));
+			return false;
+		}
+		return true;
 	}
 	
 	public AuthManager getAuthManager () {

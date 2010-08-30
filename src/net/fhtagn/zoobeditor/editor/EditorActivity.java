@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.fhtagn.zoobeditor.Common;
+import net.fhtagn.zoobeditor.EditorApplication;
 import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.editor.LevelView.UndoListener;
 import net.fhtagn.zoobeditor.editor.tools.EraseTool;
@@ -83,6 +84,12 @@ public class EditorActivity extends Activity {
 	@Override
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
+		
+		if (!((EditorApplication)getApplication()).checkZoob(this)) {
+			finish();
+			return;
+		}
+		
 		Intent i = getIntent();
 		if (!i.hasExtra("json")) { 
 			//FIXME: ONLY FOR DEBUG

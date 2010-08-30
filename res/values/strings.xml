@@ -64,6 +64,11 @@
 <string name="err_already_rated">You have already this serie</string>
 <string name="loading">Loading...</string>
 
+<string name="explain_need_zoob">
+This application allows you to create and share level for a game called "Zoob". \n 
+Therefore, you need to have this game installed before you can use this level editor. \n
+Would you like to download "Zoob" now ?</string>
+<string name="explain_need_zoob_title">Another application is required</string>
 <string name="dlg_rate_title">Rate this serie</string>
 
 <string name="my_rating">My rating</string>

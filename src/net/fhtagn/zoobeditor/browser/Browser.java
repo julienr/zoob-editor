@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TabHost;
 import android.widget.TabWidget;
+import net.fhtagn.zoobeditor.EditorApplication;
 
 public class Browser extends TabActivity {
 	static final String TAG = "ZoobEditor";
@@ -21,6 +22,11 @@ public class Browser extends TabActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if (!((EditorApplication)getApplication()).checkZoob(this)) {
+			finish();
+			return;
+		}
 		
 		Resources res = getResources();
 		TabHost tabHost = getTabHost();

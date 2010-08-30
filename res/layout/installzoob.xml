@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent" 
+                android:layout_height="wrap_content"
+                android:padding="10px" >
+	  <RelativeLayout android:id="@+id/title"
+	    android:layout_width="fill_parent"
+	    style="@style/Title">
+		   <TextView 
+		      android:layout_width="wrap_content"
+		      android:layout_height="wrap_content"
+		      android:layout_centerInParent="true"
+		      android:text="@string/explain_need_zoob_title"
+		      style="@style/TextView.Title" />
+	  </RelativeLayout>
+
+    <TextView android:id="@+id/explain"
+      android:layout_width="fill_parent" 
+      android:layout_height="wrap_content" 
+      android:layout_below="@id/title"
+      android:singleLine="false"
+      android:text="@string/explain_need_zoob" />
+  
+    <Button android:id="@+id/ok" 
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content" 
+            android:layout_below="@id/explain"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="10px"
+            android:text="@string/ok" />
+
+    <Button android:id="@+id/cancel"
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/ok"
+            android:layout_alignTop="@id/ok"
+            android:text="@string/cancel" />
+</RelativeLayout>

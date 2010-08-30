@@ -27,6 +27,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -47,6 +48,17 @@ public class Common {
 	public static final int dp2pixels (Context ctx, float dp) { 
 		final float scale = ctx.getResources().getDisplayMetrics().density;
 		return (int)(scale*dp);
+	}
+	
+	public static boolean isZoobInstalled (Context ctx) {
+		try {
+	    ctx.getPackageManager().getPackageInfo("net.fhtagn.zoobgame", 0);
+	    Log.i(TAG, "zoob found");
+	    return true;
+    } catch (NameNotFoundException e) {
+    	Log.i(TAG, "zoob not found");
+    	return false;
+    } 
 	}
 
 	
