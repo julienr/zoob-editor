@@ -3,11 +3,11 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
-  android:orientation="vertical">  
+  android:orientation="vertical"
+  android:weightSum="1">  
   
   <RelativeLayout
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
     style="@style/Title">
     <TextView android:id="@+id/title"
       android:layout_centerInParent="true"
@@ -20,7 +20,7 @@
         xmlns:ti="http://schemas.android.com/apk/res/net.fhtagn.zoobeditor"
         android:id="@android:id/list"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dip"
         android:drawSelectorOnTop="false"
         android:scrollbars="vertical"
         android:layout_weight="1"
@@ -31,7 +31,6 @@
 
   <RelativeLayout 
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
     style="@style/Footer">
     <Button android:id="@+id/new_level"
             android:layout_width="wrap_content"

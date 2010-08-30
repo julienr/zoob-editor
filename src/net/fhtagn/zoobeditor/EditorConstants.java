@@ -2,6 +2,10 @@ package net.fhtagn.zoobeditor;
 
 import java.net.URI;
 
+import net.fhtagn.zoobeditor.accounts.AuthManager;
+import net.fhtagn.zoobeditor.accounts.ModernAuthManager;
+import net.fhtagn.zoobeditor.accounts.OldAuthManager;
+
 import com.google.android.accounts.Account;
 
 import android.app.Activity;
@@ -39,11 +43,6 @@ public class EditorConstants {
 	
 	public static final int COLOR_UPLOADED = Color.parseColor("#FF50AB86");
 	public static final int COLOR_NOT_UPLOADED = Color.parseColor("#FFBC3300");
-	
-	public static boolean hasAccountManager() {
-    return Integer.parseInt(Build.VERSION.SDK) >= 7;
-  }
-
 	
 	/**
 	 * Zoobweb
@@ -94,8 +93,8 @@ public class EditorConstants {
 		return author.name;
 	}
 	
-	public static String getByAuthorListUrl (Account author) { 
-		return getServerUrl()+"/?author="+getAuthorIdentification(author);
+	public static String getByAuthorListUrl (String author) { 
+		return getServerUrl()+"/?author="+author;
 	}
 	
 	public static String getDetailsUrl (long serieId) {

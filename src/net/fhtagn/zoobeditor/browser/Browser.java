@@ -7,6 +7,7 @@ import android.app.TabActivity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,6 +54,11 @@ public class Browser extends TabActivity {
 			final float scale = res.getDisplayMetrics().density;
 			tw.getChildAt(i).getLayoutParams().height = (int)(scale*40); //40 dip for tab height (converted to pixels by using scale 
 		}
+		
+		// light theme support
+		tabHost.setBackgroundColor(Color.WHITE);
+		tabHost.getTabWidget().setBackgroundColor(Color.BLACK);
+
 	}
 	
 	@Override

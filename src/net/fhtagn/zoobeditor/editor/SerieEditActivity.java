@@ -94,21 +94,6 @@ public class SerieEditActivity extends ListActivity {
 	    
 	    /** Drag'n'drop reordering */
 	    TouchInterceptor listView = (TouchInterceptor)getListView();
-	    /*listView.setDragListener(new DragListener() {
-				@Override
-        public void drag(int from, int to) {
-					//FIXME: highlight the place where it would end ?
-        }
-	    });*/
-	    
-	    //FIXME: enable a way to remove levels
-	    //Remove is disallowed
-	    /*listView.setRemoveListener(new RemoveListener() {
-				@Override
-        public void remove(int which) {
-	        Log.i(TAG, "remove " + which);
-        }
-	    });*/
 	    
 	    listView.setDropListener(new TouchInterceptor.DropListener() {
 				@Override

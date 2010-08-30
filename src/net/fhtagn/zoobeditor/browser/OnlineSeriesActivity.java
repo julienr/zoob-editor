@@ -159,7 +159,7 @@ public class OnlineSeriesActivity extends URLFetchActivity implements OnItemClic
 	        		//mark this serie as updated
 	        		ContentValues values = new ContentValues();
 	        		values.put(Series.UPDATE_AVAILABLE, true);
-	        		getContentResolver().insert(ContentUris.withAppendedId(Series.CONTENT_URI, cur.getLong(cur.getColumnIndex(Series.ID))), values);
+	        		getContentResolver().update(ContentUris.withAppendedId(Series.CONTENT_URI, cur.getLong(cur.getColumnIndex(Series.ID))), values, null, null);
 	        		
 	        		downloadStatus.setText(R.string.update_available);
 	        		downloadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);

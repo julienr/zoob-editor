@@ -12,9 +12,10 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import net.fhtagn.zoobeditor.accounts.AuthManager;
 
 //Base classe for activities that involve a blocking server request with authentification
-public abstract class ServerRequestActivity extends Activity implements EditorApplication.OnAuthenticatedCallback {
+public abstract class ServerRequestActivity extends Activity implements AuthManager.OnAuthenticatedCallback {
 	private static final String TAG = "UploadActivity";
 	
 	static final int DIALOG_PROGRESS = 1;
@@ -36,7 +37,7 @@ public abstract class ServerRequestActivity extends Activity implements EditorAp
 		
 		showDialog(DIALOG_PROGRESS);
 		app = (EditorApplication)getApplication();
-		app.authenticate(this, httpClient, this);
+		app.getAuthManager().authenticate(this, httpClient, this);
 	}
 	
 	//successMessage is the message that will be displayed if the request succeed

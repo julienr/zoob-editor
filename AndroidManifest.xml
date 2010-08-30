@@ -49,11 +49,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     
     <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH" />
-	  <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.local" />
-	  <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.wise" />
-	  <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.writely" />
-	  <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    
+    <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.ah" />
     
     <uses-sdk android:minSdkVersion="3" />
     <supports-screens

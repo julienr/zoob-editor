@@ -25,6 +25,7 @@ import com.google.android.accounts.AuthenticatorException;
 import com.google.android.accounts.OperationCanceledException;
 
 import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.accounts.AuthManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -42,13 +43,14 @@ public class EditorApplication extends Application {
 	static final String TAG = "EditorApplication";
 
 	private SharedPreferences prefs;
-	private AccountManager accountManager;
+
+	private AuthManager authManager;
 	
 	@Override
 	public void onCreate () {
 		super.onCreate();
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		accountManager = AccountManager.get(getApplicationContext());
+		authManager = AuthManager.getAuthManager(getApplicationContext());
 		
 		if (Common.hasInternet(getApplicationContext())) {
 			syncDownloadedSeries();
@@ -58,23 +60,27 @@ public class EditorApplication extends Application {
 		//FIXME: check if zoob is installed and display an error if not
 	}
 	
+	public AuthManager getAuthManager () {
+		return authManager;
+	}
+	
 	/**
 	 * This background task will synchronize the "my series list" with the list of series we have authored as stored on the server
 	 */
 	public void syncMySeries () {
-		final Account currentAccount = findAccount();
-		if (currentAccount == null || !Common.hasInternet(getApplicationContext()))
+		final String account = authManager.getAuthorIdentification();
+		if (account == null || !Common.hasInternet(getApplicationContext()))
 			return;
 		
 		(new Thread() {
 			@Override
 			public void run () {
-				Log.i(TAG, "Launching background syncMySeries() for account : " + EditorConstants.getAuthorIdentification(currentAccount));
+				Log.i(TAG, "Launching background syncMySeries() for account : " + account);
 				HttpClient httpClient = new DefaultHttpClient();
-				String result = Common.urlQuery(httpClient, EditorConstants.getByAuthorListUrl(currentAccount));
+				String result = Common.urlQuery(httpClient, EditorConstants.getByAuthorListUrl(account));
 				if (result != null) {
 					try {
-	          insertAsMineFromJSON(httpClient, new JSONArray(result), currentAccount);
+	          insertAsMineFromJSON(httpClient, new JSONArray(result), account);
 						Log.i(TAG, "syncMySeries done");
           } catch (JSONException e) {
 	          e.printStackTrace();
@@ -86,7 +92,7 @@ public class EditorApplication extends Application {
 	}
 	
 	/**
-	 * This background task synchronize the downloaded series list (download updates)
+	 * This background task synchronize the downloaded series list (mark updatabale series)
 	 */
 	public void syncDownloadedSeries () {
 		(new Thread() {
@@ -123,7 +129,7 @@ public class EditorApplication extends Application {
 	}
 	
 	//Will insert in the local database all the series in arr that aren't yet in the DB
-	private void insertAsMineFromJSON (HttpClient httpClient, JSONArray arr, Account myAccount) {
+	private void insertAsMineFromJSON (HttpClient httpClient, JSONArray arr, String account) {
 		try {
 			int len = arr.length();
 			HashSet<Long> remoteIDs = new HashSet<Long>();
@@ -132,7 +138,7 @@ public class EditorApplication extends Application {
 				JSONObject serie = arr.getJSONObject(i);
 				JSONObject meta = serie.getJSONObject("meta");
 				String author = meta.getString("author");
-				if (!author.equals(EditorConstants.getAuthorIdentification(myAccount)))
+				if (!author.equals(account))
 					continue; //wrong author
 				long communityID = meta.getLong("id");
 				remoteIDs.add(communityID);
@@ -178,161 +184,5 @@ public class EditorApplication extends Application {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	//Retrieve account from preferences
-	private Account findAccount () {
-		String accountName = prefs.getString(getResources().getString(R.string.pref_key_account), "");
-		if (accountName == "")
-			return null;
-		
-		final Account[] accounts = AccountManager.get(this).getAccountsByType(EditorConstants.ACCOUNT_TYPE);
-		for (Account a: accounts) {
-			if (a.name.equals(accountName)) {
-				return a;
-			}
-		}
-		return null;
-	}
-	
-	public interface OnAuthenticatedCallback {
-		public void authenticated (DefaultHttpClient httpClient);
-		public void authenticationError (DefaultHttpClient httpClient, String error);
-		public void authenticationCanceled (DefaultHttpClient httpClient);
-	}
-	
-	
-	private void authError (final Activity activity, final DefaultHttpClient httpClient, final OnAuthenticatedCallback callback, final String msg) {
-		activity.runOnUiThread(new Runnable() {
-			public void run () {
-				callback.authenticationError(httpClient, msg);
-			}
-		});
-	}
-	
-	private void authSuccess (final Activity activity, final DefaultHttpClient httpClient, final OnAuthenticatedCallback callback) {
-		activity.runOnUiThread(new Runnable() {
-			public void run () {
-				callback.authenticated(httpClient);
-			}
-		});
-	}
-	
-	private void authCancel (final Activity activity, final DefaultHttpClient httpClient, final OnAuthenticatedCallback callback) {
-		activity.runOnUiThread(new Runnable() {
-			public void run () {
-				callback.authenticationCanceled(httpClient);
-			}
-		});
-	}
-	
-	private void showNoAccountDialog (final Activity activity, final DefaultHttpClient httpClient, final OnAuthenticatedCallback callback) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder.setTitle(R.string.dlg_no_account_title)
-					 .setMessage(R.string.dlg_no_account_msg)
-					 .setCancelable(false)
-					 .setPositiveButton(R.string.goto_prefs, new DialogInterface.OnClickListener() {
-						 @Override
-						 public void onClick (DialogInterface dialog, int id) {
-							 dialog.dismiss();
-							 authCancel(activity, httpClient, callback);
-							 Intent i = new Intent(getApplicationContext(), Preferences.class);
-							 activity.startActivity(i);
-						 }
-					 })
-					 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.dismiss();
-								authCancel(activity, httpClient, callback);
-							}
-					});
-		AlertDialog dialog = builder.create();
-		dialog.setOwnerActivity(activity);
-		dialog.show();
-	}
-	
-	//Fetch the auth cookie for the given httpClient by using the user-defined account stored in preferences
-	//Will redirect the user to the preferences panel if no account has been defined
-	//This is a non-blocking method, the given callback is called when authentication is done (or on error)
-	public void authenticate (final Activity activity, final DefaultHttpClient httpClient, final OnAuthenticatedCallback callback) {
-		final Account account = findAccount();
-		if (account == null) {
-			Log.i(TAG, "No accounts found");
-			showNoAccountDialog(activity, httpClient, callback);
-			return;
-		}
-		
-		(new Thread(){
-			public void run () {
-				try {
-					if (EditorConstants.isProd()) {
-						String authToken = accountManager.blockingGetAuthToken(account, EditorConstants.AUTH_TOKEN_TYPE, true);
-						if (authToken == null) {
-							//Indicate an error logging in,
-							authError(activity, httpClient, callback, "Received null auth token");
-							return;
-						}
-						//invalidate and get new, otherwise we might have an expired cached token, leading to authentication failure
-						accountManager.invalidateAuthToken(account.type, authToken);
-						authToken = accountManager.blockingGetAuthToken(account, EditorConstants.AUTH_TOKEN_TYPE, true);
-						
-						final String continueURL = EditorConstants.getServerUrl();
-						httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);		
-						HttpGet httpGet = new HttpGet(EditorConstants.getLoginUrl()+"/_ah/login?auth="
-								+ authToken + "&continue="+continueURL);
-						Log.i(TAG, "GET : " + httpGet.getURI().toString());
-						
-						HttpResponse response;
-				    response = httpClient.execute(httpGet);
-						if (response.getStatusLine().getStatusCode() != 302) {
-							//Response should be a redirect
-							authError(activity, httpClient, callback, "Response not a redirect. Status code : " 
-																												+ response.getStatusLine().getStatusCode() 
-																												+ ", error message : " 
-																												+ response.getStatusLine().getReasonPhrase());
-							return;
-						}
-						
-						for (Cookie cookie: httpClient.getCookieStore().getCookies()) {
-							if (cookie.getName().equals("ACSID")) {
-								//Good, we found our cookie
-								authSuccess(activity, httpClient, callback);
-								return;
-							}
-						}
-					} else {
-						httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);		
-						HttpGet httpGet = new HttpGet(EditorConstants.getLoginUrl()+"/_ah/login?email="
-								+account.name + "&action=Login&continue="+EditorConstants.getServerUrl());
-						HttpResponse response;
-				    response = httpClient.execute(httpGet);
-						if (response.getStatusLine().getStatusCode() != 302) {
-							//Response should be a redirect
-							authError(activity, httpClient, callback, "Response not a redirect. Status code : " 
-																												+ response.getStatusLine().getStatusCode() 
-																												+ ", error message : " 
-																												+ response.getStatusLine().getReasonPhrase());
-							return;
-						}
-						
-						for (Cookie cookie: httpClient.getCookieStore().getCookies()) {
-							if (cookie.getName().equals("dev_appserver_login")) {
-								//Good, we found our cookie
-								authSuccess(activity, httpClient, callback);
-							}
-						}
-					}
-		    } catch (ClientProtocolException e) {
-			    e.printStackTrace();
-		    } catch (IOException e) {
-			    e.printStackTrace();
-		    } catch (OperationCanceledException e) {
-			    e.printStackTrace();
-		    } catch (AuthenticatorException e) {
-			    e.printStackTrace();
-		    }
-			}
-		}).start();
 	}
 }

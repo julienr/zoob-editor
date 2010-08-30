@@ -2,6 +2,8 @@ package net.fhtagn.zoobeditor;
 
 import java.util.Arrays;
 
+import net.fhtagn.zoobeditor.accounts.AuthManager;
+
 import com.google.android.accounts.Account;
 import com.google.android.accounts.AccountManager;
 import com.google.android.googlelogin.GoogleLoginServiceHelper;
@@ -26,7 +28,7 @@ public class Preferences extends PreferenceActivity {
 		addPreferencesFromResource(R.layout.preferences);
 		
 		//Cannot do it from onResume, this would cause an infinite loop of onResume/onActivityResult
-		if (!EditorConstants.hasAccountManager()) { // android <= 2.1
+		if (!AuthManager.hasAccountManager()) { // android <= 2.0
 			ListPreference accounts = (ListPreference)findPreference("account");
 			accounts.setEnabled(false);
 			accounts.setSummary(R.string.loading);
@@ -37,7 +39,7 @@ public class Preferences extends PreferenceActivity {
 	@Override
 	protected void onResume () {
 		super.onResume();
-		if (EditorConstants.hasAccountManager()) { //android >= 2.1
+		if (AuthManager.hasAccountManager()) { //android >= 2.0
 			ListPreference accounts = (ListPreference)findPreference("account");
 			fillAccountsList(accounts);		
 			accounts.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
