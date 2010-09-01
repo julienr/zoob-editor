@@ -27,7 +27,11 @@ public class ModernAuthManager extends AuthManager {
 	private final AccountManager accountManager;
 	
 	public ModernAuthManager (Context ctx, String acc) {
-		setAccount(new AuthAccount(findAccount(ctx, acc)));
+		Account account = findAccount(ctx, acc);
+		if (account == null)
+			setAccount(null);
+		else
+			setAccount(new AuthAccount(account));
 		accountManager = AccountManager.get(ctx);
 	}
 	

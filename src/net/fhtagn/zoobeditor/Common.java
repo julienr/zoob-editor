@@ -45,6 +45,8 @@ public class Common {
 	public static final String MY_LEVELS_SUBDIR = "mylevels";
 	public static final String ONLINE_LEVELS_SUBDIR = "community";
 	
+	public static final String ZOOB_PACKAGE = "net.fhtagn.zoob_demo";
+	
 	public static final int dp2pixels (Context ctx, float dp) { 
 		final float scale = ctx.getResources().getDisplayMetrics().density;
 		return (int)(scale*dp);
@@ -52,7 +54,7 @@ public class Common {
 	
 	public static boolean isZoobInstalled (Context ctx) {
 		try {
-	    ctx.getPackageManager().getPackageInfo("net.fhtagn.zoobgame", 0);
+	    ctx.getPackageManager().getPackageInfo(ZOOB_PACKAGE, 0);
 	    Log.i(TAG, "zoob found");
 	    return true;
     } catch (NameNotFoundException e) {
@@ -64,7 +66,7 @@ public class Common {
 	
 	public static Intent playSerie (long id) {
 		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", ContentUris.withAppendedId(Series.CONTENT_URI, id));
-		i.setClassName("net.fhtagn.zoobgame", "net.fhtagn.zoobgame.Zoob");
+		i.setClassName(ZOOB_PACKAGE, ZOOB_PACKAGE+".Zoob");
 		return i;
 	}
 	
@@ -79,14 +81,14 @@ public class Common {
 		builder.path("/series/"+serieId);
 		builder.appendQueryParameter("startlevel", ""+level);
 		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", builder.build());
-		i.setClassName("net.fhtagn.zoobgame", "net.fhtagn.zoobgame.Zoob");
+		i.setClassName(ZOOB_PACKAGE, ZOOB_PACKAGE+".Zoob");
 		return i;
 	}
 	
 	public static Intent playLevel (String json) {
 		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", Uri.parse("content://net.fhtagn.zoobgame.SerieContentProvider/level"));
 		i.putExtra("json", json);
-		i.setClassName("net.fhtagn.zoobgame", "net.fhtagn.zoobgame.Zoob");
+		i.setClassName(ZOOB_PACKAGE, ZOOB_PACKAGE+".Zoob");
 		return i;
 	}
 	
