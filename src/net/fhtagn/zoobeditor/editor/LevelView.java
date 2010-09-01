@@ -301,6 +301,12 @@ public class LevelView extends View {
 		Log.i(TAG, "modify Cell ("+x+","+y+")");
 		if (currentTool.supportHistory())
 			addToHistory(new HistoryEntry(x, y, grid[x][y]));
+		else {
+			//clear history and disable undo. This would happen when the path
+			//tool is used for example
+			undoHistory.clear();
+			undoListener.enableUndo(false);
+		}
 		
 		grid[x][y] = currentTool.apply(grid[x][y]);
 		postInvalidate();

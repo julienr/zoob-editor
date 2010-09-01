@@ -6,7 +6,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -127,8 +130,24 @@ public class Common {
     }
 	}
 	
+	public static String dateToDB (Date date) {
+		return iso8601Format.format(date);
+	}
+	
+	public static Date getUTCTime () {
+		Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+		return cal.getTime();
+	}
+	
+	//Returns true if d1 is at least MILLIS_EPSILON before d2
+	public static long MILLIS_EPSILON = 1000*60; //1 minute
+	public static boolean epsilonBefore (Date d1, Date d2) {
+		final long diff = d2.getTime() - d1.getTime();
+		return diff > MILLIS_EPSILON;
+	}
+	
 	/*
-	*@return boolean return true if the application can access the internet
+	* @return boolean return true if the application can access the internet
 	*/
 	public static boolean hasInternet(Context ctx){
 		NetworkInfo info=((ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();

@@ -245,6 +245,8 @@ public class OfflineSerieViewActivity extends Activity {
 	public boolean onCreateOptionsMenu (Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.offlineserieview_menu, menu);
+		if (serieID == Series.ORIGINAL_ID) //disable delete on original serie
+			menu.findItem(R.id.delete).setEnabled(false);
 		Common.createCommonOptionsMenu(this, menu);
 		return true;
 	}

@@ -170,6 +170,7 @@ public class EditorApplication extends Application {
 				values.put(Series.JSON, new JSONObject(result).toString());
 				values.put(Series.IS_MINE, true);
 				values.put(Series.COMMUNITY_ID, communityID);
+				values.put(Series.UPLOAD_DATE,meta.getString("updated"));
 				getContentResolver().insert(Series.CONTENT_URI, values);
 			}
 			

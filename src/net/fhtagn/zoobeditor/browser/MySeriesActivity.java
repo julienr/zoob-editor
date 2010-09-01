@@ -191,15 +191,16 @@ public class MySeriesActivity extends ListActivity {
 			TextView uploadStatus = (TextView)view.findViewById(R.id.upload_status);
 			boolean uploaded = !cursor.isNull(cursor.getColumnIndex(Series.COMMUNITY_ID));
 			if (uploaded) {
-				//At first upload, UPLOAD_DATE field of the DB will be null
 				if (cursor.isNull(cursor.getColumnIndex(Series.UPLOAD_DATE))) {
+					//shouldn't happen, but yeah :)
+					Log.e(TAG, "Serie with community id : " + cursor.getLong(cursor.getColumnIndex(Series.COMMUNITY_ID)) + " has a NULL upload_date");
 					uploadStatus.setText(R.string.uploaded);
 					uploadStatus.setTextColor(EditorConstants.COLOR_UPLOADED);	
 				} else {
-					final String sUploadDate = cursor.getString(cursor.getColumnIndex(Series.UPLOAD_DATE));
-					Date uploadDate = Common.dateFromDB(sUploadDate);
+					Date uploadDate = Common.dateFromDB(cursor.getString(cursor.getColumnIndex(Series.UPLOAD_DATE)));
 					Date lastModification = Common.dateFromDB(cursor.getString(cursor.getColumnIndex(Series.LAST_MODIFICATION)));
-					if (uploadDate.before(lastModification)) {
+					Log.i(TAG, "upload date : " + uploadDate + " lastModification : " + lastModification);
+					if (Common.epsilonBefore(uploadDate, lastModification)) {
 						uploadStatus.setText(R.string.modified);
 						uploadStatus.setTextColor(EditorConstants.COLOR_NOT_UPLOADED);
 					} else {

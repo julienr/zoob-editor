@@ -90,6 +90,7 @@ public class UploadActivity extends ServerRequestActivity {
 	    int communityID = serieObj.getJSONObject("meta").getInt("id");
 	    ContentValues values = new ContentValues();
 	    values.put(Series.COMMUNITY_ID, communityID);
+	    values.put(Series.UPLOAD_DATE, Common.dateToDB(Common.getUTCTime()));
 	    getContentResolver().update(serieUri, values, null, null);
 	    return true;
     } catch (UnsupportedEncodingException e) {

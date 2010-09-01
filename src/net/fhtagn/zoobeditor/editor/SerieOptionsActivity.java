@@ -53,7 +53,7 @@ public class SerieOptionsActivity extends PreferenceActivity {
 		for (int i=0; i<numLevels; i++) {
 			entriesValues[i] = ""+i;
 			if (i == 0)
-				entries[0] = getResources().getString(R.string.item_whole_serie);
+				entries[0] = getResources().getString(R.string.item_whole_serie)+"("+i+")";
 			else
 				entries[i] = ""+i; 
 		}

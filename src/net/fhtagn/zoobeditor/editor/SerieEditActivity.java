@@ -462,10 +462,12 @@ public class SerieEditActivity extends ListActivity {
 			
 			//TextView textName = (TextView)view.findViewById(R.id.name);
 			MiniLevelView levelView = (MiniLevelView)view.findViewById(R.id.minilevel);
+			TextView txtView = (TextView)view.findViewById(R.id.lvlnum);
 			try {
 	      JSONObject levelObj = serieObj.getJSONArray("levels").getJSONObject(position);
 	      //textName.setText("Level " + position + " ["+levelObj.getInt("xdim")+","+levelObj.getInt("ydim")+"]");
 	      levelView.setLevel(levelObj);
+	      txtView.setText(""+position);
       } catch (JSONException e) {
       	TextView textView = new TextView(SerieEditActivity.this);
       	textView.setText("Error reading level");
