@@ -18,7 +18,7 @@ public class InstallZoob extends Activity {
 		okBtn.setOnClickListener(new OnClickListener() {
 			@Override
       public void onClick(View arg0) {
-				Uri fullVersionURI = Uri.parse("market://details?id=net.fhtagn.zoobgame");
+				Uri fullVersionURI = Uri.parse("market://details?id=net.fhtagn.zoob_demo");
 				Intent i = new Intent(Intent.ACTION_VIEW, fullVersionURI);
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(i);
