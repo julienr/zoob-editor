@@ -64,6 +64,8 @@
 <string name="err_already_rated">You have already this serie</string>
 <string name="loading">Loading...</string>
 
+<string name="help_title">Help</string>
+
 <string name="explain_need_zoob">
 This application allows you to create and share level for a game called "Zoob". \n 
 Therefore, you need to have this game installed before you can use this level editor. \n

@@ -3,21 +3,33 @@ package net.fhtagn.zoobeditor.browser;
 import net.fhtagn.zoobeditor.Common;
 import net.fhtagn.zoobeditor.Preferences;
 import net.fhtagn.zoobeditor.R;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.TabActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.webkit.WebView;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import net.fhtagn.zoobeditor.EditorApplication;
 
 public class Browser extends TabActivity {
 	static final String TAG = "ZoobEditor";
+	
+	static final int DIALOG_HELP = 1;
+	static final String HELP_SHOWN_PREF = "help_shown";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -26,6 +38,16 @@ public class Browser extends TabActivity {
 		if (!((EditorApplication)getApplication()).checkZoob(this)) {
 			finish();
 			return;
+		}
+		
+		//Show Help on first run
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		if (!prefs.getBoolean(HELP_SHOWN_PREF, false)) {
+			Log.i(TAG, "Showing first time help");
+			Common.showHelp(this);
+			SharedPreferences.Editor editor = prefs.edit();
+			editor.putBoolean(HELP_SHOWN_PREF, true);
+			editor.commit();
 		}
 		
 		Resources res = getResources();
@@ -64,7 +86,6 @@ public class Browser extends TabActivity {
 		// light theme support
 		tabHost.setBackgroundColor(Color.WHITE);
 		tabHost.getTabWidget().setBackgroundColor(Color.BLACK);
-
 	}
 	
 	@Override

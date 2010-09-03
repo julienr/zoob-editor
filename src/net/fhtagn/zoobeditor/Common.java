@@ -32,13 +32,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.webkit.WebView;
 import android.widget.RatingBar;
 
 public class Common {	
@@ -98,6 +102,30 @@ public class Common {
 	
 	public static String removeSpecialCharacters(String s) {
 	  return s.replaceAll("\\W", "");
+	}
+	
+	public static String readFromAssets(Activity activity, String fileName) {
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(new InputStreamReader(activity.getAssets().open(fileName)));
+			String line;
+			StringBuilder buffer = new StringBuilder();
+			while ((line = in.readLine()) != null)
+				buffer.append(line).append('\n');
+			return buffer.toString();
+		} catch (IOException e) {
+			return "Error loading " + fileName + "from assets.";
+		} finally {
+			//Close stream
+			if (in != null) {
+	      try {
+	        in.close();
+        } catch (IOException e) {
+        	//ignore
+	        e.printStackTrace();
+        }
+			}
+		}
 	}
 
 	public static String convertStreamToString(InputStream is) {
@@ -200,10 +228,36 @@ public class Common {
 				activity.startActivity(i);
 				return true;
 			case R.id.help:
-				//FIXME: show help
+				showHelp(activity);
 				return true;
 		}
 		return false;
+	}
+	
+	public static void showHelp (Activity activity) {
+		Dialog dialog = createHtmlDialog(activity, R.string.help_title, R.layout.html_dialog, Common.readFromAssets(activity, "help.html"));
+		dialog.setOwnerActivity(activity);
+		dialog.show();
+	}
+	
+	public static Dialog createHtmlDialog (Activity activity, int titleRes, int layoutRes, String html) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+		builder.setTitle(titleRes);
+		LayoutInflater inflater = (LayoutInflater)activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+		View view = inflater.inflate(layoutRes, null);
+		
+		WebView webView = (WebView)view.findViewById(R.id.webview);
+		webView.setBackgroundColor(Color.TRANSPARENT);
+		webView.loadData(html, "text/html", "utf-8");
+		
+		builder.setView(view);
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+      public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+      }
+		});
+		return builder.create();
 	}
 	
 	public static Dialog createConfirmDeleteDialog (Activity activity, int msgID, DialogInterface.OnClickListener listener) {
