@@ -75,8 +75,7 @@ public class SerieEditActivity extends ListActivity {
     	String serieString = cur.getString(cur.getColumnIndex(Series.JSON));
 	    serieObj = new JSONObject(serieString);
    
-	    setContentView(R.layout.serieedit);
-	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);    
+	    setContentView(R.layout.serieedit); 
 	    
 	    serieName = serieObj.getString("name");
 	    TextView titleView = (TextView)findViewById(R.id.title);

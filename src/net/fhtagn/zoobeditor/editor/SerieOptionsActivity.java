@@ -84,16 +84,16 @@ public class SerieOptionsActivity extends PreferenceActivity {
 	}
 	
 	
-	//set the given property to the given value for all levels in the serie
-	private void setPropertyOnAllLevels (String propKey, int value) {
+	//set the given property to true for all levels consecutive to firstIndex
+	private void setPropertyOnAllLevels (String propKey, int firstIndex) {
 		if (!serieObj.has("levels"))
 			return;
 		try {
 			final JSONArray arr = serieObj.getJSONArray("levels");
 			final int len = arr.length();
-			for (int i=0; i<len; i++) {
+			for (int i=Math.min(len, firstIndex); i<len; i++) {
 				JSONObject levelObj = arr.getJSONObject(i);
-				levelObj.put(propKey, value);
+				levelObj.put(propKey, true);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();

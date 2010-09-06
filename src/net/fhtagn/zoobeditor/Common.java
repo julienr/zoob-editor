@@ -75,6 +75,7 @@ public class Common {
 	public static Intent playSerie (long id) {
 		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", ContentUris.withAppendedId(Series.CONTENT_URI, id));
 		i.setClassName(ZOOB_PACKAGE, ZOOB_MAINCLASS);
+		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		return i;
 	}
 	
@@ -90,6 +91,7 @@ public class Common {
 		builder.appendQueryParameter("startlevel", ""+level);
 		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", builder.build());
 		i.setClassName(ZOOB_PACKAGE, ZOOB_MAINCLASS);
+		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		return i;
 	}
 	
@@ -97,6 +99,7 @@ public class Common {
 		Intent i = new Intent("net.fhtagn.zoobgame.PLAY", Uri.parse("content://net.fhtagn.zoobgame.SerieContentProvider/level"));
 		i.putExtra("json", json);
 		i.setClassName(ZOOB_PACKAGE, ZOOB_MAINCLASS);
+		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		return i;
 	}
 	

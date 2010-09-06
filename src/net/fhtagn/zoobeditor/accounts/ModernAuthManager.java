@@ -62,7 +62,7 @@ public class ModernAuthManager extends AuthManager {
 			public void run () {
 				try {
 					if (EditorConstants.isProd()) {
-						String authToken = accountManager.blockingGetAuthToken(account, EditorConstants.AUTH_TOKEN_TYPE, true);
+						String authToken = accountManager.blockingGetAuthToken(account, EditorConstants.AUTH_TOKEN_TYPE, false);
 						if (authToken == null) {
 							//Indicate an error logging in,
 							authError(activity, httpClient, callback, "Received null auth token");
@@ -70,7 +70,7 @@ public class ModernAuthManager extends AuthManager {
 						}
 						//invalidate and get new, otherwise we might have an expired cached token, leading to authentication failure
 						accountManager.invalidateAuthToken(account.type, authToken);
-						authToken = accountManager.blockingGetAuthToken(account, EditorConstants.AUTH_TOKEN_TYPE, true);
+						authToken = accountManager.blockingGetAuthToken(account, EditorConstants.AUTH_TOKEN_TYPE, false);
 						
 						final String continueURL = EditorConstants.getServerUrl();
 						httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);		
