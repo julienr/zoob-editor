@@ -68,6 +68,12 @@ public class EditorApplication extends Application {
 		return true;
 	}
 	
+	//Should be called when the account in preferences is changed, to recreate the auth manager
+	void accountChanged (String newAccount) {
+		Log.i(TAG, "account changed, reloading auth manager [newAcconut="+newAccount+"]");
+		authManager = AuthManager.getAuthManager(getApplicationContext(), newAccount);
+	}
+	
 	public AuthManager getAuthManager () {
 		return authManager;
 	}

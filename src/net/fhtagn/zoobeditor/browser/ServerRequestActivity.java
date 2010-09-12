@@ -16,7 +16,7 @@ import net.fhtagn.zoobeditor.accounts.AuthManager;
 
 //Base classe for activities that involve a blocking server request with authentification
 public abstract class ServerRequestActivity extends Activity implements AuthManager.OnAuthenticatedCallback {
-	private static final String TAG = "UploadActivity";
+	private static final String TAG = "ServerRequestActivity";
 	
 	static final int DIALOG_PROGRESS = 1;
 	static final int DIALOG_ERROR = 2;

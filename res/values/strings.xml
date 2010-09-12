@@ -80,6 +80,9 @@ Would you like to download "Zoob" now ?</string>
 <string name="dlg_no_account_msg">This functionnality requires that you define a Google account to use with this application. Please do so in the preferences.</string>
 <string name="goto_prefs">Open preferences</string>
 
+<string name="dlg_access_request_title">Authorization required</string>
+<string name="dlg_access_request_msg">Watch the notification area. There should be an Access Request for ZoobEditor to use your Google account. You need to allow it to continue</string>
+
 <string name="item_whole_serie">All levels</string>
 <string name="author">Author</string>
 <string name="num_levels">Levels</string>

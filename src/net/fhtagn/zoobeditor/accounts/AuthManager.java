@@ -24,10 +24,14 @@ public abstract class AuthManager {
 	
 	public static AuthManager getAuthManager (Context ctx) {
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+		return getAuthManager(ctx, prefs.getString(ctx.getResources().getString(R.string.pref_key_account), ""));
+	}
+	
+	public static AuthManager getAuthManager (Context ctx, String account) {
 		if (hasAccountManager())
-			return new ModernAuthManager(ctx, prefs.getString(ctx.getResources().getString(R.string.pref_key_account), ""));
+			return new ModernAuthManager(ctx, account);
 		else
-			return new OldAuthManager(ctx, prefs.getString(ctx.getResources().getString(R.string.pref_key_account), ""));
+			return new OldAuthManager(ctx, account);
 	}
 	
 	public static class AuthAccount {

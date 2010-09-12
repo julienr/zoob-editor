@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.fhtagn.zoobeditor.EditorConstants;
 import net.fhtagn.zoobeditor.R;
+import net.fhtagn.zoobeditor.accounts.AuthManager.OnAuthenticatedCallback;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -18,7 +19,11 @@ import com.google.android.accounts.AuthenticatorException;
 import com.google.android.accounts.OperationCanceledException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class ModernAuthManager extends AuthManager {
@@ -36,10 +41,23 @@ public class ModernAuthManager extends AuthManager {
 	}
 	
 	private Account findAccount (Context ctx, String accountName) {
-		if (accountName == "")
-			return null;
-		
 		final Account[] accounts = AccountManager.get(ctx).getAccountsByType(EditorConstants.ACCOUNT_TYPE);
+		if (accountName == "") {
+			//This will happen at first app launch. If we have only one account for the phone, use it by default without asking
+			//(user will be asked later anyway)
+			if (accounts.length == 1) {
+				final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+				SharedPreferences.Editor edit = prefs.edit();
+				edit.putString(ctx.getResources().getString(R.string.pref_key_account), accounts[0].name);
+				edit.commit();
+				Log.i(TAG, "Found unique Google account : " + accounts[0].name);
+				return accounts[0];
+			} else {
+				//User has multiple account, an dialog asking him to choose which account to use will be shown on first login
+				return null;
+			}
+		}
+		
 		for (Account a: accounts) {
 			if (a.name.equals(accountName)) {
 				return a;
@@ -62,15 +80,20 @@ public class ModernAuthManager extends AuthManager {
 			public void run () {
 				try {
 					if (EditorConstants.isProd()) {
-						String authToken = accountManager.blockingGetAuthToken(account, EditorConstants.AUTH_TOKEN_TYPE, false);
+						String authToken = accountManager.blockingGetAuthToken(account, EditorConstants.AUTH_TOKEN_TYPE, true);
 						if (authToken == null) {
-							//Indicate an error logging in,
-							authError(activity, httpClient, callback, "Received null auth token");
+							//An access request notification is shown to the user here, so just show a dialog telling him to look at the notification area
+							//FIXME: can we programatically trigger this access request when the user selects an account ?
+							activity.runOnUiThread(new Runnable () {
+								public void run () {
+									showAccessRequestDialog(activity, httpClient, callback);
+								}
+							});
 							return;
 						}
 						//invalidate and get new, otherwise we might have an expired cached token, leading to authentication failure
 						accountManager.invalidateAuthToken(account.type, authToken);
-						authToken = accountManager.blockingGetAuthToken(account, EditorConstants.AUTH_TOKEN_TYPE, false);
+						authToken = accountManager.blockingGetAuthToken(account, EditorConstants.AUTH_TOKEN_TYPE, true);
 						
 						final String continueURL = EditorConstants.getServerUrl();
 						httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);		
@@ -134,5 +157,22 @@ public class ModernAuthManager extends AuthManager {
 			}
 		}).start();
   }
+	
+	void showAccessRequestDialog (final Activity activity, final DefaultHttpClient httpClient, final OnAuthenticatedCallback callback) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+		builder.setTitle(R.string.dlg_access_request_title)
+					 .setMessage(R.string.dlg_access_request_msg)
+					 .setCancelable(false)
+					 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+						 @Override
+						 public void onClick (DialogInterface dialog, int id) {
+							 dialog.dismiss();
+							 authCancel(activity, httpClient, callback);
+						 }
+					 });
+		AlertDialog dialog = builder.create();
+		dialog.setOwnerActivity(activity);
+		dialog.show();
+	}
 
 }

@@ -27,9 +27,19 @@ public class Preferences extends PreferenceActivity {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.layout.preferences);
 		
+		ListPreference accounts = (ListPreference)findPreference("account");
+		accounts.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			@Override
+      public boolean onPreferenceChange(Preference pref, Object newValue) {
+				EditorApplication app = (EditorApplication)getApplication();
+				app.accountChanged((String)newValue);
+				app.syncMySeries();
+	      return true;
+      }
+		});
+		
 		//Cannot do it from onResume, this would cause an infinite loop of onResume/onActivityResult
 		if (!AuthManager.hasAccountManager()) { // android <= 2.0
-			ListPreference accounts = (ListPreference)findPreference("account");
 			accounts.setEnabled(false);
 			accounts.setSummary(R.string.loading);
 			GoogleLoginServiceHelper.getAccount(this, REQUEST_ACCOUNTS, true);
@@ -42,14 +52,6 @@ public class Preferences extends PreferenceActivity {
 		if (AuthManager.hasAccountManager()) { //android >= 2.0
 			ListPreference accounts = (ListPreference)findPreference("account");
 			fillAccountsList(accounts);		
-			accounts.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-				@Override
-	      public boolean onPreferenceChange(Preference pref, Object newValue) {
-					EditorApplication app = (EditorApplication)getApplication();
-					app.syncMySeries();
-		      return true;
-	      }
-			});
 		}
 	}
 	
